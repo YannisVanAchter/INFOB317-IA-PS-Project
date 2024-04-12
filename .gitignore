@@ -1,0 +1,6 @@
+# IDE settings
+.vscode/
+.idea/
+
+# Node.js modules (client)
+*node_modules/
