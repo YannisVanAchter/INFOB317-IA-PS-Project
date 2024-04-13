@@ -3,6 +3,8 @@ import React from 'react';
 
 import { Context } from '../../Game';
 
+import './board.css';
+
 function TourDeFranceBoard(props: Context) {
     return (
         <>
@@ -10,12 +12,11 @@ function TourDeFranceBoard(props: Context) {
             {props.G.players.map((player, i) => {
                 return (
                     <div key={i}>
-                        <h2>Player {i}</h2>
-                        <p>Position: {player.playerID}</p>
+                        <h2>Player {player.playerID}</h2>
                         {player.bikes.map((bike, j) => {
                             return (
                                 <div key={j}>
-                                    <h3>Bike {j}</h3>
+                                    <h3>Bike: {j}</h3>
                                     <p>Position: {bike.position}</p>
                                 </div>
                             );
