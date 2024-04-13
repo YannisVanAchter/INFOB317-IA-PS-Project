@@ -1,0 +1,14 @@
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 5rem;
+    width: 40rem;
+    height: auto;
+    margin: auto;
+
+    background: url(../../../public/map.png); /*TODO: Check if this is the best way to show the board and add bikes on it*/
+    background-size: cover;
+
+    resize: both;
+}

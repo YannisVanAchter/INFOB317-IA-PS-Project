@@ -4,3 +4,6 @@
 
 # Node.js modules (client)
 *node_modules/
+
+# Environment variables (client)
+.env
