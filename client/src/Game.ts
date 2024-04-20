@@ -28,8 +28,25 @@ const nbCardsFirsthand = 5;
 const nbCardsHand = 3;
 const CardsDeck = [...Array(nbCards / CardsSeconds.length)].flatMap(() => CardsSeconds); // 8x 1-12 = 96 cards
 
+const board = defineBoard(nbCases);
 
 // Types
+interface BoardIndex {
+    position: number;
+    letter: "A"|"B"|"C"|"D"; // Default A
+    side: "left"|"right"; // Default left (Separation of the board in two sides (sprint zone))
+}
+
+interface BoardCase {
+    position: number;
+    letter?: "A"|"B"|"C"|"D"; // Letter of the case (A, B, C or D)
+    next?: number[]; // Index of the next cases
+    luck: boolean; // Draw luck card
+    side?: "intern"|"extern"; // Side of the case (dans le sens de la course)
+    nbBikesMax: number; // Number of bikes that can be on the case
+    nbBikes: number; // Number of bikes on the case (default 0)
+}
+
 interface Bike {
     position: number;
     reduce: number;
@@ -62,6 +79,17 @@ interface Context {
 }
 
 // Functions
+
+/**
+ * 
+ * @param {number} nbCases Number of cases of the board
+ * @returns The board as dictionary with the index as key and the value as the position
+ */
+function defineBoard(nbCases: number): {[key: BoardIndex ]: BoardCase} {
+    // TODO: Define the board (hardcoded for now)
+    let board: {[key: BoardIndex ]: BoardCase} = {};
+    return board;
+}
 
 /**
  * 
@@ -146,6 +174,55 @@ function winnerRanking({ G, ctx }: Context) {
     return ranking.map(player => player.playerID);
 }
 
+/**
+ * 
+ *  @param {Context} context Context of the game
+ *  @param {number} card Card to use
+ *  @param {number} bikeIndex Index of the bike to use the card on
+ * 
+ *  @returns The new game state with following effects
+ *  effects: delete the card from the hand of the player and add the card to the discard pile
+ *  effects: move the bike of the player by the value of the card
+ *  effects: if the bike is at the finish line, the bike is reduced by the overflow of the card
+ * 
+ *  Use the card on the bike
+ */
+function useCardOnBike({ G }: Context, cardIndex: number) {
+    // TODO: Deep copy of G
+    let myG = { ...G }; 
+    const player = myG.players[G.currentPlayer.playerID];
+    const card = player.hand[cardIndex];
+    const bike = player.bikes[G.currentPlayer.bikeIndex];
+    bike.position += card;
+    if (bike.position > nbCases) {
+        bike.reduce = bike.position + card - nbCases;
+        if (bike.reduce > nbReduceMax) {
+            bike.reduce = nbReduceMax;
+        }
+        bike.position = nbCases;
+    }
+    player.hand.splice(cardIndex, 1);
+    myG.discard.push(card);
+    return myG;
+}
+
+function drawCards({ G }: Context) {
+    const player = G.players[G.currentPlayer.playerID];
+    for (let i = 0; i < nbCardsHand; i++) {
+        G.deck = shuffle(G.deck);
+        let card = G.deck.pop();
+        if (card !== undefined)
+            player.hand.push(card);
+        else
+            i--;
+
+        if (G.deck.length === 0) {
+            G.deck = G.discard; // shuffled at each iteration
+            G.discard = [];
+        }
+    }
+}
+
 const TourDeFrance = {
     setup: () => ({
         deck: shuffle(CardsDeck),
@@ -185,58 +262,18 @@ const TourDeFrance = {
     phase: {
         init: {
             moves: {
-                drawFirstCards: ({ G }: Context) => {
-                    G.players.forEach((_, playerID) => {
-                        for (let i = 0; i < nbCardsFirsthand; i++) {
-                            G.deck = shuffle(G.deck);
-                            const card = G.deck.pop();
-                            if (card !== undefined) {
-                                G.players[playerID].hand.push(card);
-                            }
-                        }
-                    });
-                },
+                drawFirstCards: drawCards,
             },
             next: 'play',
         },
         play: {
             move: {
-                useCardOnBike: ({ G }: Context, cardIndex: number) => {
-                    const player = G.players[G.currentPlayer.playerID];
-                    const card = player.hand[cardIndex];
-                    const bike = player.bikes[G.currentPlayer.bikeIndex];
-                    bike.position += card;
-                    if (bike.position > nbCases) {
-                        bike.reduce = bike.position + card - nbCases;
-                        if (bike.reduce > nbReduceMax) {
-                            bike.reduce = nbReduceMax;
-                        }
-                        bike.position = nbCases;
-                    }
-                    player.hand.splice(cardIndex, 1);
-                    G.discard.push(card);
-                },
-
-                drawCards: ({ G }: Context) => {
-                    const player = G.players[G.currentPlayer.playerID];
-                    for (let i = 0; i < nbCardsHand; i++) {
-                        G.deck = shuffle(G.deck);
-                        let card = G.deck.pop();
-                        if (card !== undefined)
-                            player.hand.push(card);
-                        else
-                            i--;
-
-                        if (G.deck.length === 0) {
-                            G.deck = G.discard; // shuffled at each iteration
-                            G.discard = [];
-                        }
-                    }
-                }
+                useCard: (context: Context, bikeIndex: number) => {context.G = useCardOnBike(context, bikeIndex)},
+                drawCards: drawCards,
             },
-        }
+        },
     },
 }
 
-export { TourDeFrance, winnerRanking };
+export { TourDeFrance, winnerRanking, useCardOnBike };
 export type { Player, Bike, Context, DCtx, Ctx };
