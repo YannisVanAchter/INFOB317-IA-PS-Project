@@ -1,5 +1,6 @@
 import { FnContext } from 'boardgame.io';
 import { shuffle } from './utils/shuffle';
+import { deepCopy } from './utils/deep_copy';
 
 // Constants
 const nbCases = 95;
@@ -24,8 +25,7 @@ const CardsSeconds = [
     12,
 ];
 const nbCards = 96;
-const nbCardsFirsthand = 5;
-const nbCardsHand = 3;
+const nbCardsHand = 5;
 const CardsDeck = [...Array(nbCards / CardsSeconds.length)].flatMap(() => CardsSeconds); // 8x 1-12 = 96 cards
 
 // const board = defineBoard(nbCases);
@@ -302,18 +302,6 @@ interface Context {
 }
 
 // Functions
-
-/*
- * 
- * @param {number} nbCases Number of cases of the board
- * @returns The board as dictionary with the index as key and the value as the position
- */
-// function defineBoard(nbCases: number): {[key: BoardIndex ]: BoardCase} {
-//     // TODO: Define the board (hardcoded for now)
-//     let board: {[key: BoardIndex ]: BoardCase} = {};
-//     return board;
-// }
-
 /**
  * 
  * @param {Context} context Context of the game
@@ -398,39 +386,12 @@ function winnerRanking({ G, ctx }: Context) {
 }
 
 /**
- * 
- *  @param {Context} context Context of the game
- *  @param {number} card Card to use
- *  @param {number} bikeIndex Index of the bike to use the card on
- * 
- *  @returns The new game state with following effects
- *  effects: delete the card from the hand of the player and add the card to the discard pile
- *  effects: move the bike of the player by the value of the card
- *  effects: if the bike is at the finish line, the bike is reduced by the overflow of the card
- * 
- *  Use the card on the bike
+ *  @param { G: DCtx, ctx: Ctx } context Context of the game
+ *  @effects Draw cards from the deck and add them to the hand of the player 
  */
-function useCardOnBike({ G }: Context, cardIndex: number) {
-    // TODO: Deep copy of G
-    let myG = { ...G }; 
-    const player = myG.players[G.currentPlayer.playerID];
-    const card = player.hand[cardIndex];
-    const bike = player.bikes[G.currentPlayer.bikeIndex];
-    bike.position += card;
-    if (bike.position > nbCases) {
-        bike.reduce = bike.position + card - nbCases;
-        if (bike.reduce > nbReduceMax) {
-            bike.reduce = nbReduceMax;
-        }
-        bike.position = nbCases;
-    }
-    player.hand.splice(cardIndex, 1);
-    myG.discard.push(card);
-    return myG;
-}
-
-function drawCards({ G }: Context) {
-    const player = G.players[G.currentPlayer.playerID];
+function drawCards({ G, ctx }: Context) {
+    let playerID = parseInt(ctx.currentPlayer);
+    const player = G.players[playerID];
     for (let i = 0; i < nbCardsHand; i++) {
         G.deck = shuffle(G.deck);
         let card = G.deck.pop();
@@ -446,8 +407,44 @@ function drawCards({ G }: Context) {
     }
 }
 
-const TourDeFrance = {
-    setup: () => ({
+/**
+ * 
+ *  @param {Context} context Context of the game
+ *  @param {number} card Card to use
+ *  @param {number} bikeIndex Index of the bike to use the card on
+ * 
+ *  @returns The new game state with following effects
+ *  effects: delete the card from the hand of the player and add the card to the discard pile
+ *  effects: move the bike of the player by the value of the card
+ *  effects: if the bike is at the finish line, the bike is reduced by the overflow of the card
+ * 
+ *  Use the card on the bike
+ */
+function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
+    let myG = deepCopy(G); 
+    const player = myG.players[G.currentPlayer.playerID];
+    const card = player.hand[cardIndex];
+    const bike = player.bikes[G.currentPlayer.bikeIndex];
+    bike.position += card;
+    if (bike.position > nbCases) {
+        bike.reduce = bike.position + card - nbCases;
+        if (bike.reduce > nbReduceMax) {
+            bike.reduce = nbReduceMax;
+        }
+        bike.position = nbCases;
+    }
+    player.hand.splice(cardIndex, 1);
+    myG.discard.push(card);
+
+    // Draw cards if the player has no cards left in hand
+    if (player.hand.length === 0) 
+        drawCards({ G: myG, ctx});
+
+    return myG;
+}
+
+function setUp() {
+    let ctx = {
         deck: shuffle(CardsDeck),
         discard: [],
         turn: 0,
@@ -461,7 +458,17 @@ const TourDeFrance = {
             // generate each bike by player
             bikes: [...Array(nbBikes)].map(() => ({ position: 0, reduce: 0, turn: 0 })),
         })),
-    }),
+    };
+
+    for (let i = 0; i < nbPlayers; i++) {
+        drawCards({G: ctx, ctx: {turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
+    }
+
+    return ctx;
+}
+
+const TourDeFrance = {
+    setup: setUp,
 
     players: {
         moveLimit: 3,
@@ -483,17 +490,11 @@ const TourDeFrance = {
     },
 
     phase: {
-        init: {
-            moves: {
-                drawFirstCards: drawCards,
-            },
-            next: 'play',
-        },
         play: {
             move: {
                 useCard: (context: Context, bikeIndex: number) => {context.G = useCardOnBike(context, bikeIndex)},
-                drawCards: drawCards,
             },
+            start: true,
         },
     },
 }
