@@ -1,0 +1,45 @@
+.container {
+  width: 960px;
+  margin: auto;
+}
+
+.message > div {
+  margin-top: 1px;
+  margin-bottom: 1px;
+  border: 2px;
+  border-radius: 10px;
+  padding: 5px;
+}
+.message > .content {
+  display: inline-block;
+  background-color: #e5c2c0;
+}
+
+.message > .timestamp {
+  display: inline-block;
+  background-color: #0d5d56;
+  color: #fff;
+  margin-right: 10px;
+}
+
+#message-panel {
+  position: fixed;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 30px;
+  padding-left: 50px;
+}
+
+#message-received {
+  position: fixed;
+  left: 20px; /* Gardons un petit décalage pour que cela ne colle pas exactement à la gauche. */
+  bottom: 70px; /* Augmentons la valeur ici pour lever le div au-dessus du panneau d'entrée de message. */
+  width: auto; /* Laissons la largeur s'ajuster automatiquement au contenu. */
+  max-width: calc(100% - 40px); /* Assurons-nous qu'il ne dépasse pas de l'écran, en laissant un peu d'espace des deux côtés. */
+  padding: 10px; /* Un peu d'espace intérieur pour que le texte ne touche pas les bords. */
+  background-color: #e5c2c0; /* Couleur de fond pour qu'il se démarque mais reste doux. */
+  border-radius: 10px; /* Coins arrondis pour un look plus doux. */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Petite ombre pour donner de la profondeur. */
+  z-index: 1000; /* S'assurer qu'il reste au-dessus des autres éléments interactifs. */
+}
