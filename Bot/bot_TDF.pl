@@ -1,11 +1,25 @@
-% en gros de ce que je comprends, c'est surtout la partie qui produit une réponse qui devra être refaite, parce que celle de Jcaquet est toute pétée et dégeu
-% Question est une liste de mots
-% Reponse est une liste de mots
-% le cas de base est pour le moment de dire fin au bot
+:- module(answer_question, [produire_reponse/2]).
 :- encoding(utf8).
 
-reponse_autre(Reponse):-
-    Reponse="Désolé, je n'ai pas de réponse à votre question.".
+%  mots-clés selon lesquels les réponses seront générées
+mot_cle("gagne").
+mot_cle("fin").
+mot_cle("dépassement").
+mot_cle("sprint").
+mot_cle("chance").
+mot_cle("aspiration").
+mot_cle("priorité").
+mot_cle("chute").
+mot_cle("déplacer").
+mot_cle("cartes").
+mot_cle("vainqueur").
+mot_cle("jaune").
+mot_cle("but").
+mot_cle("équipe").
+mot_cle("commence").
+
+% liste de réponses associées aux mots-clés
+% pour la réponse par défaut, il n'y a pas de mot-clé
 reponse("commence",Reponse):-
     Reponse="C'est au joueur ayant la plus haute carte secondes de commencer.".
 reponse("équipe",Reponse):-
@@ -36,43 +50,36 @@ reponse("fin",Reponse):-
     Reponse="Le coureur qui termine en premier le plus loin derrière la ligne d'arrivée obtient le meilleur score en terme de temps et gagne l'étape. Une aspiration ne peut plus avoir lieu lorsque la ligne d'arrivée est passée, tout comme une chute en série. Si plusieurs coureurs obtiennent le même score, celui situé sur la case numérotée l'emporte. Un coureur passant la ligne d'arrivée après d'autres coureurs et obtenant un meilleur score ne l'emporte pas car il est arrivé à un tour ultérieur. Pour ce coureur, on ajoute donc 10 secondes supplémentaires à son score après chaque tour.".
 reponse("gagne",Reponse):-
     Reponse="Le coureur qui arrive en premier le plus loin derrière la ligne d'arrivée remporte l'étape.".
+reponse_autre(Reponse):-
+    Reponse="Désolé, je n'ai pas de réponse à votre question.".
 
 
-
-mot_cle("gagne").
-mot_cle("fin").
-mot_cle("dépassement").
-mot_cle("sprint").
-mot_cle("chance").
-mot_cle("aspiration").
-mot_cle("priorité").
-mot_cle("chute").
-mot_cle("déplacer").
-mot_cle("cartes").
-mot_cle("vainqueur").
-mot_cle("jaune").
-mot_cle("but").
-mot_cle("équipe").
-mot_cle("commence").
-
+% lis la question de l'utilisteur
+% la question en input est split sur les espaces, tout en enlevant la ponctuation, pour récupérer une liste de mots
 lire_question(Input_question,Liste_question):-
     split_string(Input_question," ", "?,.;:!", Liste_question).
 
 
+% produit la réponse à la question
+% on test la distance entre les mots de la question et les mots-clés afin de passer outre les fautes de frappe
 produire_reponse("au revoir",Reponse):-
     Reponse="Merci d'avoir sollicité mon aide!",!.
 
 produire_reponse(Question,Reponse):-
+    % produit la liste des mots de la question
     lire_question(Question,Mots_question),
+    % test si un mot de la question correspond, moyennant erreur de frappe, à un mot clé
     mot_cle(Mot1),
     member(Mot2,Mots_question),
     isub(Mot1,Mot2,Difference,[normalize(true)]),
     Difference>0.83,
+    % produit la réponse si le mot clé a été identifié
     reponse(Mot1,Reponse),!.
 
 produire_reponse(_,Reponse):-
     reponse_autre(Reponse).
 
+% fonction principale
 tourdefrance():-
     writeln("Bonjour!"),
     writeln("comment puis-je vous aider?"),
