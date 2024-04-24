@@ -214,7 +214,7 @@ let Board: dico<BoardCase>={
 
 
 interface Bike {
-    position: number;
+    position: string;
     reduce: number;
     turn: number;
 }
@@ -399,7 +399,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: 0, reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: "", reduce: 0, turn: 0 })),
         })),
     };
 
