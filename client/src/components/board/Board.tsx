@@ -61,9 +61,6 @@ function TourDeFranceBoard({ G, ctx, moves, events, playerID, isActive, isMultip
         return (
             <div className='hand'>
                 {props.players.map((player, i) => {
-                    // Only display the current player's hand
-                    if (i !== props.currentPlayer.playerID) return null;
-
                     return (
                         <div key={i} className='player'>
                             <h3>Player: {player.playerID + 1}</h3>
