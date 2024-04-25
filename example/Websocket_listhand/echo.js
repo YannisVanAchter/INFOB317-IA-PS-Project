@@ -11,19 +11,17 @@ function wsMessageHandler(event) {
   const payload = JSON.parse(event.data); 
   log("WS Response", "Received message: '" + event.data + "'");
 
-  const messageReceived = document.getElementById("message-received"); 
-
+  const messageReceived = document.getElementById("message-received"); //Here, we are selecting the div element with the id "message-received" where we will display the received messages
   
-  if (payload.hasOwnProperty("randomValue")) {
+  if (payload.hasOwnProperty("randomValue")) { //Checks if the payload contains a "randomValue" property
     const randomValue = payload.randomValue;
-    const messageElement = document.createElement("div"); 
-    messageElement.textContent = "Valeur aléatoire choisie: " + randomValue; 
-    messageReceived.appendChild(messageElement); 
-  } else {
-   
-    const messageElement = document.createElement("div"); 
-    messageElement.textContent = payload.message; 
-    messageReceived.appendChild(messageElement); 
+    const messageElement = document.createElement("div"); //Creates a new div for the message
+    messageElement.textContent = "Random value chosen: " + randomValue; //Adds the message content to the div
+    messageReceived.appendChild(messageElement); //Adds the div to the messages container
+  } else { //If the payload does not contain a "randomValue", simply display the message
+    const messageElement = document.createElement("div"); //Creates a new div for the message
+    messageElement.textContent = payload.message; //Adds the message content to the div
+    messageReceived.appendChild(messageElement); //Adds the div to the messages container
   }
 }
 
@@ -45,16 +43,16 @@ function openWebSocket() {
 }
 
 document.addEventListener('DOMContentLoaded', (e) => {
-  const input_box = document.getElementById("input-message"); 
-  const input_button = document.getElementById("message-submit"); 
-  const connection = openWebSocket(); 
+  const input_box = document.getElementById("input-message"); //Selects the input box where the user can type messages
+  const input_button = document.getElementById("message-submit"); //Selects the button that the user can click to send messages
+  const connection = openWebSocket(); //Opens a WebSocket connection to the server
 
-  input_button.addEventListener("click", (event) => {
+  input_button.addEventListener("click", (event) => { //Adds an event listener for click on the message submit button
 
-    const inputString = input_box.value.trim(); 
-    const numbers = inputString.split(',').map(Number); 
+    const inputString = input_box.value.trim(); //Retrieves the string entered in the input box and splits it into numbers separated by commas
+    const numbers = inputString.split(',').map(Number); //Converts each element to a number
 
-    sendMessage(connection, JSON.stringify(numbers));
+    sendMessage(connection, JSON.stringify(numbers)); //Sends the numbers to the server via the WebSocket connection, converting them to JSON string
   });
 
   log("OnLoad", "Add event listeners");
