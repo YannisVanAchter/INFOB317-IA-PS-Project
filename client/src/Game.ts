@@ -40,7 +40,7 @@ type BoardIndex = [
 interface BoardCase {
     position: number;
     letter?: "A"|"B"|"C"|"D"; // Letter of the case (A, B, C or D)
-    next?: Array<string>; // Index of the next cases
+    next: Array<string>; // Index of the next cases
     luck: Array<number>; // Draw luck card  , if case on the left, value is 1, and we increment going to the right
     side?: "intern"|"extern"; // Side of the case (dans le sens de la course)
     nbBikesMax: number; // Number of bikes that can be on the case
@@ -200,16 +200,16 @@ let Board: dico<BoardCase>={
     // réunion des 2
     '95-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['0-A-left']},
     //zone buffer
-    '0-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-1-A-left']},
-    '-1-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-2-A-left']},
-    '-2-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-3-A-left']},
-    '-3-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-4-A-left']},
-    '-4-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-5-A-left']},
-    '-5-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-6-A-left']},
-    '-6-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-7-A-left']},
-    '-7-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-8-A-left']},
-    '-8-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-9-A-left']},
-    '-9-A-left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: []}
+    '0-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-1-A-left']},
+    '-1-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-2-A-left']},
+    '-2-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-3-A-left']},
+    '-3-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-4-A-left']},
+    '-4-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-5-A-left']},
+    '-5-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-6-A-left']},
+    '-6-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-7-A-left']},
+    '-7-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-8-A-left']},
+    '-8-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-9-A-left']},
+    '-9-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: []}
 }
 
 
@@ -252,11 +252,42 @@ interface Context {
 function getPossibleTilesFromPosition(position: number): string[] {
     let possibleTiles: string[] = [];
     for (const key in Board) {
-        if (Board[key].position === position) {
+        if (Board[key].position === position && Board[key].nbBikes < Board[key].nbBikesMax) {
             possibleTiles.push(key);
         }
     }
     return possibleTiles;
+}
+
+function checkMove(currentBike: Bike, cardPlayed: number): boolean {
+    let tilesToCheck = [];
+    let currentPosition = currentBike.position;
+    for (let i = 0; i < cardPlayed; i++) {
+        tilesToCheck.push(Board[currentBike.position].next[0]); // For now ignore secondary path will need to see how we handle it in the front
+    }
+    for (const tiles of tilesToCheck) {
+        if (Board[tiles].nbBikes >= Board[tiles].nbBikesMax) return false;
+    }
+    return true;
+}
+
+/**
+ * Check if the current player benefits from aspiration
+ * @param context 
+ * @param newPosition Normal new position of the player after this turn
+ * 
+ * @return boolean Return if aspiration is allowed
+ */
+function checkAspiration(context: Context, newPosition: string): boolean {
+    // Check if next is someone
+    // Take first before need to see in the front how we handle it
+    let nextPlace = Board[newPosition].next[0]
+    if (Board[nextPlace].nbBikes > 0 && Board[nextPlace].nbBikes < Board[nextPlace].nbBikesMax) return true;
+
+    let nextNextPlace = Board[nextPlace].next[0];
+    if (Board[nextNextPlace].nbBikes > 0 && Board[nextPlace].nbBikes === 0) return true;
+    return false;
+    // Check if second next is someone
 }
 
 /**
@@ -382,22 +413,38 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     const player = myG.players[G.currentPlayer.playerID];
     const card = player.hand[cardIndex];
     const bike = player.bikes[G.currentPlayer.bikeIndex];
-    bike.position += card;
-    if (Board[bike.position].position > nbCases) {
-        bike.reduce = Board[bike.position].position + card - nbCases;
+    let oldPosition = bike.position;
+    let numberedPosition = Board[bike.position].position += card;
+    if (numberedPosition > nbCases) {
+        bike.reduce = numberedPosition + card - nbCases;
         if (bike.reduce > nbReduceMax) {
             bike.reduce = nbReduceMax;
         }
-        // Need to convert to key
-        // Need to have them choose a path if multiple path is possible
-        const allPossibleTiles = getPossibleTilesFromPosition(bike.reduce);
-        // Have to choose here, needs to be done in front
-        // bike.position = nbCases;
-        // For now just choose first option
-        bike.position = allPossibleTiles[0];
+        const possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
+        bike.position = possiblePositions[bike.reduce-1];
     }
+    // Check every tile on the way is clear or has space
+    if (!checkMove(bike, card)) {
+        // Move invalide, a voir comment si on les autorisent, dans tous les cas chutent si joué
+    }
+    
+    // Check aspiration
+    if (checkAspiration({G, ctx}, getPossibleTilesFromPosition(numberedPosition)[0])) { // Select first possible position, check in front how to handle
+        // Aspiration is allowed
+    } 
+
+    // Check case chance TODO
+
+    // Put the person on the right square
+    const possibleTiles = getPossibleTilesFromPosition(numberedPosition);
+    // Needs to choose which tile here, have to be done in front, for now default to the first possible one
+    bike.position = possibleTiles[0];
     player.hand.splice(cardIndex, 1);
     myG.discard.push(card);
+
+    // Update board
+    Board[oldPosition].nbBikes--;
+    Board[bike.position].nbBikes++;
 
     // Draw cards if the player has no cards left in hand
     if (player.hand.length === 0) 
