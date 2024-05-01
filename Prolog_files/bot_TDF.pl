@@ -1,4 +1,4 @@
-:- module(answer_question, [produire_reponse/2]).
+:- module(bot_TDF, [produire_reponse/2]).
 :- encoding(utf8).
 
 %  mots-clés selon lesquels les réponses seront générées
@@ -80,10 +80,10 @@ produire_reponse(_,Reponse):-
     reponse_autre(Reponse).
 
 % fonction principale
-tourdefrance():-
-    writeln("Bonjour!"),
-    writeln("comment puis-je vous aider?"),
-    repeat,
-    write("Vous :"),
-    ttyflush,
-    lire_question
+% tourdefrance():-
+%     writeln("Bonjour!"),
+%     writeln("comment puis-je vous aider?"),
+%     repeat,
+%     write("Vous :"),
+%     ttyflush,
+%     lire_question
