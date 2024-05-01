@@ -261,7 +261,6 @@ function getPossibleTilesFromPosition(position: number): string[] {
 
 function checkMove(currentBike: Bike, cardPlayed: number): boolean {
     let tilesToCheck = [];
-    let currentPosition = currentBike.position;
     for (let i = 0; i < cardPlayed; i++) {
         tilesToCheck.push(Board[currentBike.position].next[0]); // For now ignore secondary path will need to see how we handle it in the front
     }
@@ -273,12 +272,11 @@ function checkMove(currentBike: Bike, cardPlayed: number): boolean {
 
 /**
  * Check if the current player benefits from aspiration
- * @param context 
  * @param newPosition Normal new position of the player after this turn
  * 
  * @return boolean Return if aspiration is allowed
  */
-function checkAspiration(context: Context, newPosition: string): boolean {
+function checkAspiration(newPosition: string): boolean {
     // Check if next is someone
     // Take first before need to see in the front how we handle it
     let nextPlace = Board[newPosition].next[0]
@@ -429,7 +427,7 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     }
     
     // Check aspiration
-    if (checkAspiration({G, ctx}, getPossibleTilesFromPosition(numberedPosition)[0])) { // Select first possible position, check in front how to handle
+    if (checkAspiration(getPossibleTilesFromPosition(numberedPosition)[0])) { // Select first possible position, check in front how to handle
         // Aspiration is allowed
     } 
 
