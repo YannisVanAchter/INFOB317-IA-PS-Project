@@ -41,6 +41,7 @@ interface BoardCase {
     position: number;
     letter?: "A"|"B"|"C"|"D"; // Letter of the case (A, B, C or D)
     next: Array<string>; // Index of the next cases
+    prev?: string; // Index of the previous cases, only defined around lucky square
     luck: Array<number>; // Draw luck card  , if case on the left, value is 1, and we increment going to the right
     side?: "intern"|"extern"; // Side of the case (dans le sens de la course)
     nbBikesMax: number; // Number of bikes that can be on the case
@@ -60,42 +61,42 @@ let Board: dico<BoardCase>={
     '4-A-left':{position: 4, luck: [], nbBikesMax:3, nbBikes:0, next: ['5-A-left']},
     '5-A-left':{position: 5, luck: [], nbBikesMax:3, nbBikes:0, next: ['6-A-left']},
     '6-A-left':{position: 6, luck: [], nbBikesMax:3, nbBikes:0, next: ['7-A-left']},
-    '7-A-left':{position: 7, luck: [], nbBikesMax:3, nbBikes:0, next: ['8-A-left']},
-    '8-A-left':{position: 8, luck: [], nbBikesMax:3, nbBikes:0, next: ['9-A-left','9-C-left']},
-    '9-A-left':{position: 9, luck: [1], nbBikesMax:1, nbBikes:0, next: ['10-A-left','10-C-left']},
+    '7-A-left':{position: 7, luck: [], nbBikesMax:3, nbBikes:0, next: ['8-A-left'], prev: '6-A-left'},
+    '8-A-left':{position: 8, luck: [], nbBikesMax:3, nbBikes:0, next: ['9-A-left','9-C-left'], prev: '7-A-left'},
+    '9-A-left':{position: 9, luck: [1], nbBikesMax:1, nbBikes:0, next: ['10-A-left','10-C-left'], prev: '8-A-left'},
     '9-B-left':{position: 9, luck: [], nbBikesMax:1, nbBikes:0, next: ['10-A-left','10-C-left']},
     '9-C-left':{position: 9, luck: [], nbBikesMax:1, nbBikes:0, next: ['9-B-left']},
-    '10-A-left':{position: 10, luck: [1], nbBikesMax:1, nbBikes:0, next: ['11-A-left']},
+    '10-A-left':{position: 10, luck: [1], nbBikesMax:1, nbBikes:0, next: ['11-A-left'], prev: '9-A-left'},
     '10-B-left':{position: 10, luck: [], nbBikesMax:1, nbBikes:0, next: ['11-A-left']},
     '10-C-left':{position: 10, luck: [], nbBikesMax:1, nbBikes:0, next: ['10-B-left']},
-    '11-A-left':{position: 11, luck: [1], nbBikesMax:2, nbBikes:0, next: ['12-A-left']},
-    '12-A-left':{position: 12, luck: [1], nbBikesMax:2, nbBikes:0, next: ['13-A-left']},
-    '13-A-left':{position: 13, luck: [], nbBikesMax:2, nbBikes:0, next: ['14-A-left']},
-    '14-A-left':{position: 14, luck: [], nbBikesMax:2, nbBikes:0, next: ['15-A-left']},
-    '15-A-left':{position: 15, luck: [2], nbBikesMax:2, nbBikes:0, next: ['16-A-left']},
-    '16-A-left':{position: 16, luck: [2], nbBikesMax:2, nbBikes:0, next: ['17-A-left']},
-    '17-A-left':{position: 17, luck: [], nbBikesMax:2, nbBikes:0, next: ['18-A-left']},
-    '18-A-left':{position: 18, luck: [], nbBikesMax:2, nbBikes:0, next: ['19-A-left']},
-    '19-A-left':{position: 19, luck: [3], nbBikesMax: 3, nbBikes:0, next: ['20-A-left']},
-    '20-A-left':{position: 20, luck: [], nbBikesMax: 3, nbBikes:0, next: ['21-A-left']},
+    '11-A-left':{position: 11, luck: [1], nbBikesMax:2, nbBikes:0, next: ['12-A-left'], prev: '10-A-left'},
+    '12-A-left':{position: 12, luck: [1], nbBikesMax:2, nbBikes:0, next: ['13-A-left'], prev: '11-A-left'},
+    '13-A-left':{position: 13, luck: [], nbBikesMax:2, nbBikes:0, next: ['14-A-left'], prev: '12-A-left'},
+    '14-A-left':{position: 14, luck: [], nbBikesMax:2, nbBikes:0, next: ['15-A-left'], prev: '13-A-left'},
+    '15-A-left':{position: 15, luck: [2], nbBikesMax:2, nbBikes:0, next: ['16-A-left'], prev: '14-A-left'},
+    '16-A-left':{position: 16, luck: [2], nbBikesMax:2, nbBikes:0, next: ['17-A-left'], prev: '15-A-left'},
+    '17-A-left':{position: 17, luck: [], nbBikesMax:2, nbBikes:0, next: ['18-A-left'], prev: '16-A-left'},
+    '18-A-left':{position: 18, luck: [], nbBikesMax:2, nbBikes:0, next: ['19-A-left'], prev: '17-A-left'},
+    '19-A-left':{position: 19, luck: [3], nbBikesMax: 3, nbBikes:0, next: ['20-A-left'], prev: '18-A-left'},
+    '20-A-left':{position: 20, luck: [], nbBikesMax: 3, nbBikes:0, next: ['21-A-left'], prev: '19-A-left'},
     // début zone sprint #1
-    '21-A-left':{position: 21, luck: [3], nbBikesMax: 3, nbBikes:0, next: ['22-A-left']},
-    '22-A-left':{position: 22, luck: [], nbBikesMax: 3, nbBikes:0, next: ['23-A-left','23-A-right']},
+    '21-A-left':{position: 21, luck: [3], nbBikesMax: 3, nbBikes:0, next: ['22-A-left'], prev: '20-A-left'},
+    '22-A-left':{position: 22, luck: [], nbBikesMax: 3, nbBikes:0, next: ['23-A-left','23-A-right'], prev: '21-A-left'},
     //partie gauche
-    '23-A-left':{position: 23, luck: [], nbBikesMax: 2, nbBikes:0, next: ['24-A-left']},
-    '24-A-left':{position: 24, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['25-A-left']},
-    '25-A-left':{position: 25, luck: [], nbBikesMax: 2, nbBikes:0, next: ['26-A-left','26-B-left']},
-    '26-A-left':{position: 26, luck: [1], nbBikesMax: 1, nbBikes:0, next: ['27-A-left','27-B-left']},
+    '23-A-left':{position: 23, luck: [], nbBikesMax: 2, nbBikes:0, next: ['24-A-left'], prev: '22-A-left'},
+    '24-A-left':{position: 24, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['25-A-left'], prev: '23-A-left'},
+    '25-A-left':{position: 25, luck: [], nbBikesMax: 2, nbBikes:0, next: ['26-A-left','26-B-left'], prev: '24-A-left'},
+    '26-A-left':{position: 26, luck: [1], nbBikesMax: 1, nbBikes:0, next: ['27-A-left','27-B-left'], prev: '25-A-left'},
     '26-B-left':{position: 26, luck: [], nbBikesMax: 1, nbBikes:0, next: ['27-A-left','27-B-left']},
-    '27-A-left':{position: 27, luck: [], nbBikesMax: 1, nbBikes:0, next: ['28-A-left']},
+    '27-A-left':{position: 27, luck: [], nbBikesMax: 1, nbBikes:0, next: ['28-A-left'], prev: '26-A-left'},
     '27-B-left':{position: 27, luck: [], nbBikesMax: 1, nbBikes:0, next: ['28-A-left']},
-    '28-A-left':{position: 28, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['29-A-left']},
-    '29-A-left':{position: 29, luck: [], nbBikesMax: 2, nbBikes:0, next: ['30-A-left']},
-    '30-A-left':{position: 30, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['31-A-left']},
-    '31-A-left':{position: 31, luck: [], nbBikesMax: 2, nbBikes:0, next: ['32-A-left']},
-    '32-A-left':{position: 32, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['33-A-left']},
-    '33-A-left':{position: 33, luck: [], nbBikesMax: 2, nbBikes:0, next: ['34-A-left']},
-    '34-A-left':{position: 34, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['35-A-left']},
+    '28-A-left':{position: 28, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['29-A-left'], prev: '27-A-left'},
+    '29-A-left':{position: 29, luck: [], nbBikesMax: 2, nbBikes:0, next: ['30-A-left'], prev: '28-A-left'},
+    '30-A-left':{position: 30, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['31-A-left'], prev: '29-A-left'},
+    '31-A-left':{position: 31, luck: [], nbBikesMax: 2, nbBikes:0, next: ['32-A-left'], prev: '30-A-left'},
+    '32-A-left':{position: 32, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['33-A-left'], prev: '31-A-left'},
+    '33-A-left':{position: 33, luck: [], nbBikesMax: 2, nbBikes:0, next: ['34-A-left'], prev: '32-A-left'},
+    '34-A-left':{position: 34, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['35-A-left'], prev: '33-A-left'},
     '35-A-left':{position: 35, luck: [], nbBikesMax: 2, nbBikes:0, next: ['36-A-left']},
     // partie droite
     '23-A-right':{position: 23, luck: [], nbBikesMax: 1, nbBikes:0, next: ['24-A-right']},
@@ -124,19 +125,19 @@ let Board: dico<BoardCase>={
     '43-A-left':{position: 43, luck: [], nbBikesMax: 2, nbBikes:0, next: ['44-A-left']},
     '44-A-left':{position: 44, luck: [], nbBikesMax: 2, nbBikes:0, next: ['45-A-left']},
     '45-A-left':{position: 45, luck: [], nbBikesMax: 2, nbBikes:0, next: ['46-A-left']},
-    '46-A-left':{position: 46, luck: [], nbBikesMax: 2, nbBikes:0, next: ['47-A-left']},
-    '47-A-left':{position: 47, luck: [], nbBikesMax: 2, nbBikes:0, next: ['48-A-left']},
-    '48-A-left':{position: 48, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['49-A-left']},
+    '46-A-left':{position: 46, luck: [], nbBikesMax: 2, nbBikes:0, next: ['47-A-left'], prev: '45-A-left'},
+    '47-A-left':{position: 47, luck: [], nbBikesMax: 2, nbBikes:0, next: ['48-A-left'], prev: '46-A-left'},
+    '48-A-left':{position: 48, luck: [1], nbBikesMax: 2, nbBikes:0, next: ['49-A-left'], prev: '47-A-left'},
     '49-A-left':{position: 49, luck: [], nbBikesMax: 2, nbBikes:0, next: ['50-A-left']},
     '50-A-left':{position: 50, luck: [], nbBikesMax: 2, nbBikes:0, next: ['51-A-left']},
     '51-A-left':{position: 51, luck: [], nbBikesMax: 2, nbBikes:0, next: ['52-A-left']},
     '52-A-left':{position: 52, luck: [], nbBikesMax: 2, nbBikes:0, next: ['53-A-left']},
     '53-A-left':{position: 53, luck: [], nbBikesMax: 2, nbBikes:0, next: ['54-A-left']},
     '54-A-left':{position: 54, luck: [], nbBikesMax: 2, nbBikes:0, next: ['55-A-left']},
-    '55-A-left':{position: 55, luck: [], nbBikesMax: 2, nbBikes:0, next: ['56-A-left']},
-    '56-A-left':{position: 56, luck: [], nbBikesMax: 2, nbBikes:0, next: ['57-A-left']},
+    '55-A-left':{position: 55, luck: [], nbBikesMax: 2, nbBikes:0, next: ['56-A-left'], prev: '54-A-left'},
+    '56-A-left':{position: 56, luck: [], nbBikesMax: 2, nbBikes:0, next: ['57-A-left'], prev: '55-A-left'},
     // seulement celle de droite est une case chance (57)
-    '57-A-left':{position: 57, luck: [2], nbBikesMax: 2, nbBikes:0, next: ['58-A-left']},
+    '57-A-left':{position: 57, luck: [2], nbBikesMax: 2, nbBikes:0, next: ['58-A-left'], prev: '56-A-left'},
     '58-A-left':{position: 58, luck: [], nbBikesMax: 2, nbBikes:0, next: ['59-A-left']},
     '59-A-left':{position: 59, luck: [], nbBikesMax: 2, nbBikes:0, next: ['60-A-left']},
     '60-A-left':{position: 60, luck: [], nbBikesMax: 2, nbBikes:0, next: ['61-A-left']},
@@ -145,35 +146,35 @@ let Board: dico<BoardCase>={
     '63-A-left':{position: 63, luck: [], nbBikesMax: 2, nbBikes:0, next: ['64-A-left','64-C-left']},
     '63-B-left':{position: 63, luck: [], nbBikesMax: 2, nbBikes:0, next: ['64-A-left','64-C-left']},
     '63-C-left':{position: 63, luck: [], nbBikesMax: 2, nbBikes:0, next: ['63-B-left']},
-    '64-A-left':{position: 64, luck: [], nbBikesMax: 2, nbBikes:0, next: ['65-A-left']},
+    '64-A-left':{position: 64, luck: [], nbBikesMax: 2, nbBikes:0, next: ['65-A-left'], prev: '63-A-left'},
     '64-B-left':{position: 64, luck: [], nbBikesMax: 2, nbBikes:0, next: ['65-A-left']},
     '64-C-left':{position: 64, luck: [], nbBikesMax: 2, nbBikes:0, next: ['64-B-left']},
-    '65-A-left':{position: 65, luck: [], nbBikesMax: 2, nbBikes:0, next: ['66-A-left']},
+    '65-A-left':{position: 65, luck: [], nbBikesMax: 2, nbBikes:0, next: ['66-A-left'], prev: '64-A-left'},
     // les 2 cases sont des cartes chances (66)
-    '66-A-left':{position: 66, luck: [1,2], nbBikesMax: 2, nbBikes:0, next: ['67-A-left']},
+    '66-A-left':{position: 66, luck: [1,2], nbBikesMax: 2, nbBikes:0, next: ['67-A-left'], prev: '65-A-left'},
     '67-A-left':{position: 67, luck: [], nbBikesMax: 2, nbBikes:0, next: ['68-A-left']},
     '68-A-left':{position: 68, luck: [], nbBikesMax: 2, nbBikes:0, next: ['69-A-left']},
     '69-A-left':{position: 69, luck: [], nbBikesMax: 2, nbBikes:0, next: ['70-A-left']},
     '70-A-left':{position: 70, luck: [], nbBikesMax: 2, nbBikes:0, next: ['71-A-left']},
     '71-A-left':{position: 71, luck: [], nbBikesMax: 2, nbBikes:0, next: ['72-A-left']},
-    '72-A-left':{position: 72, luck: [], nbBikesMax: 2, nbBikes:0, next: ['73-A-right']},
+    '72-A-left':{position: 72, luck: [], nbBikesMax: 2, nbBikes:0, next: ['73-A-left'], prev: '71-A-left'},
     // route à 1 avant le sprint
-    '73-A-right':{position: 73, luck: [], nbBikesMax: 1, nbBikes:0, next: ['74-A-left']},
-    '74-A-right':{position: 74, luck: [1], nbBikesMax: 1, nbBikes:0, next: ['75-A-left']},
-    '75-A-right':{position: 75, luck: [], nbBikesMax: 1, nbBikes:0, next: ['76-A-left']},
+    '73-A-left':{position: 73, luck: [], nbBikesMax: 1, nbBikes:0, next: ['74-A-left'], prev: '72-A-left'},
+    '74-A-left':{position: 74, luck: [1], nbBikesMax: 1, nbBikes:0, next: ['75-A-left'], prev: '73-A-left'},
+    '75-A-left':{position: 75, luck: [], nbBikesMax: 1, nbBikes:0, next: ['76-A-left']},
     // début zone sprint #2
-    '76-A-left':{position: 76, luck: [], nbBikesMax: 2, nbBikes:0, next: ['77-A-right']},
-    '77-A-left':{position: 77, luck: [], nbBikesMax: 2, nbBikes:0, next: ['78-A-right']},
-    '78-A-left':{position: 78, luck: [], nbBikesMax: 2, nbBikes:0, next: ['79-A-right']},
-    '79-A-left':{position: 79, luck: [], nbBikesMax: 2, nbBikes:0, next: ['80-A-right']},
-    '80-A-left':{position: 80, luck: [], nbBikesMax: 2, nbBikes:0, next: ['81-A-right']},
-    '81-A-left':{position: 81, luck: [], nbBikesMax: 2, nbBikes:0, next: ['82-A-right']},
-    '82-A-left':{position: 82, luck: [], nbBikesMax: 2, nbBikes:0, next: ['83-A-right']},
+    '76-A-left':{position: 76, luck: [], nbBikesMax: 2, nbBikes:0, next: ['77-A-left']},
+    '77-A-left':{position: 77, luck: [], nbBikesMax: 2, nbBikes:0, next: ['78-A-left']},
+    '78-A-left':{position: 78, luck: [], nbBikesMax: 2, nbBikes:0, next: ['79-A-left']},
+    '79-A-left':{position: 79, luck: [], nbBikesMax: 2, nbBikes:0, next: ['80-A-left']},
+    '80-A-left':{position: 80, luck: [], nbBikesMax: 2, nbBikes:0, next: ['81-A-left']},
+    '81-A-left':{position: 81, luck: [], nbBikesMax: 2, nbBikes:0, next: ['82-A-left']},
+    '82-A-left':{position: 82, luck: [], nbBikesMax: 2, nbBikes:0, next: ['83-A-left']},
     '83-A-left':{position: 83, luck: [], nbBikesMax: 2, nbBikes:0, next: ['84-A-left','84-A-right']},
     // séparation de la route en 2
     // partie gauche
     '84-A-left':{position: 84, luck: [], nbBikesMax: 1, nbBikes:0, next: ['85-A-left']},
-    '85-A-leftt':{position: 85, luck: [], nbBikesMax: 1, nbBikes:0, next: ['86-A-left']},
+    '85-A-left':{position: 85, luck: [], nbBikesMax: 1, nbBikes:0, next: ['86-A-left']},
     '86-A-left':{position: 86, luck: [], nbBikesMax: 1, nbBikes:0, next: ['87-A-left']},
     '87-A-left':{position: 87, luck: [], nbBikesMax: 1, nbBikes:0, next: ['88-A-left']},
     '88-A-left':{position: 88, luck: [], nbBikesMax: 1, nbBikes:0, next: ['89-A-left']},
@@ -189,10 +190,10 @@ let Board: dico<BoardCase>={
     '86-A-right':{position: 86, luck: [], nbBikesMax: 1, nbBikes:0, next: ['87-A-right']},
     '87-A-right':{position: 87, luck: [], nbBikesMax: 1, nbBikes:0, next: ['88-A-right']},
     '88-A-right':{position: 88, luck: [], nbBikesMax: 1, nbBikes:0, next: ['89-C-right']},
-    '89-B-right':{position: 89, luck: [], nbBikesMax: 1, nbBikes:0, next: ['90-C-right']},
-    '89-C-right':{position: 89, luck: [], nbBikesMax: 1, nbBikes:0, next: ['89-B-right']},
+    '89-B-right':{position: 89, luck: [], nbBikesMax: 1, nbBikes:0, next: ['90-C-right'], prev: '89-C-right'},
+    '89-C-right':{position: 89, luck: [], nbBikesMax: 1, nbBikes:0, next: ['89-B-right'], prev: '88-A-right'},
     '90-B-right':{position: 90, luck: [], nbBikesMax: 1, nbBikes:0, next: ['91-A-right']},
-    '90-C-right':{position: 90, luck: [1], nbBikesMax: 1, nbBikes:0, next: ['90-B-right']},
+    '90-C-right':{position: 90, luck: [1], nbBikesMax: 1, nbBikes:0, next: ['90-B-right'], prev: '89-B-right'},
     '91-A-right':{position: 91, luck: [], nbBikesMax: 1, nbBikes:0, next: ['92-A-right']},
     '92-A-right':{position: 92, luck: [], nbBikesMax: 1, nbBikes:0, next: ['93-A-right']},
     '93-A-right':{position: 93, luck: [], nbBikesMax: 1, nbBikes:0, next: ['94-A-right']},
@@ -268,6 +269,40 @@ function checkMove(currentBike: Bike, cardPlayed: number): boolean {
         if (Board[tiles].nbBikes >= Board[tiles].nbBikesMax) return false;
     }
     return true;
+}
+
+/**
+ * 
+ * @param currentBike Current bike being moved
+ * @param newPosition Current position of the bike
+ * 
+ * @returns The new position string
+ */
+function lucky(currentBike: Bike, newSquare: string): string {
+    let squareAfterLucky = newSquare;
+    if (Board[newSquare].luck.length === 0) return newSquare;
+    if (Board[newSquare].luck.length > 0) {
+        for (let i = 0; i < Board[newSquare].luck.length; i++) {
+            // Check if current square is gonna be a lucky square
+            if (Board[newSquare].luck[i] === (Board[newSquare].nbBikes - 1)) {
+                let n = Math.floor(Math.random() * (6 + 1) - 3);
+                if (n === 0) return squareAfterLucky;
+                if (n > 0) {
+                    for (let j = 0; j < n; j++) {
+                        squareAfterLucky = Board[squareAfterLucky].next[0];
+                    }
+                } else {
+                    for (let j = 0; j < n; j++) {
+                        if (Board[squareAfterLucky].prev !== undefined) {
+                            // @ts-ignore
+                            squareAfterLucky = Board[squareAfterLucky].prev
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return squareAfterLucky;
 }
 
 /**
@@ -431,12 +466,12 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
         // Aspiration is allowed
     } 
 
-    // Check case chance TODO
+    // Needs to choose which tile here, have to be done in front, for now default to the first possible one
+    const possibleTiles = getPossibleTilesFromPosition(numberedPosition);
+    let newTile = lucky(bike, possibleTiles[0]);
 
     // Put the person on the right square
-    const possibleTiles = getPossibleTilesFromPosition(numberedPosition);
-    // Needs to choose which tile here, have to be done in front, for now default to the first possible one
-    bike.position = possibleTiles[0];
+    bike.position = newTile;
     player.hand.splice(cardIndex, 1);
     myG.discard.push(card);
 
