@@ -246,6 +246,20 @@ interface Context {
 
 // Functions
 /**
+ * Convert the numbered position to the key for Board dict
+ * @param position Position to convert
+ */
+function getPossibleTilesFromPosition(position: number): string[] {
+    let possibleTiles: string[] = [];
+    for (const key in Board) {
+        if (Board[key].position === position) {
+            possibleTiles.push(key);
+        }
+    }
+    return possibleTiles;
+}
+
+/**
  * 
  * @param {Context} context Context of the game
  * @returns The playerID of the first player
@@ -256,7 +270,7 @@ function firstPlayer(context: Context) {
     let firstPlayer = context.G.currentPlayer;
     for (let i = 0; i < nbPlayers; i++) {
         for (let j = 0; j < nbBikes; j++) {
-            if (context.G.players[i].bikes[j].position > firstPlayer.bikeIndex) {
+            if (Board[context.G.players[i].bikes[j].position].position > firstPlayer.bikeIndex) {
                 firstPlayer = { playerID: i, bikeIndex: j }
             }
         }
@@ -291,7 +305,7 @@ function nextPlayer(context: Context) {
  * The game is over if all the bikes of all the players are at the finish line
  */
 function isGameOver({ G }: Context) {
-    return G.players.every((player: Player) => player.bikes.every((bike: Bike) => bike.position >= nbCases));
+    return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases));
 }
 
 /**
@@ -304,7 +318,7 @@ function isGameOver({ G }: Context) {
  * If two players have the same sum of positions and the same reduce value, the ranking is based on the sum of turns of the bikes of the player
  */
 function winnerRanking({ G, ctx }: Context) {
-    const sumPositionOfBikes = G.players.map(player => player.bikes.reduce((acc, bike) => acc + bike.position, 0));
+    const sumPositionOfBikes = G.players.map(player => player.bikes.reduce((acc, bike) => acc + Board[bike.position].position, 0));
     const applyReduce = G.players.map(player => player.bikes.reduce((acc, bike) => acc + bike.reduce, 0));
     const sumTurnOfBikes = G.players.map(player => player.bikes.reduce((acc, bike) => acc + bike.turn, 0));
 
@@ -369,12 +383,18 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     const card = player.hand[cardIndex];
     const bike = player.bikes[G.currentPlayer.bikeIndex];
     bike.position += card;
-    if (bike.position > nbCases) {
-        bike.reduce = bike.position + card - nbCases;
+    if (Board[bike.position].position > nbCases) {
+        bike.reduce = Board[bike.position].position + card - nbCases;
         if (bike.reduce > nbReduceMax) {
             bike.reduce = nbReduceMax;
         }
-        bike.position = nbCases;
+        // Need to convert to key
+        // Need to have them choose a path if multiple path is possible
+        const allPossibleTiles = getPossibleTilesFromPosition(bike.reduce);
+        // Have to choose here, needs to be done in front
+        // bike.position = nbCases;
+        // For now just choose first option
+        bike.position = allPossibleTiles[0];
     }
     player.hand.splice(cardIndex, 1);
     myG.discard.push(card);
