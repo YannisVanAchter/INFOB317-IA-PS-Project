@@ -11,24 +11,20 @@
   ]
 ).
 
-%Necessary modules from the SWI-Prolog library to handle HTTP servers, HTTP requests, static files, and WebSockets
+%les modules nécéssaires pr le code
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_files)).
 :- use_module(library(http/websocket)).
 
+
 %Directs all HTTP requests to the local directory
 %so if accessing http://localhost:3000, the server will serve files from the local directory
 
-% http_handler docs: http://www.swi-prolog.org/pldoc/man?predicate=http_handler/3
 % =http_handler(+Path, :Closure, +Options)=
 %
-% * root(.) indicates we're matching the root URL
-% * We create a closure using =http_reply_from_files= to serve up files
-%   in the local directory
-% * The option =spawn= is used to spawn a thread to handle each new
-%   request (not strictly necessary, but otherwise we can only handle one
-%   client at a time since echo will block the thread)
+% * root(.) :  il est activé lorsque l'URL demandée est juste le nom de domaine,
+% *  http_reply_from_files : les fichiers seront servis à partir du répertoire local où se trouve le fichier Prolog en cours d'exécution
 :- http_handler(root(.),
                 http_reply_from_files('.', []),
                 [prefix]).
@@ -42,6 +38,8 @@
 % * The option =spawn= is used to spawn a thread to handle each new
 %   request (not strictly necessary, but otherwise we can only handle one
 %   client at a time since echo will block the thread)
+
+% pour le moment, le code est relié du coup au fichier js echo qui est dans le dossier
 :- http_handler(root(echo),
                 http_upgrade_to_websocket(echo, []),
                 [spawn([])]).
@@ -77,17 +75,13 @@ echo(WebSocket) :-
 
 
 
-
-
 random_response(Response) :-
   Responses = ["Vive Krokmou", "Krokmou DOAT", "Krokmou El Mastro", "Connaissez Vous Krokmou?", "Krokmou Je T Aime", "Je Suis Un Dragon"],
   random_member(Response, Responses).
 
-%! get_response(+Message, -Response) is det.
-% Pull the message content out of the JSON converted to a prolog dict
-% then add the current time, then pass it back up to be sent to the
-% client
-get_response(_, Response) :-
+
+%Le get doit être modifié pour soit utiliser le predicat du bot à question soit le predicat de l'IA
+get_response(Input, Response) :-
   get_time(Time),
   random_response(Message), %The received message doesn't influence the message sent here
   Response = _{message: Message, time: Time}. %he time isn't necessary, it was set by default. We can safely remove it
