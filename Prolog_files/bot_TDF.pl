@@ -78,12 +78,3 @@ produire_reponse(Question,Reponse):-
 
 produire_reponse(_,Reponse):-
     reponse_autre(Reponse).
-
-% fonction principale
-% tourdefrance():-
-%     writeln("Bonjour!"),
-%     writeln("comment puis-je vous aider?"),
-%     repeat,
-%     write("Vous :"),
-%     ttyflush,
-%     lire_question
