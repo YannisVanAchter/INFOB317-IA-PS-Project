@@ -13,6 +13,8 @@ RUN npm install
 # Copy the rest of the app source code to the working directory
 COPY ./public ./public
 COPY ./src ./src
+COPY ./.env ./.env
+COPY ./tsconfig.json ./tsconfig.json
 
 # Build the app
 RUN npm run build

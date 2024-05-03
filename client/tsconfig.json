@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2022",
     "lib": [
       "dom",
+      "DOM",
+      "ES2022",
       "dom.iterable",
       "esnext"
     ],
@@ -21,6 +23,7 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
-  ]
+    "src",
+    "custom.d.ts"
+  ],
 }

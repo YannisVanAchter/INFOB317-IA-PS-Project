@@ -55,6 +55,7 @@ type dico<BoardCase>={
 }
 
 let Board: dico<BoardCase>={
+    '0-B-left':{position: 0, luck: [], nbBikesMax: 20, nbBikes:0, next: ['1-A-left']}, // 0
     '1-A-left':{position: 1, luck: [], nbBikesMax: 3, nbBikes:0, next: ['2-A-left']},
     '2-A-left':{position: 2, luck: [], nbBikesMax:3, nbBikes:0, next: ['3-A-left']},
     '3-A-left':{position: 3, luck: [], nbBikesMax:3, nbBikes:0, next: ['4-A-left']},
@@ -251,12 +252,18 @@ interface Context {
  * @param position Position to convert
  */
 function getPossibleTilesFromPosition(position: number): string[] {
+    console.log(position);
     let possibleTiles: string[] = [];
     for (const key in Board) {
+        // console.log(Board[key]);
+        // console.log(Board[key].position);
+        // console.log(Board[key].nbBikes);
+        // console.log(Board[key].nbBikesMax);
         if (Board[key].position === position && Board[key].nbBikes < Board[key].nbBikesMax) {
             possibleTiles.push(key);
         }
     }
+    console.log(possibleTiles);
     return possibleTiles;
 }
 
@@ -445,9 +452,10 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     let myG = deepCopy(G); 
     const player = myG.players[G.currentPlayer.playerID];
     const card = player.hand[cardIndex];
+    console.log(card);
     const bike = player.bikes[G.currentPlayer.bikeIndex];
     let oldPosition = bike.position;
-    let numberedPosition = Board[bike.position].position += card;
+    let numberedPosition = Board[bike.position].position + card;
     if (numberedPosition > nbCases) {
         bike.reduce = numberedPosition + card - nbCases;
         if (bike.reduce > nbReduceMax) {
@@ -462,7 +470,10 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     }
     
     // Check aspiration
-    if (checkAspiration(getPossibleTilesFromPosition(numberedPosition)[0])) { // Select first possible position, check in front how to handle
+    console.log(numberedPosition);
+    let test = getPossibleTilesFromPosition(numberedPosition);
+    console.log(test);
+    if (checkAspiration(test[0])) { // Select first possible position, check in front how to handle
         // Aspiration is allowed
     } 
 
@@ -499,7 +510,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: "", reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '0-B-left', reduce: 0, turn: 0 })),
         })),
     };
 
@@ -542,5 +553,5 @@ const TourDeFrance = {
     },
 }
 
-export { TourDeFrance, winnerRanking, useCardOnBike };
+export { TourDeFrance, winnerRanking, useCardOnBike, Board };
 export type { Player, Bike, Context, DCtx, Ctx };
