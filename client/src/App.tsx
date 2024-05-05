@@ -1,31 +1,35 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+
 import './App.css';
 
-import { TourDeFrance } from './Game';
-
-import { Client } from 'boardgame.io/react';
-import TourDeFranceBoard from './components/board/Board';
-
-// TODO: check why this is not working 
-// ! process.env.REACT_DEBUG is "undefined" when running "npm start"
-// ! Find a way to set the environment variable in the .env file and read it here
-const isDebug = process.env.REACT_DEBUG === "true" || true; // TODO: once working, replace "|| true" by "|| false" for production
-console.log(`process.env.REACT_DEBUG: ${process.env.REACT_DEBUG}, isDebug: ${isDebug}x`); // TODO: remove this line once working
+import Home from './pages/home/home';
+import Game from './pages/game/game';
 
 document.title = 'Tour de France';
 
-function App() {
-  const TourDeFranceClient = Client({
-    game: TourDeFrance,
-    board: TourDeFranceBoard,
-    numPlayers: 4,
-    debug: isDebug,
-  });
+const NotFound = () => <h1>404 - Not Found</h1>;
 
-  const [showSettingsModal] = React.useState(false);
+function App() {
   return (
     <div className="App">
-      <TourDeFranceClient />
+      <BrowserRouter>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/game">Game</Link>
+            </li>
+          </ul>
+        </nav>
+        <Routes>
+          {/* <Route path="/" element={<Home />} /> */}
+          <Route path="/" element={<Game />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
