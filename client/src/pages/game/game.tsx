@@ -3,8 +3,11 @@ import React from 'react';
 import { TourDeFrance } from '../../Game';
 import { Client } from 'boardgame.io/react';
 import TourDeFranceBoard from '../../components/board/Board';
+import ChatBot from '../../components/bot/bot';
 import DisplayHands from '../../components/hands/hands';
 import SideBoard from '../../components/sideBoard/sideBoard';
+
+import './game.css';
 
 document.title = 'Tour de France';
 
@@ -17,7 +20,7 @@ console.log(`process.env.REACT_DEBUG: ${process.env.REACT_DEBUG}, isDebug: ${isD
 type TODO = any;
 
 function Page(props: TODO) {
-    console.log('props', props);
+    // console.log('props', props);
     let players = props.G.players;
     let boardProps = {players: [
         {playerID: 0 as 0, bikes: players[0].bikes.map((bike: any) => bike.position)},
@@ -26,12 +29,12 @@ function Page(props: TODO) {
         {playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position)},
     ]};
     return (
-        <>
+        <div className='board-game'>
             <SideBoard {...props} />
             <TourDeFranceBoard players={boardProps.players}/>
             {/* TODO: Finish the display of cards once Youlan updated Game.ts for simulations */}
             {/* <DisplayHands {...props} /> */}
-        </>
+        </div>
     );
 }
 
@@ -41,10 +44,14 @@ function Game(props: any) {
         game: TourDeFrance,
         board: Page,
         numPlayers: 4,
-        debug: isDebug,
+        // debug: isDebug,
+        debug: false,
     });
 
-    return <TourDeFranceClient />;
+    return <div>
+        <TourDeFranceClient />
+        <ChatBot />
+    </div>;
 }
 
 export default Game;

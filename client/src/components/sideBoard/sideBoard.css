@@ -1,23 +1,24 @@
-aside {
+.winner {
     position: fixed;
-    top: 10%;
+    top: 15%;
     left: 0%;
     width: 20%;
 
     /* Put in two column */
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
 }
 
-aside .player {
-    display: flex;
-    flex-direction: column;
-    justify-content: column;
+.winner .player {
     margin: 1rem;
     color: var(--primary-color);
     font-size: 1rem;
 }
 
-aside .player * {
-    font-size: .9rem;
+.player + .player {
+    margin-top: 2rem;
+}
+
+.winner .player * {
+    font-size: 1.3rem;
 }

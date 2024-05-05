@@ -10,8 +10,13 @@ interface Message {
     response?: Message;
 }
 
-function ChatBot() {
-    const [messages, setMessages] = useState<Message[]>([]);
+function ChatBot(props: any) {
+
+    const [messages, setMessages] = useState<Message[]>([{ 
+        id: 0, 
+        content: "Bonjour, comment puis-je vous aider ?", 
+        sender: 'bot' 
+    }]);
     const [input, setInput] = useState('');
     const [showChat, setShowChat] = useState(false);
 
@@ -23,7 +28,8 @@ function ChatBot() {
         setMessages([...messages, newMessage]);
     }
 
-    const sendMessage = async () => {
+    const sendMessage = async (event: any) => {
+        event.preventDefault();
         // Using async function to send message to the server
         // Allow user to send multiple messages without refreshing the page
         // And getting the answer from the bot
@@ -36,8 +42,12 @@ function ChatBot() {
         setInput('');
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/message`, {
-                content: input,
+            const url = `${process.env.REACT_APP_SERVER_URL}/message`
+            console.log('url:', url);
+            const response = await axios.get(url, {
+                params: {
+                    question: input,
+                },
             });
             const botResponse: Message = {
                 id: messages.length + 2,
@@ -52,25 +62,34 @@ function ChatBot() {
     };
 
     return (
-        <div className={`chat-bot ${showChat ? 'show' : 'hide'}`}>
-            <button onClick={toggleChat}>Toggle Chat</button>
-            <div className="messages">
-                {messages.map((message) => (
-                    <div key={message.id} className={`message ${message.sender}`}>
-                        {message.content}
-                    </div>
-                ))}
+        <>
+            <button onClick={toggleChat} className={`display-button ${!showChat ? 'show' : 'hide'}`}>Toggle Chat</button>
+            <div className={`chat-bot ${showChat ? 'show' : 'hide'}`}>
+                <div className="header">
+                    <h3>Chat Bot</h3>
+                    <button onClick={toggleChat} className='display-button close'>Close</button>
+                </div>
+                <ul className="messages">
+                    {messages.map((message) => (
+                        <li key={message.id} className={`message ${message.sender}`}>
+                            {message.content}
+                        </li>
+                    ))}
+                    <li>
+                    </li>
+                </ul>
+                <form onSubmit={sendMessage} className='form-chat-bot'>
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Type your message..."
+                    />
+                    <input type="submit" value="Send" />
+                </form>
             </div>
-            <form onSubmit={sendMessage}>
-                <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your message..."
-                />
-                <input type="submit" value="Send" />
-            </form>
-        </div>
+
+        </>
     );
 };
 

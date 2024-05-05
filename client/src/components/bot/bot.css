@@ -1,36 +1,108 @@
+.display-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 2rem;
+    padding: 1rem 2rem;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 10px var(--primary-color);
+}
+
+.display-button.close {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    margin-right: .5rem;
+    font-weight: bold;
+
+    transition: all 0.1s;
+}
+
+.display-button.close:hover {
+    color: var(--error-color);
+    font-size: medium;
+}
+
 .chat-bot {
     position: fixed;
     bottom: 0;
     right: 0;
     width: 300px;
     height: 400px;
-    background-color: #f9f9f9;
+    background-color: var(--secondary-color);
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.hide {
     display: none;
 }
 
-.chat-bot.show {
-    display: block;
+.chat-bot .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 .5rem;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border-radius: 10px 10px 0 0;
 }
 
 .messages {
-    height: 80%;
+    /* height: 80%; */
     overflow-y: auto;
+    margin-bottom: 10px;
+    min-height: 15rem;
+    background-color: var(--ternary-color);
+    border-radius: 1rem;
+    padding: 0rem;
+    list-style: none;
 }
 
 .message {
-    margin-bottom: 10px;
+    padding: .5rem;
+    margin: 0.5rem;
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
 }
 
 .message.user {
     text-align: right;
-    color: #007bff;
+    border-radius: 1rem 1rem 0 1rem;
 }
 
 .message.bot {
     text-align: left;
-    color: #333;
+    border-radius: 1rem 1rem 1rem 0px;
+}
+
+.form-chat-bot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 .5rem;
+    background-color: var(--ternary-color);
+    height: 2.5rem;
+    border-radius: 1rem;
+}
+
+.form-chat-bot input {
+    width: 80%;
+    padding: .5rem;
+    border: none;
+    border-radius: 5rem;
+    margin: 0 .5rem;
+    background-color: var(--ternary-color);
+}
+
+.form-chat-bot input[type="submit"] {
+    display: none;
 }
