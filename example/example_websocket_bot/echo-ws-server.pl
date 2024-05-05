@@ -23,7 +23,7 @@
 
 % =http_handler(+Path, :Closure, +Options)=
 %
-% * root(.) :  il est activé lorsque l'URL demandée est juste le nom de domaine,
+% * root(.) :  il est activé lorsque l'url demandée est juste le nom de domaine,
 % *  http_reply_from_files : les fichiers seront servis à partir du répertoire local où se trouve le fichier Prolog en cours d'exécution
 :- http_handler(root(.),
                 http_reply_from_files('.', []),
@@ -64,24 +64,27 @@ default_port(3000).
 % This predicate is used to read in a message via websockets and echo it
 % back to the client
 echo(WebSocket) :-
-  ws_receive(WebSocket, Message, [format(json)]), %Here we wait to receive a message via WebSocket, if we receive one, we put it into Message, specifying the format as JSON
-  ( Message.opcode == close %Checking if it's a close message, in which case we return true
+  ws_receive(WebSocket, Message, [format(json)]), %Iici on recoit le message que le client à envoyer en format JSON
+  write("Message: "), writeln(Message), %Juste pour voir sur le terminal
+  ( Message.opcode == close %Vérifier si c'es un "close message", alors on retourne true
   -> true
-  ; get_response(Message.data, Response), %We get the response to send in get_response
-    write("Response: "), writeln(Response), %Here was to see errors in the terminal
-    ws_send(WebSocket, json(Response)), %We send the response
-    echo(WebSocket) %We maintain the connection with recursion
+  ; 
+    get_response(Message.data.id, Message.data.content, Response), %Nous réucpérons le message à renvoyer au client
+    write("Response: "), writeln(Response), %Juste pour voir sur le terminal
+    ws_send(WebSocket, json(Response)), %On renvoit le message au client
+    echo(WebSocket) %On maintient la connexion par récursivité
   ).
 
-
+test_response(Input, Response) :- 
+  Response = Input.
 
 random_response(Response) :-
   Responses = ["Vive Krokmou", "Krokmou DOAT", "Krokmou El Mastro", "Connaissez Vous Krokmou?", "Krokmou Je T Aime", "Je Suis Un Dragon"],
   random_member(Response, Responses).
 
-
 %Le get doit être modifié pour soit utiliser le predicat du bot à question soit le predicat de l'IA
-get_response(Input, Response) :-
-  get_time(Time),
-  random_response(Message), %The received message doesn't influence the message sent here
-  Response = _{message: Message, time: Time}. %he time isn't necessary, it was set by default. We can safely remove it
+get_response(ID, Input, Response) :-
+  (ID == "bot" -> random_response(Message); % Si l'id vaut bot, utilise le prédicat random_response
+    test_response(Input, Message) %Sinon, utilise le prédicat test_response
+    ),
+  Response = _{message: Message}. %Renvoyer le message sous forme de JSON
