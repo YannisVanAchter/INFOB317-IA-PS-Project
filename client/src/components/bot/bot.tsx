@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import './bot.css';
@@ -10,15 +10,18 @@ interface Message {
     response?: Message;
 }
 
-function ChatBot(props: any) {
+// Votre interface Message reste inchangée
 
-    const [messages, setMessages] = useState<Message[]>([{ 
-        id: 0, 
-        content: "Bonjour, comment puis-je vous aider ?", 
-        sender: 'bot' 
-    }]);
+function ChatBot(props: any) {
+    const firstMessage: Message = {
+        id: 0,
+        content: "Bonjour, comment puis-je vous aider?",
+        sender: 'bot'
+    };
+    const [messages, setMessages] = useState<Message[]>([firstMessage]);
     const [input, setInput] = useState('');
     const [showChat, setShowChat] = useState(false);
+    const [scrollHeight, setScrollHeight] = useState(0);
 
     const toggleChat = () => {
         setShowChat(!showChat);
@@ -61,34 +64,53 @@ function ChatBot(props: any) {
         }
     };
 
+     // Effet to adjust the scroll height of the chat
+    useEffect(() => {
+        const messagesElement = document.querySelector('.messages');
+        if (messagesElement) {
+            setScrollHeight(messagesElement.scrollHeight);
+        }
+    }, [messages]); 
+
+    // Effet to scroll to the bottom of the chat
+    useEffect(() => {
+        const messagesElement = document.querySelector('.messages');
+        if (messagesElement && scrollHeight > 0) {
+            messagesElement.scrollTop = scrollHeight;
+        }
+    }, [scrollHeight]); 
+
     return (
         <>
-            <button onClick={toggleChat} className={`display-button ${!showChat ? 'show' : 'hide'}`}>Toggle Chat</button>
-            <div className={`chat-bot ${showChat ? 'show' : 'hide'}`}>
+            <button onClick={toggleChat} className={`display-button ${!showChat? 'show' : 'hide'}`}>J'ai une question!</button>
+            <div className={`chat-bot ${showChat? 'show' : 'hide'}`}>
                 <div className="header">
                     <h3>Chat Bot</h3>
-                    <button onClick={toggleChat} className='display-button close'>Close</button>
+                    <button 
+                        onClick={(e) => setMessages([firstMessage])} 
+                        className='display-button refresh'
+                    >
+                        Rafraichir
+                    </button>
+                    <button onClick={toggleChat} className='display-button close'>Fermer</button>
                 </div>
-                <ul className="messages">
+                <ul className="messages" style={{ maxHeight: '27rem', overflowY: 'auto' }}>
                     {messages.map((message) => (
                         <li key={message.id} className={`message ${message.sender}`}>
                             {message.content}
                         </li>
                     ))}
-                    <li>
-                    </li>
                 </ul>
                 <form onSubmit={sendMessage} className='form-chat-bot'>
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your message..."
+                        placeholder="Tape ton message..."
                     />
                     <input type="submit" value="Send" />
                 </form>
             </div>
-
         </>
     );
 };
