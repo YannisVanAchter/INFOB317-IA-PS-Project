@@ -248,6 +248,14 @@ interface Context {
 
 // Functions
 /**
+ * @param {string} position Position of the bike in the board
+ * @return {object} Return the board case object
+ */
+function getBoardCase(position: string): BoardCase {
+    return Board[position];
+};
+
+/**
  * Convert the numbered position to the key for Board dict
  * @param position Position to convert
  */
@@ -553,5 +561,5 @@ const TourDeFrance = {
     },
 }
 
-export { TourDeFrance, winnerRanking, useCardOnBike, Board };
+export { TourDeFrance, winnerRanking, useCardOnBike, getBoardCase, Board };
 export type { Player, Bike, Context, DCtx, Ctx };

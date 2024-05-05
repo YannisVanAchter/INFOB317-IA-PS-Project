@@ -1,109 +1,54 @@
 // client/src/Board.tsx
-import React, { useState } from 'react';
-
-import { Context, DCtx, Ctx, winnerRanking, useCardOnBike } from '../../Game';
+import React from 'react';
 
 import './board.css';
-import { deepCopy } from '../../utils/deep_copy';
+import { fromMapToSVG } from '../../utils/simonLTransform';
+import { boardKey } from '../../utils/simonLTransform';
+import { getBoardCase } from '../../Game';
 
-// const mapPath = "../../assets/map.svg";
-// const Map = require(mapPath);
 import Map from '../../assets/map';
+// import Map from '../../assets/map.svg';
 
-type TODO = {
-    G: DCtx,
-    ctx: Ctx,
-    copiedG: DCtx,
+const player_teams_emoticons = {
+    0: "&#127463 &#127466",// belgique
+    1: "&#127475 &#127473",// Holland
+    2: "&#127465 &#127466",// Allemagne
+    3: "&#127470 &#127481"// Italie
 };
 
-function displayCard(card: number) {
-    return <>{card}</>
-}
-
-function DisplayHand(props: TODO) {
-    let { G, ctx, copiedG } = props;
-    const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
-    const [clickedCardIndex, setClickedCardIndex] = useState<number | null>(null);
-
-    const copiedGTemp = useCardOnBike({G: copiedG, ctx}, hoveredCardIndex !== null ? hoveredCardIndex : 0);
-    const clickedGTemp = useCardOnBike({G: G, ctx}, clickedCardIndex !== null ? clickedCardIndex : 0);
-
-    const handleMouseOver = (card: number, index: number) => {
-        console.log('Card:', card, 'Index:', index);
-        setHoveredCardIndex(index);
+function TourDeFranceBoard(props: {players: {playerID: 0 | 1 | 2 | 3, bikes: boardKey[]}[]}) {
+    if (props.players === undefined) {
+        return (
+            <>
+                <Map />
+            </>
+        );
     }
-    const handleClickedCard = (card: number, index: number) => {
-        console.log('Apply useCardOnBike\nCard:', card, 'Index:', index);
-        setClickedCardIndex(index);
-    }
-    if (copiedGTemp !== null) {
-        copiedG = copiedGTemp;
-    }
-    if (clickedGTemp !== null) {
-        G = clickedGTemp;
-    }
-    
-    return (
-        <div className='hand'>
-            {G.players.map((player, i) => {
-                return (
-                    <div key={i} className='player'>
-                        <h3>Player: {player.playerID + 1}</h3>
-                        <p>Hand: </p>
-                        <div className='cards'> 
-                            {player.hand.map((card, j) => {
-                                return (
-                                    <div 
-                                        key={j} 
-                                        className='card'
-                                        onClick={() => handleClickedCard(card, j)}
-                                        onMouseOver={() => handleMouseOver(card, j)}
-                                    >
-                                        {displayCard(card)}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
-}
+    // Add bikes to the map with the player's color
+    for (let player of props.players) {
+        for (let bike of player.bikes) {
+            let boardCase = getBoardCase(bike);
+            let svgId = fromMapToSVG(bike, boardCase.nbBikesMax as 1 | 2 | 3);
 
-function ListBikes(props: DCtx) {
-    return (
-        <aside>
-            {props.players.map((player, i) => {
-                return (
-                    <div key={i} className='player'>
-                        <h3>Player: {player.playerID + 1}</h3>
-                        {player.bikes.map((bike, j) => {
-                            return (
-                                <div key={j}>
-                                    <p>Bike: {bike.position}c</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                );
-            })}
-        </aside>
-    );
-}
-
-function TourDeFranceBoard({ G, ctx, moves, events, playerID, isActive, isMultiplayer }: any) {
-    let copiedG: DCtx = deepCopy(G);
+            // Add the corresponding bike to the map
+            // let svgElement = document.getElementById(svgId);
+            // if (svgElement === null) {
+            //     console.error(`svgElement with id ${svgId} not found`);
+            //     continue;
+            // }
+            // let playerEmoticons = player_teams_emoticons[player.playerID];
+            // let bikeElementTemplate = `
+            // <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="1.5em">
+            //     ${playerEmoticons}
+            // </text>
+            // ` as unknown as SVGElement;
+            // svgElement.appendChild(bikeElementTemplate);
+        }
+    }
 
     return (
         <>
-            <h2>Board</h2>
-            <ListBikes {...copiedG} />
-
             <Map />
-            {/* <img src={mapPath} alt="Map" /> */}
-
-            {/* <DisplayHand copiedG={copiedG} G={G} ctx={ctx}  /> */}
         </>
     );
 }
