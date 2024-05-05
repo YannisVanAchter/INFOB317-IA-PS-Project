@@ -5,7 +5,7 @@ function log(topic, message) { //fonction pour afficher les messages dans la con
   console.log('[' + topic + '] ' + message)
 }
 
-function wsMessageHandler(event) { //la fct qui s'occupe de la reception des messages par le serveur, y aura surement besoin de modifier celle-ci
+function wsMessageHandler(event) { //la fct qui s'occupe de la reception des messages par le serveur, c'est surtout pour tester mais faudra surement modifier dans notre cas
   const payload = JSON.parse(event.data) //Converti le message reçu en object JavaScript
   log("WS Response", "Received message: '" + event.data + "'") //utiliser la fct log
 
@@ -32,7 +32,7 @@ function openWebSocket() { //fonction pour ouvrir une connexion websocket
   connection.onerror = (error) => { //le handler pour les erreurs qui se produisent lors de la connexion websocket
     log("WS", error)
   } 
-  connection.onmessage = wsMessageHandler //le handler pour les messages reçus via la connexion websocket
+  connection.onmessage = wsMessageHandler //le handler pour les messages reçus via la connexion websocket, donc on désigne ici où les messages reçus doivent être traités
   return connection
 }
 
@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', (e) => { //fonction qui s'exécute
   const input_button = document.getElementById("message-submit") //Sélectionne le bouton qui envoie le message
   const connection = openWebSocket() //ouvre la connexion websocket et stocke l'objet de connexion dans une variable
   input_button.addEventListener("click", (event) => { //add un event listener pour le click sur le bouton 
-    const isBot = false; //Ici faut changer manuellement pour le moment donc faudra surement modifier
+    const isBot = false; //Ici faut changer manuellement pour le moment donc faudra surement modifier. 
+    //le but c'est d'avoir deux id différents pour si c'est une requete pour le bot ou l'ia
     const payload = { //Crée un plyload object contenant le message entré dans la zone de texte
       id: isBot ? "bot" : "ia", //si isBot = true, alors id = "bot", sinon id = "ia"
       content: input_box.value

@@ -10,16 +10,16 @@
     stop_server/0
   ]
 ).
-%faut évidemment changer pour les modules de notre bot et ia mais l'idée reste la même
-:- use_module(test_ia, [test_response/2]).
-:- use_module(test_bot, [random_response/1]).
-
 
 %les modules nécéssaires pr le code
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_files)).
 :- use_module(library(http/websocket)).
+
+%à remplacer par les modules de notre bot et ia
+:- use_module(test_ia, [test_response/2]).
+:- use_module(test_bot, [random_response/1]).
 
 
 %Directs all HTTP requests to the local directory
@@ -29,9 +29,12 @@
 %
 % * root(.) :  il est activé lorsque l'url demandée est juste le nom de domaine,
 % *  http_reply_from_files : les fichiers seront servis à partir du répertoire local où se trouve le fichier Prolog en cours d'exécution
+
+%Donc ici, c'est l'endroit où on connecte avec le fichier client du coup, à modifier pour notre cas aussi
 :- http_handler(root(.),
-                http_reply_from_files('.', []),
+                http_reply_file('../client_test/index.html', []),
                 [prefix]).
+
 
 %Directs HTTP requests to /echo (WebSocket handler named echo)
 %allowing the server to handle WebSocket connections

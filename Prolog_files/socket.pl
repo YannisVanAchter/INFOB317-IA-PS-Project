@@ -27,23 +27,39 @@ home_page(_Request) :-
     title('Demo server'),
     [ h1('test')]).
 
-answer(Que, _Request):-
-    produire_reponse(Que,Resp),
-    reply_html_page(title('test'),[h1(Resp)]).
 
-answer_ia(Request) :-
-    http_read_json_dict(Request, Board),
-    get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
-    reply_json(json([response=Move])).
+% post
 
-%  ça pas encore fini, il faudra que nous on gère les requêtes post
-:- http_handler(root(post_request), handle_post, [method(post)]).
+% ça pas encore fini, il faudra que nous on gère les requêtes post
+% je sais pas si ce handler est vrmt necéssaire du coup
+%:- http_handler(root(post_request), handle_post, [method(post)]).
 %:- http_handler(root(post_request), handle_post(Method), [method(Method), methods([post])]).
 
-handle_post(Request) :-
+handle_post(Request, Response, ID) :-
     http_read_data(Request, Data, []),
-    format('Content-type: text/plain', []),
-    reply_html_page(title('post'), [p('data'), pre(Data)]).
+    (   ID == "bot",
+        Reply = json([response=Response]),
+        http_post_data('http://localhost:8080/bot/', Reply, Received, []) %faut changer l'endroit de retour surement mais j'avoue ne pas trop savoir ou
+    ;   ID == "ia",
+        Reply = json([response=Response]),
+        http_post_data('http://localhost:8080/ia/', Reply, Received, []) %idem
+    ),
+    format('Content-type: text/plain~n~n', []),
+    format('Response: ~w~n', [Received]).
+
+
+answer(Question, Request):-
+    produire_reponse(Question, Resp),
+    handle_post(Request, Resp, "bot"),
+    reply_html_page(title('test'),[h1(Resp)]).
+    
+answer_ia(Board, Request) :-
+    %http_read_json_dict(Request, Board),
+    get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
+    handle_post(Request, Move, "ia"),
+    reply_json(json([response=Move])).
+
+
 %handle_post(post, Request):-
 %    http_read_data(Request, Data, []),
 %    format('Content-type: text/plain', []),
@@ -57,6 +73,5 @@ handle_post(Request) :-
 %     http_read_data(Request, Data, []),
 %     format(’Content-type: text/plain’, []),
 %     reply_html_page(title(’post’), [h1(Data)]).
-    
 
 
