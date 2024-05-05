@@ -7,3 +7,5 @@
 
 # Environment variables (client)
 .env
+
+/test-local

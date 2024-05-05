@@ -1,55 +1,62 @@
-// client/src/Board.tsx
-import React from 'react';
-
+import React, { LegacyRef, useEffect, useRef } from 'react';
+import * as SVG from '@svgdotjs/svg.js';
 import './board.css';
 import { fromMapToSVG } from '../../utils/simonLTransform';
 import { boardKey } from '../../utils/simonLTransform';
 import { getBoardCase } from '../../Game';
+const mapUrl = '../../assets/map.svg';
 
-import Map from '../../assets/map';
-// import Map from '../../assets/map.svg';
+const playerTeamsEmoticons = [
+    "🇧🇪", // Belgique
+    "🇳🇱", // Pays-Bas
+    "🇩🇪", // Allemagne
+    "🇮🇹" // Italie
+];
 
-const player_teams_emoticons = {
-    0: "&#127463 &#127466",// belgique
-    1: "&#127475 &#127473",// Holland
-    2: "&#127465 &#127466",// Allemagne
-    3: "&#127470 &#127481"// Italie
-};
+function getSVGElemByID(svg: SVG.Svg, id: string) {
+    return svg.findOne(`#${id}`);
+}
 
-function TourDeFranceBoard(props: {players: {playerID: 0 | 1 | 2 | 3, bikes: boardKey[]}[]}) {
-    if (props.players === undefined) {
-        return (
-            <>
-                <Map />
-            </>
-        );
-    }
-    // Add bikes to the map with the player's color
-    for (let player of props.players) {
-        for (let bike of player.bikes) {
-            let boardCase = getBoardCase(bike);
-            let svgId = fromMapToSVG(bike, boardCase.nbBikesMax as 1 | 2 | 3);
+function TourDeFranceBoard(props: { players: { playerID: 0 | 1 | 2 | 3, bikes: boardKey[] }[] }) {
+    const svgRef = useRef(null);
 
-            // Add the corresponding bike to the map
-            // let svgElement = document.getElementById(svgId);
-            // if (svgElement === null) {
-            //     console.error(`svgElement with id ${svgId} not found`);
-            //     continue;
-            // }
-            // let playerEmoticons = player_teams_emoticons[player.playerID];
-            // let bikeElementTemplate = `
-            // <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="1.5em">
-            //     ${playerEmoticons}
-            // </text>
-            // ` as unknown as SVGElement;
-            // svgElement.appendChild(bikeElementTemplate);
-        }
-    }
+    useEffect(() => {
+        if (!svgRef.current) return;
+
+        const svg = SVG.SVG().addTo(svgRef.current).size('100%', '100%');
+        const map = svg.image(mapUrl).addTo(svg);
+
+        props.players.forEach((player, index) => {
+            player.bikes.forEach((bike, bikeIndex) => {
+                const boardCase = getBoardCase(bike);
+                const SVGIDBike = fromMapToSVG(bike, boardCase.nbBikesMax as 1 | 2 | 3); // id attribute of the SVG element
+                const bikeEmoticon = playerTeamsEmoticons[index];
+
+                const bikeSVG = getSVGElemByID(svg, SVGIDBike) as SVG.Text;
+                if (bikeSVG === null) {
+                    console.error(`Could not find SVG element with id ${SVGIDBike}`);
+                    alert('Could not be able to load the map, please refresh the page')
+                    return;
+                }
+                bikeSVG.text(bikeEmoticon).font({
+                    size: 20,
+                    anchor: 'middle',
+                    leading: 1,
+                    fill: 'black',
+                    family: 'Arial'
+                });
+            });
+        });
+    }, [props.players]);
+
+    // if (props.players === undefined) {
+    //     return <Map />;
+    // }
 
     return (
-        <>
-            <Map />
-        </>
+        <div className='board'>
+            <div ref={svgRef as unknown as LegacyRef<HTMLDivElement>}></div>
+        </div>
     );
 }
 
