@@ -6,5 +6,8 @@
  *  @returns Copied object
  */
 export function deepCopy<T>(obj: T): T {
-    return JSON.parse(JSON.stringify(obj));
+    const str = JSON.stringify(obj);
+    if (str)
+        return JSON.parse(str);
+    return new Object() as T;
 }
