@@ -37,3 +37,11 @@ Use the command:
 ```bash
 $ docker-compose up -d
 ```
+
+ ## Exemple websocket
+
+- Open a terminal and navigate to the directory ./example/example_websocket_bot/
+- Run the command =swipl echo-ws-server.pl=
+- Execute =:- start_server=
+- Open your browser and enter http://localhost:3000 in the address bar
+- the /echo route is for WebSocket communication
