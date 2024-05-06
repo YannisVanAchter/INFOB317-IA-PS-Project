@@ -1,0 +1,51 @@
+.hands {
+    position: fixed;
+    bottom: 2%;
+    left: 0;
+    right: 20%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.hands .player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.hands .player + .player .cards {
+    margin: 0rem;
+    margin-left: .5rem;
+    margin-right: .5rem;
+    border-left: .1rem solid var(--primary-color);
+}
+
+.hands ul.cards {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: inherit;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.hands .player .cards .card {
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    max-width: 7.5rem;
+    transform: rotate(calc(-40deg * var(--card-index)));
+    transition: scale .2s;
+}
+
+.hands .player .cards .card ~ .card {
+    --card-index: 1;
+    transform: rotate(calc(-20deg * var(--card-index)));
+}
+
+.hands .player .cards .card:hover {
+    scale: 1.5;
+}

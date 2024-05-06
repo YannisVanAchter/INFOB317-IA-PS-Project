@@ -32,8 +32,7 @@ function Page(props: TODO) {
         <div className='board-game'>
             <SideBoard {...props} />
             <TourDeFranceBoard players={boardProps.players}/>
-            {/* TODO: Finish the display of cards once Youlan updated Game.ts for simulations */}
-            {/* <DisplayHands {...props} /> */}
+            <DisplayHands {...props} />
         </div>
     );
 }
