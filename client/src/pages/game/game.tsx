@@ -27,11 +27,14 @@ function Page(props: TODO) {
         {playerID: 1 as 1, bikes: players[1].bikes.map((bike: any) => bike.position)},
         {playerID: 2 as 2, bikes: players[2].bikes.map((bike: any) => bike.position)},
         {playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position)},
-    ]};
+    ],
+    currentPlayer: props.ctx.currentPlayer,
+    availableMoves: []
+    };
     return (
         <div className='board-game'>
             <SideBoard {...props} />
-            <TourDeFranceBoard players={boardProps.players}/>
+            <TourDeFranceBoard {...boardProps}/>
             <DisplayHands {...props} />
         </div>
     );
