@@ -10,8 +10,6 @@ interface Message {
     response?: Message;
 }
 
-// Votre interface Message reste inchangée
-
 function ChatBot(props: any) {
     const firstMessage: Message = {
         id: 0,

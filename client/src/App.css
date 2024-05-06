@@ -19,3 +19,55 @@ h2 {
   margin: auto;
   padding: auto;
 }
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.header .nav-bar {
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+
+  font-size: 1.2rem;
+
+  h1 {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    color: var(--secondary-color);
+  }
+  
+  ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+
+    li + li {
+      margin-left: 1rem;
+    }
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--secondary-color);
+    padding: .5rem;
+  }
+
+  a:hover {
+    color: var(--error-color);
+    font-weight: bold;
+    padding: .4rem;
+  }
+}

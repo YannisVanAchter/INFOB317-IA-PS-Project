@@ -14,16 +14,20 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/game">Game</Link>
-            </li>
-          </ul>
-        </nav>
+        <header className='header'>
+          <nav className='nav-bar'>
+            <Link to="/"><h1>Tour de France</h1></Link>
+            <ul>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/game">Game</Link>
+              </li>
+            </ul>
+          </nav>
+        </header>        
+        
         <Routes>
           {/* <Route path="/" element={<Home />} /> */}
           <Route path="/" element={<Game />} />
