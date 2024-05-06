@@ -77,11 +77,43 @@ get_infos_player([H_infos|T_infos],Num_player,H_infos):-
 get_infos_player([H_infos|T_infos],Num_player,Infos):-
     get_infos_player(T_infos,Num_player,Infos).
 
-create_minmax(Tree,Depth).
+% create_minmax_2(Tree,_,_,_,0).
+% create_minmax_2(Tree,Player1,Player2,Player,Depth):-
+%     New_depth is Depth-1,
+%     nth0(1,Player,Cards),
+%     nth0(2,Player,Cyclists),
+%     % liste avec toutes les poss entre toutes cartes tous joueurs
+%     % fonction recu inter je pense
+%     member(Card,Cards),
+%     member(Position,Cyclists),
 
-explore_minmax(Tree,Choice).
+% comme ça je serai limitée pour la profondeur je crois, parce qu'il faudrait retenir quelle carte a été utilisée là, ou alors on fait un tuple carte joueur new pos,et après on test si la carte est déjà prise dans la branche
+% create_branch(Branch,[],Bikes1,[],Bikes2,_).
+% create_branch(Branch,Cards1,Bikes1,Cards2,Bikes2,0).
+% % pas [H_cards1|T_cards1] mais member et def nouvelle liste, pour toutes poss
+% create_branch(Branch,Cards1,Bikes1,Cards2,Bikes2,Depth):-
 
-explore_branch(Branch,Choice).
+% create all the possible next moves for each bike with each card in hand
+iterate_cards([],_,[]).
+iterate_cards([Card|Other_cards],Bikes,Possible_moves):-
+    iterate_bikes(Bikes,Card,Moves),
+    Possible_moves=[Card,Moves|Other_moves],
+    iterate_cards(Other_cards,Bikes,Other_moves).
+
+iterate_bikes([],_,[]).
+iterate_bikes([Bike|Other_bikes],Card,Moves):-
+    Moves=[Next_pos|Other_moves],
+    get_next_position(Bike,Card,Next_pos),
+    iterate_bikes(Other_bikes,Card,Other_moves).
+
+% create_node(Node,Cards,Bikes):-
+%     member(Card,Cards),
+%     member(Bike,Bikes),
+%     get_next_position(Card,Bikes,Value_node).
+
+% explore_minmax(Tree,Choice).
+
+% explore_branch(Branch,Choice).
 
 % gets the potential next positions of the player depending on the value of his cards
 get_next_position(Position,0,Position).
