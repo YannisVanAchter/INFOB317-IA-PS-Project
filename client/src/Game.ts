@@ -446,8 +446,8 @@ function drawCards({ G, ctx }: Context) {
 /**
  * 
  *  @param {Context} context Context of the game
- *  @param {number} cardIndex Index of the card to use
- *  @param {boolean} mock Whether to apply the card to the final state or not (false to apply)
+ *  @param {number} card Card to use
+ *  @param {number} bikeIndex Index of the bike to use the card on
  * 
  *  @returns The new game state with following effects
  *  effects: delete the card from the hand of the player and add the card to the discard pile
@@ -456,23 +456,21 @@ function drawCards({ G, ctx }: Context) {
  * 
  *  Use the card on the bike
  */
-function useCardOnBike({ G, ctx }: Context, cardIndex: number, mock: boolean) {
+function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     let myG = deepCopy(G); 
     const player = myG.players[G.currentPlayer.playerID];
     const card = player.hand[cardIndex];
     console.log(card);
     const bike = player.bikes[G.currentPlayer.bikeIndex];
     let oldPosition = bike.position;
-    let tempNumberedPosition = Board[bike.position].position + card;
-    let tempPosition = null;
-    let tempReducePosition = bike.reduce;
-    if (tempNumberedPosition > nbCases) {
-        tempReducePosition = tempNumberedPosition + card - nbCases;
-        if (tempReducePosition > nbReduceMax) {
-            tempReducePosition = nbReduceMax;
+    let numberedPosition = Board[bike.position].position + card;
+    if (numberedPosition > nbCases) {
+        bike.reduce = numberedPosition + card - nbCases;
+        if (bike.reduce > nbReduceMax) {
+            bike.reduce = nbReduceMax;
         }
         const possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
-        tempPosition = possiblePositions[bike.reduce-1];
+        bike.position = possiblePositions[bike.reduce-1];
     }
     // Check every tile on the way is clear or has space
     if (!checkMove(bike, card)) {
@@ -480,31 +478,29 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number, mock: boolean) {
     }
     
     // Check aspiration
-    console.log(tempNumberedPosition);
-    let test = getPossibleTilesFromPosition(tempNumberedPosition);
+    console.log(numberedPosition);
+    let test = getPossibleTilesFromPosition(numberedPosition);
     console.log(test);
     if (checkAspiration(test[0])) { // Select first possible position, check in front how to handle
         // Aspiration is allowed
     } 
 
     // Needs to choose which tile here, have to be done in front, for now default to the first possible one
-    const possibleTiles = getPossibleTilesFromPosition(tempNumberedPosition);
+    const possibleTiles = getPossibleTilesFromPosition(numberedPosition);
     let newTile = lucky(bike, possibleTiles[0]);
 
     // Put the person on the right square
-    tempPosition = newTile;
-    if (!mock) {
-        player.hand.splice(cardIndex, 1);
-        myG.discard.push(card);
-        // Update board
-        Board[oldPosition].nbBikes--;
-        Board[bike.position].nbBikes++;
-        // Draw cards if the player has no cards left in hand
-        if (player.hand.length === 0) 
-            drawCards({ G: myG, ctx});
-    }
+    bike.position = newTile;
+    player.hand.splice(cardIndex, 1);
+    myG.discard.push(card);
 
-    if (mock) return tempPosition
+    // Update board
+    Board[oldPosition].nbBikes--;
+    Board[bike.position].nbBikes++;
+
+    // Draw cards if the player has no cards left in hand
+    if (player.hand.length === 0) 
+        drawCards({ G: myG, ctx});
 
     return myG;
 }
