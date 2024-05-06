@@ -51,7 +51,7 @@
 
 .chat-bot {
     position: fixed;
-    bottom: 0;
+    bottom: 10%;
     right: 0;
     width: 20rem;
     height: 35rem;
