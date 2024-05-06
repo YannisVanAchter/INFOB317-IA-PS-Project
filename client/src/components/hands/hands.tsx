@@ -15,6 +15,7 @@ type TODO = {
 // TODO: finish this component once mock data for simulation is available
 function DisplayHands(props: TODO) {
     let { G, ctx, copiedG } = props;
+    const currentPlayer = ctx.currentPlayer;
     let players = G.players;
     // const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
     // const [clickedCardIndex, setClickedCardIndex] = useState<number | null>(null);
@@ -41,14 +42,14 @@ function DisplayHands(props: TODO) {
         <div className='hands'>
             {players.map((player, i) => {
                 return (
-                    <div key={i} className='player'>
+                    <div key={i} className={`player ${currentPlayer === player.toString() ? 'current': ''}`}>
                         <h3>Player: {player.playerID + 1}</h3>
                         <ul className='cards'> 
                             {player.hand.map((card, j) => {
                                 return (
-                                    <li 
+                                    <li
                                         key={j} 
-                                        className={`card`}
+                                        className={`card card-${j}`}
                                     >
                                         <CardFront number={card} />
                                     </li>

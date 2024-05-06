@@ -80,8 +80,8 @@ function ChatBot(props: any) {
 
     return (
         <>
-            <button onClick={toggleChat} className={`display-button ${!showChat? 'show' : 'hide'}`}>J'ai une question!</button>
-            <div className={`chat-bot ${showChat? 'show' : 'hide'}`}>
+            <button onClick={toggleChat} className={`display-button ${!showChat? 'show fade-in' : 'hide fade-out'}`}>J'ai une question!</button>
+            <div className={`chat-bot ${showChat? 'show fade-in' : 'hide fade-out'}`}>
                 <div className="header">
                     <h3>Chat Bot</h3>
                     <button 
@@ -92,7 +92,7 @@ function ChatBot(props: any) {
                     </button>
                     <button onClick={toggleChat} className='display-button close'>Fermer</button>
                 </div>
-                <ul className="messages" style={{ maxHeight: '27rem', overflowY: 'auto' }}>
+                <ul className="messages">
                     {messages.map((message) => (
                         <li key={message.id} className={`message ${message.sender}`}>
                             {message.content}

@@ -51,10 +51,10 @@
 
 .chat-bot {
     position: fixed;
-    bottom: 10%;
+    bottom: 15%;
     right: 0;
     width: 20rem;
-    height: 35rem;
+    height: 30rem;
     background-color: var(--secondary-color);
     padding: 0;
     border: 1px solid #ccc;
@@ -65,6 +65,24 @@
 
 .hide {
     display: none;
+}
+
+.fade-out {
+    animation: fadeOut ease 1.5s;
+}
+
+@keyframes fadeOut {
+    0% {opacity:1;}
+    100% {opacity:0;}
+}
+
+.fade-in {
+    animation: fadeIn ease .5s;
+}
+
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
 }
 
 .chat-bot .header {
@@ -79,12 +97,12 @@
 }
 
 .messages {
-    /* height: 80%; */
     overflow-y: auto;
     margin-bottom: 10px;
-    min-height: 15rem;
+    height: 22.5rem;
+    overflow-y: auto;
     background-color: var(--ternary-color);
-    border-radius: 1rem;
+    border-radius: 1rem 1rem 0 0;
     padding: 0rem;
     list-style: none;
 }
@@ -92,6 +110,7 @@
 .message {
     padding: .5rem;
     margin: 0.5rem;
+    margin-bottom: 0.1rem;
     border-radius: 10px;
     background-color: var(--primary-color);
     color: var(--secondary-color);
@@ -111,10 +130,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 0rem;
     padding: 0 .5rem;
     background-color: var(--ternary-color);
     height: 2.5rem;
-    border-radius: 1rem;
+    border-radius: 0 0 1rem 1rem;
 }
 
 .form-chat-bot input {

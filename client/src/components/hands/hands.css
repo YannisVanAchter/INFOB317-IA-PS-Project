@@ -16,6 +16,10 @@
     flex-wrap: nowrap;
 }
 
+.hands .player.current {
+    scale: 1.2;
+}
+
 .hands .player + .player .cards {
     margin: 0rem;
     margin-left: .5rem;
@@ -27,6 +31,8 @@
     display: flex;
     flex-direction: row;
     flex-wrap: inherit;
+    justify-content: center;
+    align-items: center;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -37,15 +43,29 @@
     margin: 0;
     padding: 0;
     max-width: 7.5rem;
-    transform: rotate(calc(-40deg * var(--card-index)));
     transition: scale .2s;
-}
-
-.hands .player .cards .card ~ .card {
-    --card-index: 1;
-    transform: rotate(calc(-20deg * var(--card-index)));
 }
 
 .hands .player .cards .card:hover {
     scale: 1.5;
+}
+
+.hands .player .cards .card.card-0 {
+    transform: translate(4.5rem, 0rem) rotate(-60deg);
+}
+
+.hands .player .cards .card.card-1 {
+    transform: translate(2rem, -0.5rem) rotate(-30deg);
+}
+
+.hands .player .cards .card.card-2 {
+    transform: translate(0rem, -1rem) rotate(0deg);
+}
+
+.hands .player .cards .card.card-3 {
+    transform: translate(-2rem, -0.5rem) rotate(30deg);
+}
+
+.hands .player .cards .card.card-4 {
+    transform: translate(-4.5rem, 0rem) rotate(60deg);
 }
