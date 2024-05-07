@@ -443,6 +443,10 @@ function drawCards({ G, ctx }: Context) {
     }
 }
 
+function mockUseCardOnBike(params: any): string[] {
+    return []; 
+}
+
 /**
  * 
  *  @param {Context} context Context of the game
@@ -561,5 +565,5 @@ const TourDeFrance = {
     },
 }
 
-export { TourDeFrance, winnerRanking, useCardOnBike, getBoardCase, Board };
+export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, Board };
 export type { Player, Bike, Context, DCtx, Ctx };
