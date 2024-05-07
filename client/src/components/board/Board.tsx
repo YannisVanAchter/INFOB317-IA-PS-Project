@@ -33,6 +33,7 @@ function TourDeFranceBoard(props: BoardProps) {
         if (map) {
             bikes = props.players.map(player => {
                 return player.bikes.map(bike => {
+                    if (bike === "0-B-left") return;
                     const caseElement = getBoardCase(bike);
                     const SvgID = fromMapToSVG(bike, caseElement.nbBikesMax as 1|2|3);
                     if (map === null) 
