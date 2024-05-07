@@ -22,6 +22,7 @@ type BoardProps = {
 
 function TourDeFranceBoard(props: BoardProps) {
     // load svg map 
+    console.log('TourDeFranceBoard');
     let [map, setMap] = useState<Svg|null>(null);
     let [bikes, setBikes] = useState<Element[]>([]);
     let [playerMoves, setPlayerMoves] = useState<Dom[]>([]);
@@ -41,7 +42,7 @@ function TourDeFranceBoard(props: BoardProps) {
                     if (bikeFuturePosition === undefined) {
                         console.error(`SvgID: ${SvgID} not found`);
                         return null;
-                    }   
+                    }
                     const playerEmoticon = playerTeamsEmoticons[player.playerID];
                     const bikeSVG = map.group();
                     bikeSVG.text(playerEmoticon).addClass('player-emoticon');
@@ -73,12 +74,26 @@ function TourDeFranceBoard(props: BoardProps) {
 
     // Add the map to the DOM
     useEffect(() => {
+        let isMounted = true;
         fetch(Map)
             .then(response => response.text())
             .then(data => {
-                map = SVG().addTo('#board-map').svg(data);
-                setMap(map);
+                if (isMounted) {
+                    if (map) {
+                        map.remove();
+                    }
+                    map = SVG()
+                        .addTo('#board-map')
+                        .size('100%', '100%')
+                        .front()
+                        .svg(data);
+                    setMap(map);
+                }
             });
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     // Update the current player
@@ -87,9 +102,7 @@ function TourDeFranceBoard(props: BoardProps) {
     }, [props.currentPlayer]);
     
     return <>
-        <div id="board-map" className='board'>
-            <img className='board' src={mapPng} alt='Tour de France plateau' />
-        </div>
+        <img id="board-map" className='board' src={mapPng} alt='Tour de France plateau' />
     </>;
 }
 
