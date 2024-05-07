@@ -9,6 +9,12 @@
     grid-template-columns: 1fr;
 }
 
+.winner p {
+    text-align: center;
+    font-size: 10rem;
+    color: var(--primary-color);
+}
+
 .winner .player {
     margin: 1rem;
     color: var(--primary-color);
