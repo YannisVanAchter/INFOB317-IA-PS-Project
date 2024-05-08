@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 import './App.css';
+import velo from './assets/velo-icon.png';
 
 import Home from './pages/home/home';
 import Game from './pages/game/game';
@@ -16,17 +17,14 @@ function App() {
       <BrowserRouter>
         <header className='header'>
           <nav className='nav-bar'>
-            <Link to="/"><h1>Tour de France</h1></Link>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/game">Game</Link>
-              </li>
-            </ul>
+            <Link to="/" className='profile-page link'>
+              <img className='icon' src={velo} alt="velo" />
+              <h1>Tour de France</h1>
+            </Link>
+            <Link to="/" className='link'>Home</Link>
+            <Link to="/game" className='link'>Game</Link>
           </nav>
-        </header>        
+        </header>
         
         <Routes>
           {/* <Route path="/" element={<Home />} /> */}

@@ -21,17 +21,27 @@ h2 {
 }
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4rem;
+
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
   background-color: var(--primary-color);
   color: var(--secondary-color);
+
 }
 
 .header .nav-bar {
   margin: 0;
   padding: 0;
+  margin-left: 30%;
+  margin-right: 30%;
 
   display: flex;
   flex-direction: row;
@@ -40,32 +50,39 @@ h2 {
 
   font-size: 1.2rem;
 
-  h1 {
+  
+  .profile-page {
     margin: 0;
     padding: 0;
-    text-decoration: none;
-    color: var(--secondary-color);
-  }
-  
-  ul {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    list-style: none;
 
-    li + li {
-      margin-left: 1rem;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+
+    .icon {
+      width: 20%;
+      height: 20%;
+
+      margin-right: .5rem;
+      transform: translateY(.5rem) rotateY(180deg) rotateZ(-20deg);
+    }
+
+    h1 {
+      margin: 0;
+      padding: 0;
+      text-decoration: none;
+      color: var(--secondary-color);
     }
   }
 
-  a {
+  .link {
     text-decoration: none;
     color: var(--secondary-color);
     padding: .5rem;
+    margin: 0;
   }
 
-  a:hover {
+  .link:hover {
     color: var(--error-color);
     font-weight: bold;
     padding: .4rem;
