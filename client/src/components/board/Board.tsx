@@ -8,93 +8,106 @@ import Map from '../../assets/map.svg';
 import mapPng from '../../assets/map.png';
 
 const playerTeamsEmoticons = [
-    "🇧🇪", // Belgique
-    "🇳🇱", // Pays-Bas
-    "🇩🇪", // Allemagne
-    "🇮🇹" // Italie
+    "https://hatscripts.github.io/circle-flags/flags/be.svg", // Belgique
+    "https://hatscripts.github.io/circle-flags/flags/nl.svg", // Pays-Bas
+    "https://hatscripts.github.io/circle-flags/flags/de.svg", // Allemagne
+    "https://hatscripts.github.io/circle-flags/flags/it.svg" // Italie
 ];
 
 type BoardProps = {
     players: { playerID: 0 | 1 | 2 | 3, bikes: boardKey[] }[],
-    currentPlayer: 0 | 1 | 2 | 3
-    availableMoves: boardKey[]
+    currentPlayer: 0 | 1 | 2 | 3,
+    availableMoves: boardKey[],
 };
 
 function TourDeFranceBoard(props: BoardProps) {
     // load svg map 
-    console.log('TourDeFranceBoard');
+    console.log('props', props);
     let [map, setMap] = useState<Svg|null>(null);
     let [bikes, setBikes] = useState<Element[]>([]);
-    let [playerMoves, setPlayerMoves] = useState<Dom[]>([]);
+    let [playerMoves, setPlayerMoves] = useState<any[]>([]);
     let [currentPlayer, setCurrentPlayer] = useState<0 | 1 | 2 | 3>(parseInt(props.currentPlayer.toString()) as 0 | 1 | 2 | 3);
 
-    // Add bikes to the map
-    useEffect(() => {
-        if (map) {
-            bikes = props.players.map(player => {
-                return player.bikes.map(bike => {
-                    if (bike === "0-B-left") return;
-                    const caseElement = getBoardCase(bike);
-                    const SvgID = fromMapToSVG(bike, caseElement.nbBikesMax as 1|2|3);
-                    if (map === null) 
-                        map = Map as unknown as Svg;
-                    console.log(`SvgID: ${SvgID}`);
-                    const bikeFuturePosition = map.data(`#${SvgID}`);
-                    if (bikeFuturePosition === undefined) {
-                        console.error(`SvgID: ${SvgID} not found`);
-                        return null;
-                    }
-                    const playerEmoticon = playerTeamsEmoticons[player.playerID];
-                    const bikeSVG = map.group();
-                    bikeSVG.text(playerEmoticon).addClass('player-emoticon');
-                    bikeSVG.move(bikeFuturePosition.cx(), bikeFuturePosition.cy());
+    let svgMapRendered = useRef(false);
 
-                    bikeFuturePosition.add(bikeSVG);
-                    return bikeFuturePosition;
-                }) as unknown as Element[];
-            }).flat();
-            setBikes(bikes);
-        }
-    }, [map, props.players]);
+    // Add bikes to the map
+    // useEffect(() => {
+    //     if (map) {
+    //         bikes = props.players.map(player => {
+    //             return player.bikes.map(bike => {
+    //                 if (bike === "0-B-left") return; // Skip the first position (start line)
+    //                 const caseElement = getBoardCase(bike);
+    //                 const SvgID = fromMapToSVG(bike, caseElement.nbBikesMax as 1|2|3);
+    //                 if (map === null) 
+    //                     map = Map as unknown as Svg;
+    //                 console.log(`SvgID: ${SvgID}`);
+    //                 const bikeFuturePosition = document.getElementById(SvgID);
+    //                 if (bikeFuturePosition === undefined) {
+    //                     console.error(`SvgID: ${SvgID} not found`);
+    //                     return null;
+    //                 }
+    //                 const playerEmoticon = playerTeamsEmoticons[player.playerID];
+    //                 const playerEmoticonElement = document.createElement('span');
+    //                 playerEmoticonElement.textContent = playerEmoticon;
+    //                 bikeFuturePosition!.appendChild(playerEmoticonElement);
+
+    //                 return bikeFuturePosition;
+    //             }) as unknown as Element[];
+    //         }).flat();
+    //         setBikes(bikes);
+    //     }
+    // }, [map, props.players]);
 
     // Add player moves to the map
     useEffect(() => {
         if (map) {
             playerMoves = props.availableMoves.map(move => {
                 if (map === null) 
-                    map = Map as unknown as Svg;
+                    return ;
                 const caseElement = getBoardCase(move);
-                const SvgID = fromMapToSVG(move, caseElement.nbBikesMax as 1|2|3);
-                const moveElement = map.data(`#${SvgID}`) as Dom;
-                moveElement.addClass('move');
+                const SvgID = fromMapToSVG(move, caseElement.nbBikesMax as 1|2|3) as string;
+                const moveElement = document.getElementById(SvgID);
+                if (!moveElement) {
+                    console.error(`Element: ${moveElement} for ${SvgID} not found`);
+                    return null;
+                }
+                console.log(`Element: ${moveElement} for ${SvgID}`);
+                moveElement!.classList.add('move');
                 return moveElement;
-            }).filter(moveElement => moveElement !== null) as Dom[];
+            }).filter(moveElement => moveElement !== null);
             setPlayerMoves(playerMoves);
         }
     }, [map, props.availableMoves]);
 
     // Add the map to the DOM
     useEffect(() => {
-        let isMounted = true;
-        fetch(Map)
-            .then(response => response.text())
-            .then(data => {
-                if (isMounted) {
-                    if (map) {
-                        map.remove();
-                    }
-                    map = SVG()
-                        .addTo('#board-map')
-                        .size('100%', '100%')
-                        .front()
-                        .svg(data);
-                    setMap(map);
-                }
-            });
+        if (!svgMapRendered.current) {
+            const mapElement = document.getElementById('board-map');
+            if (mapElement === null) {
+                console.error('Map element not found');
+                return;
+            }
 
-        return () => {
-            isMounted = false;
-        };
+            // Charger l'image SVG
+            fetch('/static/media/map.94d8e552a56358b2467a849395bf7b1b.svg')
+                .then(response => response.text())
+                .then(data => {
+                    let map = SVG().svg(data);
+                    map.addClass('svg-map');
+                    map.attr('id', 'map');
+                    if (document.getElementById('map') === null) {
+                        const startLine = `
+                            <g id="start-line" transform="translate(750, 750)">
+                            </g>
+                        `;
+                        map.node.innerHTML += startLine;
+                        mapElement.appendChild(map.node);
+                    }
+                    setMap(map);
+                    svgMapRendered.current = true;
+                })
+                .catch(error => console.error('Error loading SVG:', error));
+        }
     }, []);
 
     // Update the current player
@@ -103,7 +116,7 @@ function TourDeFranceBoard(props: BoardProps) {
     }, [props.currentPlayer]);
     
     return <>
-        <img id="board-map" className='board' src={mapPng} alt='Tour de France plateau' />
+        <div id="board-map" className='board'></div>
     </>;
 }
 

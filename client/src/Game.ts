@@ -1,6 +1,7 @@
 import { FnContext } from 'boardgame.io';
 import { shuffle } from './utils/shuffle';
 import { deepCopy } from './utils/deep_copy';
+import { boardKey } from './utils/simonLTransform';
 
 // Constants
 const nbCases = 95;
@@ -259,7 +260,7 @@ function getBoardCase(position: string): BoardCase {
  * Convert the numbered position to the key for Board dict
  * @param position Position to convert
  */
-function getPossibleTilesFromPosition(position: number): string[] {
+function getPossibleTilesFromPosition(position: number): boardKey[] {
     console.log(position);
     let possibleTiles: string[] = [];
     for (const key in Board) {
@@ -443,7 +444,7 @@ function drawCards({ G, ctx }: Context) {
     }
 }
 
-function mockUseCardOnBike(bike: Bike, card: number): string[] {
+function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
     let numberedPosition = Board[bike.position].position + card;
     if (numberedPosition > nbCases) {
         let tempPos = numberedPosition + card - nbCases;
@@ -544,7 +545,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '0-B-left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '1-A-left', reduce: 0, turn: 0 })),
         })),
     };
 

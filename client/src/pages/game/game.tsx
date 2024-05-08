@@ -29,9 +29,15 @@ function Page(props: TODO) {
         {playerID: 2 as 2, bikes: players[2].bikes.map((bike: any) => bike.position)},
         {playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position)},
     ],
-    currentPlayer: props.ctx.currentPlayer,
-    availableMoves: mockUseCardOnBike(players[currentPlayer.playerID].bikes[currentPlayer.bikeIndex], 0)
+    currentPlayer: parseInt(props.ctx.currentPlayer) as 0 | 1 | 2 | 3,
+    availableMoves: [] as string[]
     };
+
+    for (let i = 0; i < props.G.players[currentPlayer.playerID].hand.length; i++) {
+        const availableMoves = mockUseCardOnBike(props.G.players[currentPlayer.playerID].bikes[currentPlayer.bikeIndex], props.G.players[currentPlayer.playerID].hand[i]);
+        boardProps.availableMoves = [...boardProps.availableMoves, ...availableMoves];
+    }
+
     return (
         <div className='board-game'>
             <SideBoard {...props} />

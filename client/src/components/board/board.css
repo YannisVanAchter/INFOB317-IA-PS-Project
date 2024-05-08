@@ -3,10 +3,12 @@
     position: fixed;
     top: 15%;
     left: 25%;
-    width: auto;
-    height: auto;
-    max-height: 25rem;
 
+    /* Size fit SVG content */
+    width: 55.5%;
+    height: 70%;
+
+    background-image: url('../../assets/map.png');
     background-size: cover;
 
     resize: both;
@@ -14,7 +16,12 @@
     box-shadow: 0rem 0rem 2.5rem 0rem var(--primary-color);
 }
 
-.move {
+.svg-map {
+    width: 100%;
+    height: 100%;
+}
+
+.board .move {
     cursor: pointer;
     background-color: white;
     opacity: 0.5;
