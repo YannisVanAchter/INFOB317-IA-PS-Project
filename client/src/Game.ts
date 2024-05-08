@@ -443,8 +443,30 @@ function drawCards({ G, ctx }: Context) {
     }
 }
 
-function mockUseCardOnBike(params: any): string[] {
-    return []; 
+function mockUseCardOnBike(bike: Bike, card: number): string[] {
+    let numberedPosition = Board[bike.position].position + card;
+    if (numberedPosition > nbCases) {
+        let tempPos = numberedPosition + card - nbCases;
+        if (tempPos > nbReduceMax) {
+            tempPos = nbReduceMax;
+        }
+        const possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
+        return [possiblePositions[tempPos-1]];
+    }
+
+    if (!checkMove(bike, card)) {
+        return [];
+    }
+
+    let newPosition = getPossibleTilesFromPosition(numberedPosition);
+    let possiblePositions = [...newPosition];
+    for (let i = 0; i < newPosition.length; i++) {
+        if (checkAspiration(possiblePositions[i])) {
+            possiblePositions.push(...Board[possiblePositions[i]].next);
+        }
+    }
+
+    return possiblePositions;
 }
 
 /**
