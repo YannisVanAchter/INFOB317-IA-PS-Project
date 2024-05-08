@@ -26,12 +26,12 @@ function SideBoard(props: TODO) {
     return (
         <aside className={`${props.className} winner`}>
             <h2>Current player:</h2>
-            <p className='player'>{props.ctx.currentPlayer}</p>
+            <p className='player'>Player {parseInt(props.ctx.currentPlayer) + 1}</p>
             <h2>Winner ranking</h2>
             <ol>
                 {winners.map((player) => (
                     <li key={player} className='player'>
-                        <span>Player {player}</span>
+                        <span>Player {player + 1}</span>
                     </li>
                 ))}
             </ol>

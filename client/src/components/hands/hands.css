@@ -29,11 +29,7 @@
 }
 
 .hands ul.cards {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: inherit;
-    justify-content: center;
-    align-items: center;
+    display: flex   ;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -46,13 +42,15 @@
     cursor: pointer;
     margin: 0;
     padding: 0;
-    max-width: 3rem;
-    transition: scale .2s;
-
 }
 
-.hands .player.current .card:hover {
-    scale: 2;
+.hands .player .card.hovered {
+    scale: 1.2;
+    opacity: 100%;
+}
+
+.hands .player .card.other-card-hovered {
+    opacity: 0.5;
 }
 
 .hands .player .card.card-0 {
@@ -76,5 +74,64 @@
 }
 
 .hands .player .card.empty-card {
-    opacity: 0;
+    opacity: 0; /* hide empty card */
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(var(--secondary-color), 0.9);
+
+}
+
+.modal .content {
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+
+    opacity: 2;
+
+    color: var(--secondary-color);
+
+    padding: 1rem;
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        li {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            margin: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+
+            width: fit-content;
+            cursor: pointer;
+        }
+    }
+
+    button {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        margin: 0.5rem;
+        cursor: pointer;
+    }
 }

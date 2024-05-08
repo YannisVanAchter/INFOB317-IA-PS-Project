@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TourDeFrance } from '../../Game';
+import { TourDeFrance, mockUseCardOnBike } from '../../Game';
 import { Client } from 'boardgame.io/react';
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
@@ -22,6 +22,7 @@ type TODO = any;
 function Page(props: TODO) {
     // console.log('props', props);
     let players = props.G.players;
+    const currentPlayer = props.G.currentPlayer;
     let boardProps = {players: [
         {playerID: 0 as 0, bikes: players[0].bikes.map((bike: any) => bike.position)},
         {playerID: 1 as 1, bikes: players[1].bikes.map((bike: any) => bike.position)},
@@ -29,7 +30,7 @@ function Page(props: TODO) {
         {playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position)},
     ],
     currentPlayer: props.ctx.currentPlayer,
-    availableMoves: []
+    availableMoves: mockUseCardOnBike(players[currentPlayer.playerID].bikes[currentPlayer.bikeIndex], 0)
     };
     return (
         <div className='board-game'>

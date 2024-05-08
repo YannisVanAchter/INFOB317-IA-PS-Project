@@ -82,7 +82,7 @@ function ChatBot(props: any) {
         <>
             <button onClick={toggleChat} className={`display-button ${!showChat? 'show fade-in' : 'hide fade-out'}`}>J'ai une question!</button>
             <div className={`chat-bot ${showChat? 'show fade-in' : 'hide fade-out'}`}>
-                <div className="header">
+                <div className="header-bot">
                     <h3>Chat Bot</h3>
                     <button 
                         onClick={(e) => setMessages([firstMessage])} 

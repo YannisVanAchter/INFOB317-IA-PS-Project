@@ -1,6 +1,6 @@
 :root {
-  --primary-color: yellow;
-  --secondary-color: black;
+  --primary-color: #ffff00;
+  --secondary-color: #000000;
   --ternary-color: #fff9da;
   --error-color: #a81e1e;
 }
