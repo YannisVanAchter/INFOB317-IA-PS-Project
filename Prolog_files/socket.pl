@@ -51,7 +51,7 @@ handle_post(Request, Response, ID) :-
 answer(Question, Request):-
     produire_reponse(Question, Resp),
     handle_post(Request, Resp, "bot"),
-    reply_html_page(title('test'),[h1(Resp)]).
+    reply_json(json([answer=Resp])).
     
 answer_ia(Board, Request) :-
     %http_read_json_dict(Request, Board),

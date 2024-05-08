@@ -62,7 +62,7 @@ function TourDeFranceBoard(props: BoardProps) {
     useEffect(() => {
         if (map) {
             playerMoves = props.availableMoves.map(move => {
-                if (map === null) 
+                if (map === null)
                     return ;
                 const caseElement = getBoardCase(move);
                 const SvgID = fromMapToSVG(move, caseElement.nbBikesMax as 1|2|3) as string;

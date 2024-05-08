@@ -40,23 +40,20 @@ function ChatBot(props: any) {
             sender: 'user',
         };
         updateMessages(newMessage);
-        setInput('');
+        // setInput('');
 
         try {
-            const url = `${process.env.REACT_APP_SERVER_URL}/message`
+            const url = `${process.env.REACT_APP_SERVER_URL}/bot/${input}`
             console.log('url:', url);
-            const response = await axios.get(url, {
-                params: {
-                    question: input,
-                },
-            });
+            const response = await axios.get(url, {});
             const botResponse: Message = {
                 id: messages.length + 2,
-                content: response.data.botResponse,
+                content: response.data.answer,
                 sender: 'bot',
                 response: newMessage,
             };
             updateMessages(botResponse);
+            setInput('');
         } catch (error) {
             console.error('Error sending message:', error);
         }

@@ -19,6 +19,9 @@
 .svg-map {
     width: 100%;
     height: 100%;
+
+    /* Remove default color for opacity of 0 */
+    fill: currentColor;
 }
 
 .board .move {
