@@ -8,7 +8,6 @@
 
 % je suppose que le echo servira pour la réponse...? Non ça aurait servi si on utilisait le protocole websocket mais c'est pas le cas ici
 
-
 :- initialization http_server([port(8080)]).
 
 % get
@@ -28,6 +27,17 @@ home_page(_Request) :-
     [ h1('test')]).
 
 
+answer(Question, _Request):-
+    produire_reponse(Question, Resp),
+    reply_json(json([answer=Resp])).
+        
+answer_ia(Board, Request) :-
+    %http_read_json_dict(Request, Board),
+    get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
+    reply_json(json([response=Move])).
+
+get_move_IA(Board, Move). %en attendant que l'ia soit fonctionnel et pour éviter les problèmes dans ce code, à supprimer par la suite
+
 % post
 
 % ça pas encore fini, il faudra que nous on gère les requêtes post
@@ -35,29 +45,17 @@ home_page(_Request) :-
 %:- http_handler(root(post_request), handle_post, [method(post)]).
 %:- http_handler(root(post_request), handle_post(Method), [method(Method), methods([post])]).
 
-handle_post(Request, Response, ID) :-
-    http_read_data(Request, Data, []),
-    (   ID == "bot",
-        Reply = json([response=Response]),
-        http_post_data('http://localhost:8080/bot/', Reply, Received, []) %faut changer l'endroit de retour surement mais j'avoue ne pas trop savoir ou
-    ;   ID == "ia",
-        Reply = json([response=Response]),
-        http_post_data('http://localhost:8080/ia/', Reply, Received, []) %idem
-    ),
-    format('Content-type: text/plain~n~n', []),
-    format('Response: ~w~n', [Received]).
-
-
-answer(Question, Request):-
-    produire_reponse(Question, Resp),
-    handle_post(Request, Resp, "bot"),
-    reply_json(json([answer=Resp])).
-    
-answer_ia(Board, Request) :-
-    %http_read_json_dict(Request, Board),
-    get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
-    handle_post(Request, Move, "ia"),
-    reply_json(json([response=Move])).
+%handle_post(Request, Response, ID) :-
+%    http_read_data(Request, Data, []),
+%    (   ID == "bot",
+%        Reply = json([response=Response]),
+%        http_post_data('http://localhost:8080/bot/', Reply, Received, []) %faut changer l'endroit de retour surement mais j'avoue ne pas trop savoir ou
+%   ;   ID == "ia",
+%        Reply = json([response=Response]),
+%        http_post_data('http://localhost:8080/ia/', Reply, Received, []) %idem
+%    ),
+%    format('Content-type: text/plain~n~n', []),
+%    format('Response: ~w~n', [Received]).
 
 
 %handle_post(post, Request):-
