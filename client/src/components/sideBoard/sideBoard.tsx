@@ -6,19 +6,10 @@ import { winnerRanking } from '../../Game';
 import './sideBoard.css';
 
 type TODO = {
-    G: DCtx,
-    ctx: Ctx,
+    G: any,
+    ctx: any,
     moves: any,
-    events: any,
-    playerID: any,
-    isActive: any,
-    isMultiplayer: any,
-    isConnected: any,
-    isConnectedWebRtc: any,
-    gameMetadata: any,
-    matchData: any,
-    isPreview: any,
-    className: string,
+    className: string
 };
 
 function SideBoard(props: TODO) {

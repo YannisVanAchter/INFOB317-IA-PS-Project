@@ -1,6 +1,6 @@
 .display-button {
     position: fixed;
-    bottom: 0;
+    top: 10%;
     right: 0;
     margin: 2rem;
     padding: 1rem 2rem;
@@ -68,12 +68,12 @@
 }
 
 .fade-out {
-    animation: fadeOut ease 1.5s;
+    animation: fadeOut ease .5s;
 }
 
 @keyframes fadeOut {
-    0% {opacity:1;}
-    100% {opacity:0;}
+    0% {opacity:1; transform: translateX(0);}
+    100% {opacity:0; transform: translateX(100%);}
 }
 
 .fade-in {
@@ -81,8 +81,8 @@
 }
 
 @keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
+    0% {opacity:0; transform: translateX(100%);}
+    100% {opacity:1; transform: translateX(0);}
 }
 
 .chat-bot .header-bot {

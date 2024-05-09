@@ -26,7 +26,9 @@ function ChatBot(props: any) {
     };
 
     const updateMessages = (newMessage: Message) => {
-        setMessages([...messages, newMessage]);
+        const id = messages.length;
+        const { content, sender, response } = newMessage;
+        setMessages([...messages, { id, content, sender, response }]);
     }
 
     const sendMessage = async (event: any) => {
@@ -40,14 +42,14 @@ function ChatBot(props: any) {
             sender: 'user',
         };
         updateMessages(newMessage);
-        // setInput('');
+        const url = `${process.env.REACT_APP_SERVER_URL}/bot/${input}`
+        // console.log('url:', url);
+        setInput('');
 
         try {
-            const url = `${process.env.REACT_APP_SERVER_URL}/bot/${input}`
-            console.log('url:', url);
-            const response = await axios.get(url, {});
+            const response = await axios.get(url);
             const botResponse: Message = {
-                id: messages.length + 2,
+                id: messages.length + 1,
                 content: response.data.answer,
                 sender: 'bot',
                 response: newMessage,

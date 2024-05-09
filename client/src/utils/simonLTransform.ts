@@ -20,11 +20,13 @@ type svgId = `c${position}_${svgSide}`;
  * @param key from de board variable in Game.ts
  * @return the id in the SVG
  */
-function fromMapToSVG(key: boardKey, nbBikesMax: 1 | 2 | 3) {
-    let [position, caseLetter, _] = key.split('-');
-    let svgSide = (nbBikesMax - 1);
+function fromMapToSVG(key: boardKey, alreadyUsed: boardKey[] = []) {
+    if (key === "0-B-left") return "start";
 
-    // Road position
+    let [position, caseLetter, _] = key.split('-');
+    let svgSide = alreadyUsed.filter((k) => k === key).length as svgSide;
+
+    // read caseLetter
     switch (caseLetter) {
         case 'B':
             svgSide = 1;

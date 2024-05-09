@@ -2,7 +2,6 @@
     position: fixed;
     bottom: 0%;
     left: 0;
-    right: 20%;
     display: flex;
     justify-content: space-around;
     margin-top: 20px;
@@ -38,10 +37,16 @@
     scale: 2;
 }
 
-.hands .player .card {
+.hands .player .cards .card {
     cursor: pointer;
     margin: 0;
     padding: 0;
+
+    /* TODO: remove padding overflow */
+    box-shadow: 0rem 0rem 0.5rem 0rem var(--primary-color);
+
+    width: 3.75rem;
+    height: 2.5rem;
 }
 
 .hands .player .card.hovered {

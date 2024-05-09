@@ -545,7 +545,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '1-A-left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '0-B-left', reduce: 0, turn: 0 })),
         })),
     };
 
@@ -578,13 +578,11 @@ const TourDeFrance = {
         maxMoves: nbBikes,
     },
 
-    phase: {
-        play: {
-            move: {
-                useCard: (context: Context, bikeIndex: number) => {context.G = useCardOnBike(context, bikeIndex)},
-            },
-            start: true,
-        },
+    moves: {
+        useCard: (context: any, bikeIndex: number) => {
+            console.log(context);
+            console.log(bikeIndex);
+            context.G = useCardOnBike(context, bikeIndex)},
     },
 }
 

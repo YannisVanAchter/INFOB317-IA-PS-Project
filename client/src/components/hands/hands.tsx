@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import CardFront from '../../assets/cardFront';
+import CardFront, { cardValue } from '../../assets/cardFront';
 import { DCtx, Ctx, useCardOnBike } from '../../Game';
 import { mockUseCardOnBike } from '../../Game'; 
 import { deepCopy } from '../../utils/deep_copy';
@@ -9,12 +9,12 @@ import './hands.css';
 
 type TODO = {
     G: DCtx,
-    ctx: Ctx,
+    applyCardOnBike: (target: string) => void
 };
 
 // TODO: finish this component once mock data for simulation is available
 function DisplayHands(props: TODO) {
-    let { G, ctx } = props;
+    let { G } = props;
     const currentPlayer = G.currentPlayer.playerID.toString();
     const currentBikeIndex = G.currentPlayer.bikeIndex;
     const currentBike = G.players[parseInt(currentPlayer)].bikes[currentBikeIndex];
@@ -26,13 +26,13 @@ function DisplayHands(props: TODO) {
     const Modal = () => {
         const availableMoves = mockUseCardOnBike(currentBike, modalCardValue);
         if (availableMoves.length === 1) {
-            // useCardOnBike(G, ctx, modalPlayerID, modalCardValue, availableMoves[0]);
+            props.applyCardOnBike(availableMoves[0]);
             setDisplayModal(false);
         }
 
         const handleChoice = (e: any, move: string) => {
             e.preventDefault();
-            // useCardOnBike(G, ctx, modalPlayerID, modalCardValue, move);
+            props.applyCardOnBike(move);
             setDisplayModal(false);
         }
 
@@ -63,8 +63,6 @@ function DisplayHands(props: TODO) {
         setModalCardValue(cardValue);
         setDisplayModal(true);
     };
-
-    // TODO: add modal to display choices for player to make when card is played and has multiple destinations
 
     //  Effect that apply 1.2 scale to the card when hovered and 0.85 opacity when other cards are hovered
     useEffect(() => {
@@ -100,7 +98,7 @@ function DisplayHands(props: TODO) {
                 // if (i.toString() !== currentPlayer) return;
                 let hand = deepCopy(player.hand);
                 while (hand.length < 5) {
-                    console.log(hand);
+                    // console.log(hand);
                     if (hand.length % 2 === 1) { // if even
                         hand = [-1, ...hand, -1];
                     }
@@ -120,7 +118,7 @@ function DisplayHands(props: TODO) {
                                     <li
                                         id={`id-${player.playerID}-${j}`}
                                         key={j}
-                                        className={`card card-${j} empty-card`}
+                                        className={`card empty-card`}
                                     >
                                         <CardFront number={-1} />
                                     </li>
@@ -131,7 +129,7 @@ function DisplayHands(props: TODO) {
                                         className={`card card-${j}`}
                                         onClick={(e) => handleClickCard(e, player.playerID, card)}
                                     >
-                                        <CardFront number={card} />
+                                        <CardFront number={card as cardValue} />
                                     </li>
                                 );
                             })}

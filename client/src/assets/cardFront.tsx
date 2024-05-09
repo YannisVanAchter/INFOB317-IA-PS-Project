@@ -2,7 +2,7 @@ import React from 'react';
 
 type cardValue = -3 | -2 | -1 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
-const CardFront = ({ number, className }: any) => {
+const CardFront = ({ number, className = '' }: {number: cardValue, className?: string}) => {
     // Contenu du SVG initial
     const svgContent = `
     <!-- All credits to Mariya-Laurel Ivakhnenko that created this SVG -->
@@ -33,3 +33,4 @@ const CardFront = ({ number, className }: any) => {
 };
 
 export default CardFront;
+export type { cardValue };
