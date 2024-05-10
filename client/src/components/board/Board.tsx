@@ -3,9 +3,8 @@ import './board.css';
 import { fromMapToSVG } from '../../utils/simonLTransform';
 import { boardKey } from '../../utils/simonLTransform'; // Type definition
 import Map from '../../assets/map';
-import { Svg } from '@svgdotjs/svg.js';
 
-const playerTeamsEmoticons = [
+const playerTeamsEmoticons: string[] = [
     "https://hatscripts.github.io/circle-flags/flags/be.svg", // Belgique
     "https://hatscripts.github.io/circle-flags/flags/nl.svg", // Pays-Bas
     "https://hatscripts.github.io/circle-flags/flags/de.svg", // Allemagne
@@ -14,7 +13,7 @@ const playerTeamsEmoticons = [
 
 type BoardProps = {
     players: { playerID: 0 | 1 | 2 | 3, bikes: boardKey[] }[],
-    currentPlayer: 0 | 1 | 2 | 3,
+    currentPlayer: { playerID: 0 | 1 | 2 | 3, bikeIndex: number },
     availableMoves: boardKey[],
     applyCardOnBike: (target: boardKey) => void
 };
@@ -28,29 +27,27 @@ function TourDeFranceBoard(props: BoardProps) {
             player.bikes.forEach(bike => {
                 let SvgID = fromMapToSVG(bike, usedMove);
                 if (SvgID === "start") 
-                    SvgID = `start-${props.currentPlayer}`;
+                    SvgID = `start-${player.playerID}`;
                 const element = document.getElementById(SvgID);
                 if (element === undefined || element === null) {
                     console.error(`SvgID: ${SvgID} not found`);
                     return;
                 }
-                const img = `
-                <image 
-                    x="-20" y="-20" 
-                    height="40" width="40" 
-                    href="${playerTeamsEmoticons[player.playerID]}"
-                    style="z-index: 9999;"
-                ></image>
-                `;
-                const template = document.createElement('template');
-                template.innerHTML = img;
-                const node = template.content.firstChild;
+
+                const node = document.createElement('img');
+                node.src = playerTeamsEmoticons[player.playerID];
+                node.style.width = '20px';
+                node.style.height = '20px';
+                node.style.zIndex = '9999';
+                node.style.position = 'relative';
+                node.style.top = '-20px';
+                node.style.left = '-20px';
 
                 // TODO: Check why not working ??
                 element.appendChild(node!);
 
                 usedMove.push(bike);
-                // console.log('element', element, 'has been updated to the player', player.playerID);
+                console.log('element', element, 'has been updated to the player', player.playerID);
             });
         });
     };

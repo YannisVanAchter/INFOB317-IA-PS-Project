@@ -82,7 +82,7 @@ function Page(props: TODO) {
         {playerID: 2 as 2, bikes: players[2].bikes.map((bike: any) => bike.position)},
         {playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position)},
     ],
-    currentPlayer: parseInt(props.ctx.currentPlayer) as 0 | 1 | 2 | 3,
+    currentPlayer: currentPlayer,
     availableMoves: [] as string[],
     applyCardOnBike: applyCardOnBike
     };

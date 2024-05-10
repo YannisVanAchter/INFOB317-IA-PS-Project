@@ -11,21 +11,21 @@ export default function Map(props: any) {
 <svg className={`${props.className}`} clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" version="1.1" viewBox="0 0 2276 1500" xmlSpace="preserve" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
     <g className={`${props.className}`} width={`${width}`}  height={`${height}`} transform="scale(2.2222)">
         <use id='img-map' width="1025px" height="676px"  xlinkHref="#a"/>
-        <g id="start-0">
+        <g>
             {/* <!-- Rectangle to store bikes in start line --> */}
-            <rect x="305" y="320" width="20" height="20" fill="#f00" fillOpacity="0.48"/>
+            <rect id="start-0" x="305" y="320" width="20" height="20" fill="#0f0" fillOpacity="0.28"/>
         </g>
-        <g id="start-1">
+        <g>
             {/* <!-- Rectangle to store bikes in start line --> */}
-            <rect x="325" y="320" width="20" height="20" fill="#f00" fillOpacity="0.48"/>
+            <rect id="start-1" x="325" y="320" width="20" height="20" fill="#0f0" fillOpacity="0.28"/>
         </g>
-        <g id="start-2">
+        <g>
             {/* <!-- Rectangle to store bikes in start line --> */}
-            <rect x="345" y="320" width="20" height="20" fill="#f00" fillOpacity="0.48"/>
+            <rect id="start-2" x="345" y="320" width="20" height="20" fill="#0f0" fillOpacity="0.28"/>
         </g>
-        <g id="start-3">
+        <g>
             {/* <!-- Rectangle to store bikes in start line --> */}
-            <rect x="365" y="320" width="20" height="20" fill="#f00" fillOpacity="0.48"/>
+            <rect id="start-3" x="365" y="320" width="20" height="20" fill="#0f0" fillOpacity="0.28"/>
         </g>
         <g id="c43_0" transform="matrix(.61813 0 0 1 469.3 157.93)">
             <path d="m315.79 289 32.356-1 4.853 29.5-32.356-3.5-4.853-25z" fill="#f00" fillOpacity="0.48"/>

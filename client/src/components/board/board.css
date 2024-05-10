@@ -46,8 +46,7 @@ svg {
     width: max-content;
 }
 
-
-.svg-map g path, .svg-map g rect {
+.svg-map g path {
     opacity: 0;
     cursor: not-allowed;
 }
