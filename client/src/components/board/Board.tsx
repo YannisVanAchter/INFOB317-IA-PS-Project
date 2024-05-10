@@ -83,6 +83,12 @@ function TourDeFranceBoard(props: BoardProps) {
     useEffect(() => {
         addBikes();
         addPlayerMoves();
+
+        // Set img in shadow DOM fit the cases
+        const img = document.getElementById('a');
+        if (img !== null) {
+            img.style.width = 'max-content';
+        }
     }, []);
     
     return <>

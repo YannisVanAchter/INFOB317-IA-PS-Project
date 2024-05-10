@@ -10,7 +10,7 @@ export default function Map(props: any) {
     return (
 <svg className={`${props.className}`} clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" version="1.1" viewBox="0 0 2276 1500" xmlSpace="preserve" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
     <g className={`${props.className}`} width={`${width}`}  height={`${height}`} transform="scale(2.2222)">
-        <use width="1025px" height="676px"  xlinkHref="#a"/>
+        <use id='img-map' width="1025px" height="676px"  xlinkHref="#a"/>
         <g id="start-0">
             {/* <!-- Rectangle to store bikes in start line --> */}
             <rect x="305" y="320" width="20" height="20" fill="#f00" fillOpacity="0.48"/>
