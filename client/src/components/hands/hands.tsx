@@ -66,7 +66,11 @@ function DisplayHands(props: TODO) {
 
     //  Effect that apply 1.2 scale to the card when hovered and 0.85 opacity when other cards are hovered
     useEffect(() => {
-        const cards = document.querySelectorAll('.card');
+        const cards_1 = document.querySelectorAll('.card-1');
+        const cards_2 = document.querySelectorAll('.card-2');
+        const cards_3 = document.querySelectorAll('.card-3');
+        const cards_4 = document.querySelectorAll('.card-4');
+        const cards = [...cards_1, ...cards_2, ...cards_3, ...cards_4];
         const classNameOn = 'hovered';
         const classNameOff = 'other-card-hovered';
         cards.forEach((card) => {
@@ -74,7 +78,7 @@ function DisplayHands(props: TODO) {
             card.addEventListener('mouseover', () => {
                 card.className += ` ${classNameOn}`;
                 cards.forEach((otherCard) => {
-                    if (otherCard !== card) {
+                    if (otherCard.id !== card.id) {
                         otherCard.className += ` ${classNameOff}`;
                     }   
                 });
@@ -82,7 +86,7 @@ function DisplayHands(props: TODO) {
             card.addEventListener('mouseout', () => {
                 card.className = card.className.replace(` ${classNameOn}`, '');
                 cards.forEach((otherCard) => {
-                    if (otherCard !== card) {
+                    if (otherCard.id !== card.id) {
                         otherCard.className = otherCard.className.replace(` ${classNameOff}`, '');
                     }   
                 });
@@ -125,11 +129,11 @@ function DisplayHands(props: TODO) {
                                 );
                                 return (
                                     <li
-                                        key={j}
-                                        className={`card card-${j}`}
+                                        id={`id-${player.playerID}-${j}`}
+                                        className={`card`}
                                         onClick={(e) => handleClickCard(e, player.playerID, card)}
                                     >
-                                        <CardFront number={card as cardValue} />
+                                        <CardFront className={`value card-${j}`} number={card as cardValue} />
                                     </li>
                                 );
                             })}

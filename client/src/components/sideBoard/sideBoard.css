@@ -1,7 +1,7 @@
 .winner {
     position: fixed;
     top: 15%;
-    left: 0%;
+    left: 5vh;
     width: 20%;
 
     /* Put in two column */
@@ -16,7 +16,7 @@
 }
 
 .winner .player {
-    margin: 1rem;
+    margin: 1.5vh;
     color: var(--primary-color);
     font-size: 1rem;
 }
