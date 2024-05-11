@@ -27,7 +27,8 @@ const Modal = ({selectedCard, applyCardOnBike, setMultipleCardsAllowed, G, ctx}:
     return (
         <div className='modal'>
             <div className='content'>
-                <h2>Multiple cards available</h2>
+                <h2>Plusieurs cartes mènent à cet destination</h2>
+                <p>Choisissez la carte à utiliser</p>
                 <ul>
                     {selectedCard.map((cardIndex: number) => (
                         <li key={cardIndex}>

@@ -16,9 +16,9 @@ type TODO = {
 
 function DisplayHands(props: TODO) {
     let { G } = props;
-    const currentPlayer = G.currentPlayer.playerID.toString();
+    const currentPlayer = G.currentPlayer.playerID;
     const currentBikeIndex = G.currentPlayer.bikeIndex;
-    const currentBike = G.players[parseInt(currentPlayer)].bikes[currentBikeIndex];
+    const currentBike = G.players[currentPlayer].bikes[currentBikeIndex];
     let players = G.players;
 
     const [displayModal, setDisplayModal] = useState(false);
@@ -40,8 +40,10 @@ function DisplayHands(props: TODO) {
         return <>
             <div className='modal'>
                 <div className='content'>
-                    <h2>Card played {modalCardValue}</h2>
-                    <p>Player {currentPlayer} played card with value {modalCardValue}</p>
+                    <h2>Carte jouée: {modalCardValue}</h2>
+                    <p>L'équipe {PlayerRep[currentPlayer as playerID].teamName} a joué la carte: {modalCardValue}</p>
+                    <p>Cette carte mene à plusieurs endroit.</p>
+                    <p>Choisissez la destination</p>
                     <ul>
                         {availableMoves.map((move, i) => {
                             return <li 
@@ -60,7 +62,7 @@ function DisplayHands(props: TODO) {
 
     const handleClickCard = (e: any, playerID: number, cardValue: number) => {
         e.preventDefault();
-        if (playerID !== parseInt(currentPlayer)) return;
+        if (playerID !== currentPlayer) return;
         setModalCardValue(cardValue);
         setDisplayModal(true);
     };
@@ -116,7 +118,7 @@ function DisplayHands(props: TODO) {
                     }
                 }
                 return (
-                    <div key={i} className={`player ${currentPlayer === player.toString() ? 'current': ''}`}>
+                    <div key={i} className={`player ${currentPlayer === player.playerID ? 'current': ''}`}>
                         <h3>{PlayerRep[i as playerID].teamName}</h3>
                         <ul className='cards'> 
                             {hand.map((card, j) => {
