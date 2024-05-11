@@ -22,10 +22,10 @@ ASSETS.
 
 MIT License
 
-Copyright (c) 2023 Mairya-Laurel Ivakhnenko
+Copyright (c) 2024 Mairya-Laurel Ivakhnenko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of these assets (carte_face.svg, chance_verso.svg, cycliste.svg, and secondes.svg) and associated documentation files (the "Assets"), to deal
+of these assets (carte_face.svg) and associated documentation files (the "Assets"), to deal
 in the Assets without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Assets, and to permit persons to whom the Assets are
