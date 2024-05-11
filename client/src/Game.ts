@@ -3,6 +3,8 @@ import { shuffle } from './utils/shuffle';
 import { deepCopy } from './utils/deep_copy';
 import { boardKey } from './utils/simonLTransform';
 
+import { BoardCase, dico, Bike, Player, DCtx, Ctx, Context } from './types/game';
+
 // Constants
 const nbCases = 95;
 const nbReduceMax = 9;
@@ -28,32 +30,6 @@ const CardsSeconds = [
 const nbCards = 96;
 const nbCardsHand = 5;
 const CardsDeck = [...Array(nbCards / CardsSeconds.length)].flatMap(() => CardsSeconds); // 8x 1-12 = 96 cards
-
-// const board = defineBoard(nbCases);
-
-// Types
-type BoardIndex = [
-    position: number,
-    letter: "A"|"B"|"C"|"D", // Default A
-    side: "left"|"right" // Default left (Separation of the board in two sides (sprint zone))
-]
-
-interface BoardCase {
-    position: number;
-    letter?: "A"|"B"|"C"|"D"; // Letter of the case (A, B, C or D)
-    next: Array<string>; // Index of the next cases
-    prev?: string; // Index of the previous cases, only defined around lucky square
-    luck: Array<number>; // Draw luck card  , if case on the left, value is 1, and we increment going to the right
-    side?: "intern"|"extern"; // Side of the case (dans le sens de la course)
-    nbBikesMax: number; // Number of bikes that can be on the case
-    nbBikes: number; // Number of bikes on the case (default 0)
-}
-
-// type BoardDictionnary= Record<BoardIndex, BoardCase>;
-// type dico={[key: BoardIndex ]: BoardCase};
-type dico<BoardCase>={
-    [key: string]:BoardCase;
-}
 
 let Board: dico<BoardCase>={
     '0-B-left':{position: 0, luck: [], nbBikesMax: 20, nbBikes:0, next: ['1-A-left']}, // 0
@@ -215,38 +191,6 @@ let Board: dico<BoardCase>={
     '-9-A-left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: []}
 }
 
-
-interface Bike {
-    position: string;
-    reduce: number;
-    turn: number;
-}
-
-interface Player {
-    playerID: number;
-    hand: number[];
-    bikes: Bike[];
-}
-
-interface DCtx {
-    deck: number[];
-    discard: number[];
-    turn: number;
-    currentPlayer: { playerID: number, bikeIndex: number };
-    players: Player[];
-}
-
-interface Ctx {
-    turn: number;
-    currentPlayer: string;
-    numPlayers: number;
-}
-
-interface Context {
-    G: DCtx;
-    ctx: Ctx;
-}
-
 // Functions
 /**
  * @param {string} position Position of the bike in the board
@@ -261,7 +205,7 @@ function getBoardCase(position: string): BoardCase {
  * @param position Position to convert
  */
 function getPossibleTilesFromPosition(position: number): boardKey[] {
-    console.log(position);
+    // console.log(position);
     let possibleTiles: string[] = [];
     for (const key in Board) {
         // console.log(Board[key]);
@@ -272,7 +216,7 @@ function getPossibleTilesFromPosition(position: number): boardKey[] {
             possibleTiles.push(key);
         }
     }
-    console.log(possibleTiles);
+    // console.log(possibleTiles);
     return possibleTiles;
 }
 
@@ -487,7 +431,7 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     let myG = deepCopy(G); 
     const player = myG.players[G.currentPlayer.playerID];
     const card = player.hand[cardIndex];
-    console.log(card);
+    // console.log(card);
     const bike = player.bikes[G.currentPlayer.bikeIndex];
     let oldPosition = bike.position;
     let numberedPosition = Board[bike.position].position + card;
@@ -505,9 +449,9 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
     }
     
     // Check aspiration
-    console.log(numberedPosition);
+    // console.log(numberedPosition);
     let test = getPossibleTilesFromPosition(numberedPosition);
-    console.log(test);
+    // console.log(test);
     if (checkAspiration(test[0])) { // Select first possible position, check in front how to handle
         // Aspiration is allowed
     } 
@@ -580,11 +524,10 @@ const TourDeFrance = {
 
     moves: {
         useCard: (context: any, bikeIndex: number) => {
-            console.log(context);
-            console.log(bikeIndex);
+            // console.log(context);
+            // console.log(bikeIndex);
             context.G = useCardOnBike(context, bikeIndex)},
     },
 }
 
 export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, Board };
-export type { Player, Bike, Context, DCtx, Ctx };
