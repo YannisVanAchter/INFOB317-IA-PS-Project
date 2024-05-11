@@ -46,7 +46,13 @@ svg {
     width: max-content;
 }
 
-.svg-map g path {
+.svg-map g path, .svg-map g #c33_1 { 
+    /**
+     *  c33_1 does not have path elem inside but rect
+     *  Because start cases have rect and not path elem
+     *  We do not want to change the color of the rect but the specific case 
+     *  So we need to select the rect element by it's id
+     */
     opacity: 0;
     cursor: not-allowed;
 }
