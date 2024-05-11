@@ -5,9 +5,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_AI_API=Undefined
-      - REACT_BOT_API=Undefined
-      - REACT_DEBUG=false
+  
+  server:
+    build:
+      context: ./Prolog_files
+      dockerfile: Dockerfile

@@ -1,0 +1,17 @@
+# Utilisez une image de base SWI-Prolog
+FROM swipl:latest
+
+# Définissez le répertoire de travail
+WORKDIR /api
+
+# Copiez les fichiers de votre API dans le conteneur
+COPY . .
+
+# Installez les dépendances (si nécessaire)
+# RUN apt-get update && apt-get install -y <nom_du_paquet>
+
+# Exposez le port que votre API utilise
+EXPOSE 8080
+
+# Définissez la commande de démarrage
+CMD ["swipl", "socket.pl"]

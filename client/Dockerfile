@@ -14,10 +14,11 @@ RUN npm install
 COPY ./public ./public
 COPY ./src ./src
 COPY ./.env ./.env
+COPY ./custom.d.ts ./custom.d.ts
 COPY ./tsconfig.json ./tsconfig.json
 
 # Build the app
-RUN npm run build
+# RUN npm run build
 
 # Expose the port that the app will run on
 EXPOSE 3000
