@@ -1,8 +1,8 @@
 import React from 'react';
+import { CardValue } from '../types/game';
 
-type cardValue = -3 | -2 | -1 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-const CardFront = ({ number, className = '' }: {number: cardValue, className?: string}) => {
+const CardFront = ({ number, className = '' }: {number: CardValue, className?: string}) => {
     // Contenu du SVG initial
     const svgContent = `
     <svg viewBox="280.998 87.675 280 420" preserveAspectRatio="xMidYMid meet">
@@ -27,4 +27,3 @@ const CardFront = ({ number, className = '' }: {number: cardValue, className?: s
 };
 
 export default CardFront;
-export type { cardValue };

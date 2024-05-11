@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import CardFront, { cardValue } from '../../assets/cardFront';
-import { DCtx } from '../../types/game';
+import CardFront from '../../assets/cardFront';
+import { DCtx, CardValue, playerID } from '../../types/game';
 import { mockUseCardOnBike } from '../../Game'; 
 import { deepCopy } from '../../utils/deep_copy';
+
+import { players as PlayerRep } from '../../data/player';
 
 import './hands.css';
 
@@ -12,7 +14,6 @@ type TODO = {
     applyCardOnBike: (target: string) => void
 };
 
-// TODO: finish this component once mock data for simulation is available
 function DisplayHands(props: TODO) {
     let { G } = props;
     const currentPlayer = G.currentPlayer.playerID.toString();
@@ -116,7 +117,7 @@ function DisplayHands(props: TODO) {
                 }
                 return (
                     <div key={i} className={`player ${currentPlayer === player.toString() ? 'current': ''}`}>
-                        <h3>Player: {player.playerID + 1}</h3>
+                        <h3>{PlayerRep[i as playerID].teamName}</h3>
                         <ul className='cards'> 
                             {hand.map((card, j) => {
                                     if (card === -1) return (
@@ -134,7 +135,7 @@ function DisplayHands(props: TODO) {
                                         className={`card`}
                                         onClick={(e) => handleClickCard(e, player.playerID, card)}
                                     >
-                                        <CardFront className={`value card-${j}`} number={card as cardValue} />
+                                        <CardFront className={`value card-${j}`} number={card as CardValue} />
                                     </li>
                                 );
                             })}

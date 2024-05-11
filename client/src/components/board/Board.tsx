@@ -3,13 +3,7 @@ import './board.css';
 import { fromMapToSVG } from '../../utils/simonLTransform';
 import { BoardProps, boardKey } from '../../types/board'; 
 import Map from '../../assets/map';
-
-const playerTeamsEmoticons: string[] = [
-    "https://hatscripts.github.io/circle-flags/flags/be.svg", // Belgique
-    "https://hatscripts.github.io/circle-flags/flags/nl.svg", // Pays-Bas
-    "https://hatscripts.github.io/circle-flags/flags/de.svg", // Allemagne
-    "https://hatscripts.github.io/circle-flags/flags/it.svg" // Italie
-];
+import { players } from '../../data/player';
 
 function TourDeFranceBoard(props: BoardProps) {
     const applyCardOnBike = props.applyCardOnBike;
@@ -28,7 +22,7 @@ function TourDeFranceBoard(props: BoardProps) {
                 }
 
                 const node = document.createElement('img');
-                node.src = playerTeamsEmoticons[player.playerID];
+                node.src = players[player.playerID].flag;
                 node.style.width = '20px';
                 node.style.height = '20px';
                 node.style.zIndex = '9999';

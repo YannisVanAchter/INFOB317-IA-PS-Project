@@ -1,5 +1,16 @@
 import { boardKey } from "./board";
 
+type playerID = 0 | 1 | 2 | 3;
+
+type PlayerRep = {
+    [key in playerID]: {
+        teamName: string,
+        flag: string, // Emoticon used to represent the player on the board
+    }
+}
+
+type CardValue = -3 | -2 | -1 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
 interface BoardCase {
     position: number;
     letter?: "A"|"B"|"C"|"D"; // Letter of the case (A, B, C or D)
@@ -13,8 +24,8 @@ interface BoardCase {
 
 // type BoardDictionnary= Record<BoardIndex, BoardCase>;
 // type dico={[key: BoardIndex ]: BoardCase};
-type dico<BoardCase>={
-    [key: boardKey]:BoardCase;
+type dico<T>={
+    [key: boardKey]:T;
 }
 
 
@@ -26,14 +37,14 @@ interface Bike {
 }
 
 interface Player {
-    playerID: number;
-    hand: number[];
+    playerID: playerID
+    hand: CardValue[];
     bikes: Bike[];
 }
 
 interface DCtx {
-    deck: number[];
-    discard: number[];
+    deck: CardValue[];
+    discard: CardValue[];
     turn: number;
     currentPlayer: { playerID: number, bikeIndex: number };
     players: Player[];
@@ -50,4 +61,4 @@ interface Context {
     ctx: Ctx;
 }
 
-export type { BoardCase, dico, Bike, Player, DCtx, Ctx, Context };
+export type { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID, PlayerRep, CardValue };
