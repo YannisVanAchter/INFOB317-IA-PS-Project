@@ -15,8 +15,6 @@ function TourDeFranceBoard(props: BoardProps) {
                 let SvgID = fromMapToSVG(bike, usedMove);
                 if (SvgID === "start") 
                     SvgID = `start-${player.playerID}`;
-                if (player.bikes.includes(bike))
-                    return;
                 const element = document.getElementById(SvgID);
                 if (element === undefined || element === null) {
                     console.error(`SvgID: ${SvgID} not found`);
@@ -50,6 +48,8 @@ function TourDeFranceBoard(props: BoardProps) {
                 SvgID = "start";
             else 
                 SvgID= fromMapToSVG(move, usedMove);
+            if (usedMove.includes(move) )
+                return;
 
             const element = document.getElementById(SvgID);
             if (element === undefined || element === null) {
