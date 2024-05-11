@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './board.css';
 import { fromMapToSVG } from '../../utils/simonLTransform';
-import { boardKey } from '../../utils/simonLTransform'; // Type definition
+import { BoardProps, boardKey } from '../../types/board'; 
 import Map from '../../assets/map';
 
 const playerTeamsEmoticons: string[] = [
@@ -11,18 +11,11 @@ const playerTeamsEmoticons: string[] = [
     "https://hatscripts.github.io/circle-flags/flags/it.svg" // Italie
 ];
 
-type BoardProps = {
-    players: { playerID: 0 | 1 | 2 | 3, bikes: boardKey[] }[],
-    currentPlayer: { playerID: 0 | 1 | 2 | 3, bikeIndex: number },
-    availableMoves: boardKey[],
-    applyCardOnBike: (target: boardKey) => void
-};
-
 function TourDeFranceBoard(props: BoardProps) {
     const applyCardOnBike = props.applyCardOnBike;
     // Add bikes to the map
     const addBikes = () => {
-        let usedMove: string[] = [];
+        let usedMove: boardKey[] = [];
         props.players.forEach(player => {
             player.bikes.forEach(bike => {
                 let SvgID = fromMapToSVG(bike, usedMove);
@@ -54,7 +47,7 @@ function TourDeFranceBoard(props: BoardProps) {
 
     // Add player moves to the map
     const addPlayerMoves = () => {
-        let usedMove: string[] = [];
+        let usedMove: boardKey[] = [];
         props.availableMoves.forEach((move, index) => {
             let SvgID: string;
             if (move === "0-B-left")

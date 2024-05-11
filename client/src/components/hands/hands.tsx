@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import CardFront, { cardValue } from '../../assets/cardFront';
-import { DCtx, Ctx, useCardOnBike } from '../../Game';
+import { DCtx } from '../../types/game';
 import { mockUseCardOnBike } from '../../Game'; 
 import { deepCopy } from '../../utils/deep_copy';
 

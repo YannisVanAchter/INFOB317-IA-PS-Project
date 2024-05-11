@@ -1,13 +1,14 @@
 import React from 'react';
 
-import { DCtx, Ctx } from '../../Game';
 import { winnerRanking } from '../../Game';
+
+import { DCtx, Ctx, } from '../../types/game';
 
 import './sideBoard.css';
 
 type TODO = {
-    G: any,
-    ctx: any,
+    G: DCtx
+    ctx: Ctx,
     moves: any,
     className: string
 };

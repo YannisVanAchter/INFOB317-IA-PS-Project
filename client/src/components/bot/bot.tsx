@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import './bot.css';
+import { Message } from '../../types/bot';
 
-interface Message {
-    id: number;
-    content: string;
-    sender: 'user' | 'bot';
-    response?: Message;
-}
+import './bot.css';
 
 function ChatBot(props: any) {
     const firstMessage: Message = {
