@@ -113,7 +113,7 @@ function Game(props: any) {
         debug: false,
     });
 
-    return <div>
+    return <div className='page'>
         <TourDeFranceClient />
         <ChatBot />
     </div>;

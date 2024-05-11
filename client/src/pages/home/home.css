@@ -3,5 +3,54 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    flex-wrap: nowrap;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: bold;
+
+    margin: 0;
+    padding: 0;
+}
+
+.rules {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+
+    margin: 1rem;
+    padding: 0;
+    max-width: 50rem;
+
+    text-align: center;
+
+    p {
+        margin: .5rem;
+        padding: 0;
+    }
+}
+
+.start-game {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+
+    margin: 2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.start-game button {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+
+    background-color: var(--secondary-color);
+    border: 0.1rem solid var(--primary-color);
+    border-radius: 5px;
+    padding: 1rem 2rem;
+    margin: 1rem;
+
+    cursor: pointer;
 }
