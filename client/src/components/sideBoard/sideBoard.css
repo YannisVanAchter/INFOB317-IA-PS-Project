@@ -7,11 +7,16 @@
     /* Put in two column */
     display: grid;
     grid-template-columns: 1fr;
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
 }
 
 .winner p {
     text-align: center;
-    font-size: 10rem;
+    font-size: 20rem;
     color: var(--primary-color);
 }
 
@@ -19,10 +24,11 @@
     margin: 1.5vh;
     color: var(--primary-color);
     font-size: 1rem;
+    margin-bottom: 1rem;
 }
 
 .winner .player + .player {
-    margin-top: 2rem;
+    margin-top: 0rem;
 }
 
 .winner .player * {
