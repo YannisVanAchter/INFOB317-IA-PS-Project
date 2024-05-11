@@ -49,8 +49,10 @@
 }
 
 .hands .player .card .hovered {
+    position: relative;
     scale: 1.2;
     opacity: 100%;
+    z-index: 9999;
 }
 
 .hands .player .card .other-card-hovered {
