@@ -21,9 +21,8 @@ function ChatBot(props: any) {
     };
 
     const updateMessages = (newMessage: Message) => {
-        const id = messages.length;
-        const { content, sender, response } = newMessage;
-        setMessages([...messages, { id, content, sender, response }]);
+        newMessage.id = messages.length;
+        setMessages(messages => [...messages, newMessage]);
     }
 
     const sendMessage = async (event: any) => {
@@ -32,25 +31,24 @@ function ChatBot(props: any) {
         // Allow user to send multiple messages without refreshing the page
         // And getting the answer from the bot
         const newMessage: Message = {
-            id: messages.length + 1,
+            id: messages.length,
             content: input,
             sender: 'user',
         };
         updateMessages(newMessage);
-        const url = `${process.env.REACT_APP_SERVER_URL}/bot/${input}`
-        // console.log('url:', url);
+        const url = `${process.env.REACT_APP_SERVER_URL}/bot/${input}`.replaceAll(' ', '-');
         setInput('');
 
         try {
             const response = await axios.get(url);
+            console.log(response)
             const botResponse: Message = {
-                id: messages.length + 1,
+                id: messages.length,
                 content: response.data.answer,
                 sender: 'bot',
                 response: newMessage,
             };
             updateMessages(botResponse);
-            setInput('');
         } catch (error) {
             console.error('Error sending message:', error);
         }

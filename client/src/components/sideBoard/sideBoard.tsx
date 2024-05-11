@@ -20,7 +20,7 @@ function SideBoard(props: TODO) {
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
     return (
         <aside className={`${props.className} winner`}>
-            <h2>Joueur à jouer</h2>
+            <h2>Au tour de l'équipe:</h2>
             <p className='player'>{players[currentPlayer].teamName}</p>
             <h2>Classement temporaire</h2>
             <ol>
