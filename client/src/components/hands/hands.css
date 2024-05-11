@@ -80,43 +80,22 @@
 
 .hands .player .card.empty-card {
     opacity: 0;
-} 
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 100%;
-    height: 100%;
-
-    background-color: rgba(var(--secondary-color), 0.9);
-
 }
 
-.modal .content {
-    background-color: var(--primary-color);
-    border-radius: 1rem;
+.modal {
+    margin-left: 47.5%;
+    margin-bottom: 30%;
+    /* margin-right: 33%; */
 
-    opacity: 2;
-
-    color: var(--secondary-color);
-
-    padding: 1rem;
+    * {
+        margin: .5rem;
+        padding: 0;
+    }
 
     ul {
         padding: 0;
         margin: 0;
         list-style: none;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
 
         li {
             background-color: var(--secondary-color);
