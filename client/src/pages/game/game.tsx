@@ -72,6 +72,18 @@ function Page(props: TODO) {
             props.moves.useCard({ ...props }, availableCards[0]);
         }
         else {
+            let cards = [availableCards[0]];
+            for (let i = 1; i < availableCards.length; i++) {
+                if (props.G.players[currentPlayer.playerID].hand[availableCards[i]] !== props.G.players[currentPlayer.playerID].hand[availableCards[i - 1]]) {
+                    cards.push(availableCards[i]);
+                }
+            }
+
+            if (cards.length === 1) {
+                props.moves.useCard({ ...props }, cards[0]);
+                return;
+            }
+
             setSelectedCard(availableCards);
             setMultipleCardsAllowed(true);
         };
