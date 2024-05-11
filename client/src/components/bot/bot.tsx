@@ -1,74 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
-import { Message } from '../../types/bot';
-
+import React from 'react';
+import { useBot } from '../../hooks';
 import './bot.css';
 
 function ChatBot(props: any) {
-    const firstMessage: Message = {
-        id: 0,
-        content: "Bonjour, comment puis-je vous aider?",
-        sender: 'bot'
-    };
-    const [messages, setMessages] = useState<Message[]>([firstMessage]);
-    const [input, setInput] = useState('');
-    const [showChat, setShowChat] = useState(false);
-    const [scrollHeight, setScrollHeight] = useState(0);
-
-    const toggleChat = () => {
-        setShowChat(!showChat);
-    };
-
-    const updateMessages = (newMessage: Message) => {
-        newMessage.id = messages.length;
-        setMessages(messages => [...messages, newMessage]);
-    }
-
-    const sendMessage = async (event: any) => {
-        event.preventDefault();
-        // Using async function to send message to the server
-        // Allow user to send multiple messages without refreshing the page
-        // And getting the answer from the bot
-        const newMessage: Message = {
-            id: messages.length,
-            content: input,
-            sender: 'user',
-        };
-        updateMessages(newMessage);
-        const url = `${process.env.REACT_APP_SERVER_URL}/bot/${input}`.replaceAll(' ', '-');
-        setInput('');
-
-        try {
-            const response = await axios.get(url);
-            console.log(response)
-            const botResponse: Message = {
-                id: messages.length,
-                content: response.data.answer,
-                sender: 'bot',
-                response: newMessage,
-            };
-            updateMessages(botResponse);
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
-    };
-
-     // Effet to adjust the scroll height of the chat
-    useEffect(() => {
-        const messagesElement = document.querySelector('.messages');
-        if (messagesElement) {
-            setScrollHeight(messagesElement.scrollHeight);
-        }
-    }, [messages]); 
-
-    // Effet to scroll to the bottom of the chat
-    useEffect(() => {
-        const messagesElement = document.querySelector('.messages');
-        if (messagesElement && scrollHeight > 0) {
-            messagesElement.scrollTop = scrollHeight;
-        }
-    }, [scrollHeight]); 
+    const {
+        messages,
+        input,
+        showChat,
+        toggleChat,
+        sendMessage,
+        resetChat,
+        handleInputChange,
+    } = useBot(props);
 
     return (
         <>
@@ -77,7 +20,7 @@ function ChatBot(props: any) {
                 <div className="header-bot">
                     <h3>Chat Bot</h3>
                     <button 
-                        onClick={(e) => setMessages([firstMessage])} 
+                        onClick={resetChat} 
                         className='display-button refresh'
                     >
                         Rafraichir
@@ -95,7 +38,7 @@ function ChatBot(props: any) {
                     <input
                         type="text"
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={handleInputChange}
                         placeholder="Tape ton message..."
                     />
                     <input type="submit" value="Send" />
