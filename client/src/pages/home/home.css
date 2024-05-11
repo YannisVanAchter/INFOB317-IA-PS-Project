@@ -54,3 +54,27 @@
 
     cursor: pointer;
 }
+
+.start-game button:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.modal {
+    margin-left: 47.5%;
+    /* margin-right: 33%; */
+
+    * {
+        margin: .5rem;
+        padding: 0.5rem;
+    }
+
+    button {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        margin: 0.5rem;
+    }
+}
