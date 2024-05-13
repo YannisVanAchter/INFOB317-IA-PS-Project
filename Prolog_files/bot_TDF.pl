@@ -57,7 +57,7 @@ reponse_autre(Reponse):-
 % lis la question de l'utilisteur
 % la question en input est split sur les espaces, tout en enlevant la ponctuation, pour récupérer une liste de mots
 lire_question(Input_question,Liste_question):-
-    split_string(Input_question," ", "?,.;:!", Liste_question).
+    split_string(Input_question,"-", "?,.;:!", Liste_question).
 
 
 % produit la réponse à la question
