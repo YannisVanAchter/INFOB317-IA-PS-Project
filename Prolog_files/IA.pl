@@ -65,37 +65,110 @@ get_move_IA(Infos,Move):-
     get_infos_player(Data,1,Player1),
     get_infos_player(Data,2,Player2),
     get_infos_player(Data,3,Player3),
-    get_infos_player(Data,4,Player4),
-    nth0(1,Infos,Player).
+    get_infos_player(Data,4,Player4).
 
 
 % there is not base case since every player should be present one time only, and each shoul be present
-get_infos_player([H_infos|T_infos],Num_player,H_infos):-
+get_infos_player([H_infos|_],Num_player,Infos):-
     nth0(0,H_infos,Num),
-    Num = Num_player.
+    nth0(1,H_infos,Hand),
+    nth0(2,H_infos,Bikes),
+    Num = Num_player,
+    Infos=[Hand,Bikes], !.
 
 get_infos_player([H_infos|T_infos],Num_player,Infos):-
     get_infos_player(T_infos,Num_player,Infos).
 
-% create_minmax_2(Tree,_,_,_,0).
-% create_minmax_2(Tree,Player1,Player2,Player,Depth):-
-%     New_depth is Depth-1,
-%     nth0(1,Player,Cards),
-%     nth0(2,Player,Cyclists),
-%     % liste avec toutes les poss entre toutes cartes tous joueurs
-%     % fonction recu inter je pense
-%     member(Card,Cards),
-%     member(Position,Cyclists),
+    
 
-% comme ça je serai limitée pour la profondeur je crois, parce qu'il faudrait retenir quelle carte a été utilisée là, ou alors on fait un tuple carte joueur new pos,et après on test si la carte est déjà prise dans la branche
-% create_branch(Branch,[],Bikes1,[],Bikes2,_).
-% create_branch(Branch,Cards1,Bikes1,Cards2,Bikes2,0).
-% % pas [H_cards1|T_cards1] mais member et def nouvelle liste, pour toutes poss
-% create_branch(Branch,Cards1,Bikes1,Cards2,Bikes2,Depth):-
+% player 0=min
+% player 1= max
+
+% State,Depth,Player,BestScore
+% base case: depth reached or terminal state reached
+minmax(State,0,_,Best_score).
+minmax(State,Depth,Player,Best_score,Best_move):-
+    terminal_state(State).
+
+% recursive case
+minmax(State,Depth,Player,Best_score,Best_move):-
+    possible_moves(Cards,Bikes,Moves),
+    evaluate_moves(Moves,State,Depth,Player,Best_score,Best_move).
+
+evaluate_moves([],_,_,_,Best_score,Best_move).
+
+evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score,Best_move):-
+    Player=1,
+    make_move(State,Move,New_state),
+    Opponent= 0,
+    New_depth is Depth-1,
+    minmax(New_state, New_depth, Opponent, Temp_score),
+    New_best_score= max(Best_score,Temp_score),
+    New_best_score>Best_score,
+    Best_move=Move,
+    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
+
+evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score,Best_move):-
+    Player=1,
+    make_move(State,Move,New_state),
+    Opponent= 0,
+    New_depth is Depth-1,
+    minmax(New_state, New_depth, Opponent, Temp_score),
+    New_best_score= max(Best_score,Temp_score),
+    New_best_score=<Best_score,
+    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
+
+evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score):-
+    Player=0,
+    make_move(State,Move,New_state),
+    Opponent= 1,
+    New_depth is Depth-1,
+    minmax(New_state, New_depth, Opponent, Temp_score),
+    BestScore= min(Best_score,Temp_score),
+    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
+    
+
+% TODO
+% aussi set le state, ça serait
+%  [ [ [cards Player max], [bikes player max] ] , [ [cards Player min] , [Bikes player min] ] ]
+% et donc selon quel joueur est l'IA, les 3 autres sont une équipe
+terminal_state(State).
+
+make_move(State,Move,New_state).
+
+game_state(IA,Others,[IA,Others]).
+
+score(State,Score).
+
+
+% en gros pour chaque il faudrait prendre la liste des mouv "réalisés" et refaire un arbre depuis ça
+% alors là je sais pas
+% soit on appelle arbre d'ici
+% soit on met ça dans l'arbre, mais il doit créer un nouvel arbre pour chaque elem de la liste
+% donc en vrai peut-être mieux de call arbre d'ici
+%  du coup pour chacune, ça sera une position de vélo diff, donc passer les vélos de base et mixer les éléments
+% si on ne fait bien bouger qu'un vélo par tour
+new_hand([Branch|Other_branches],Hand,Turn,Hand2,Bikes2,Tree):-
+    Turn=0,
+    nth0(0,Branch,Used_card)
+    New_hand=select(Used_card, Hand,New_hand),
+   new_bikes(),
+   new_hand().
+
+% la main est déjà modif car fait au dessus, ici je veux repartir sur chaque vélo
+% et faudrait faire ça mais qui donne une val diff de new_pos à chaque fois
+% faut aussi créer new_bikes, pour ça je pense que dégager l'elem à l'index et le remplacer ok
+new_bikes(Used_card,Hand,New_pos,[Pos|Other_pos],Turn,Hand2,Bikes2,Tree):-
+    New_turn,
+    New_bikes,
+    New_tree=[(Used_card,Position)],
+    arbre_d(Hand,New_bikes,Hand2,Bikes2,Turn,New_tree),
+    new_bikes().
+
 
 % create all the possible next moves for each bike with each card in hand
-iterate_cards([],_,[]).
-iterate_cards([Card|Other_cards],Bikes,Possible_moves):-
+possible_moves([],_,[]).
+possible_moves([Card|Other_cards],Bikes,Possible_moves):-
     iterate_bikes(Bikes,Card,Moves),
     Possible_moves=[Card,Moves|Other_moves],
     iterate_cards(Other_cards,Bikes,Other_moves).
@@ -106,14 +179,7 @@ iterate_bikes([Bike|Other_bikes],Card,Moves):-
     get_next_position(Bike,Card,Next_pos),
     iterate_bikes(Other_bikes,Card,Other_moves).
 
-% create_node(Node,Cards,Bikes):-
-%     member(Card,Cards),
-%     member(Bike,Bikes),
-%     get_next_position(Card,Bikes,Value_node).
 
-% explore_minmax(Tree,Choice).
-
-% explore_branch(Branch,Choice).
 
 % gets the potential next positions of the player depending on the value of his cards
 get_next_position(Position,0,Position).
