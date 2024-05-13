@@ -1,0 +1,80 @@
+.home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: bold;
+
+    margin: 0;
+    padding: 0;
+}
+
+.rules {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+
+    margin: 1rem;
+    padding: 0;
+    max-width: 50rem;
+
+    text-align: center;
+
+    p {
+        margin: .5rem;
+        padding: 0;
+    }
+}
+
+.start-game {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+
+    margin: 2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.start-game button {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+
+    background-color: var(--secondary-color);
+    border: 0.1rem solid var(--primary-color);
+    border-radius: 5px;
+    padding: 1rem 2rem;
+    margin: 1rem;
+
+    cursor: pointer;
+}
+
+.start-game button:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.modal {
+    margin-left: 47.5%;
+    /* margin-right: 33%; */
+
+    * {
+        margin: .5rem;
+        padding: 0.5rem;
+    }
+
+    button {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        margin: 0.5rem;
+    }
+}
