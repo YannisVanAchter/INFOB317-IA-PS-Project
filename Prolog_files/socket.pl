@@ -39,6 +39,8 @@ answer(Question, _Request):-
         
 answer_ia(Board, Request) :-
     %http_read_json_dict(Request, Board),
+    write("Board: "), writeln(Board),
+    
     get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
     cors_enable, %pour régler le soucis de CORS
     reply_json(json([response=Move])).
