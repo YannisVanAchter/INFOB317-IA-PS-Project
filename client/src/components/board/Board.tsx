@@ -9,7 +9,7 @@ function TourDeFranceBoard(props: BoardProps) {
     useBoard(props);
     
     return <>
-            <Map className="svg-map" />
+            <Map id="svg-map" className="svg-map" />
     </>;
 }
 
