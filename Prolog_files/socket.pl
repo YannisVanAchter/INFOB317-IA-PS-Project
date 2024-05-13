@@ -3,17 +3,15 @@
 :- use_module(library(http/http_json)).
 :- use_module(library(http/json_convert)).
 
+:- use_module(library(http/http_cors)). %Test pour régler l'erreur "Reason: CORS header ‘Access-Control-Allow-Origin’ missing" 
+
 :- use_module(bot_TDF).
 :- use_module(ia).
 
-%Test pour régler l'erreur "Reason: CORS header ‘Access-Control-Allow-Origin’ missing" 
-http:reply_header(Header, _Options, _Request) :-
-    cors_header(Header).
-
-cors_header('Access-Control-Allow-Origin': '*'). %On peut changer ici à qui on veut donner l'autorisation d'accès. '*' c'est pour accepter tt
-
 
 % je suppose que le echo servira pour la réponse...? Non ça aurait servi si on utilisait le protocole websocket mais c'est pas le cas ici
+
+:- initialization set_setting(http:cors, [*]). %On peut changer ici à qui on veut donner l'autorisation d'accès. '*' c'est pour accepter tt
 
 :- initialization http_server([port(8080)]).
 
@@ -36,11 +34,13 @@ home_page(_Request) :-
 
 answer(Question, _Request):-
     produire_reponse(Question, Resp),
+    cors_enable, %pour régler le soucis de CORS
     reply_json(json([answer=Resp])).
         
 answer_ia(Board, Request) :-
     %http_read_json_dict(Request, Board),
     get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
+    cors_enable, %pour régler le soucis de CORS
     reply_json(json([response=Move])).
 
 get_move_IA(Board, Move). %en attendant que l'ia soit fonctionnel et pour éviter les problèmes dans ce code, à supprimer par la suite
