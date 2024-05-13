@@ -132,6 +132,8 @@ evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score):-
 % aussi set le state, ça serait
 %  [ [ [cards Player max], [bikes player max] ] , [ [cards Player min] , [Bikes player min] ] ]
 % et donc selon quel joueur est l'IA, les 3 autres sont une équipe
+
+% + test_move
 terminal_state(State).
 
 make_move(State,Move,New_state).
@@ -166,9 +168,31 @@ new_bikes(Used_card,Hand,New_pos,[Pos|Other_pos],Turn,Hand2,Bikes2,Tree):-
     new_bikes().
 
 
+% if moves without causing a fall possible, return those
+possible_moves(Cards,Bikes,Possible_moves):-
+    generate_moves(Cards,Bikes,All_moves,Candidate_moves),
+    lenght(Candidate_moves,Number_moves),
+    Number_moves>0,
+    Possible_moves is Candidate_moves.
+
+% if not, return all
+possible_moves(Cards,Bikes,Possible_moves):-
+    generate_moves(Cards,Bikes,Possible_moves,_).
+
+% generate all moves for current hand and bikes position
+generate_moves(Cards,Bikes,Possible_moves,Moves):-
+    iterate_cards(Cards,Bikes,Possible_moves),
+    test_moves(Possible_moves,Moves).
+
+% test if a move can be played without causing a fall
+test_moves([],[]).
+% il faudra tester si on ne fait pas tomber d'autres vélos, donc surement passer le state en paramètre ici aussi
+test_moves([Current_move|Other_moves],Moves_without_fall).
+
+
 % create all the possible next moves for each bike with each card in hand
-possible_moves([],_,[]).
-possible_moves([Card|Other_cards],Bikes,Possible_moves):-
+iterate_cards([],_,[]).
+iterate_cards([Card|Other_cards],Bikes,Possible_moves):-
     iterate_bikes(Bikes,Card,Moves),
     Possible_moves=[Card,Moves|Other_moves],
     iterate_cards(Other_cards,Bikes,Other_moves).
