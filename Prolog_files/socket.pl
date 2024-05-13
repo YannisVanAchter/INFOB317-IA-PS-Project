@@ -6,6 +6,13 @@
 :- use_module(bot_TDF).
 :- use_module(ia).
 
+%Test pour régler l'erreur "Reason: CORS header ‘Access-Control-Allow-Origin’ missing" 
+http:reply_header(Header, _Options, _Request) :-
+    cors_header(Header).
+
+cors_header('Access-Control-Allow-Origin': '*'). %On peut changer ici à qui on veut donner l'autorisation d'accès. '*' c'est pour accepter tt
+
+
 % je suppose que le echo servira pour la réponse...? Non ça aurait servi si on utilisait le protocole websocket mais c'est pas le cas ici
 
 :- initialization http_server([port(8080)]).
