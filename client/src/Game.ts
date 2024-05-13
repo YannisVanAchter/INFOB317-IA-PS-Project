@@ -472,8 +472,9 @@ function mockUseCardOnBike(bike: Bike, card: number): string[] {
 /**
  * 
  *  @param {Context} context Context of the game
- *  @param {number} card Card to use
- *  @param {number} bikeIndex Index of the bike to use the card on
+ *  @param {number} cardIndex Index of the Card to use
+ *  @param {number} target Target position the player wants to get to
+ * 
  * 
  *  @returns The new game state with following effects
  *  effects: delete the card from the hand of the player and add the card to the discard pile
@@ -482,7 +483,7 @@ function mockUseCardOnBike(bike: Bike, card: number): string[] {
  * 
  *  Use the card on the bike
  */
-function useCardOnBike({ G, ctx }: Context, cardIndex: number) {
+function useCardOnBike({ G, ctx }: Context, cardIndex: number, target: string) {
     let myG = deepCopy(G); 
     const player = myG.players[G.currentPlayer.playerID];
     const card = player.hand[cardIndex];
