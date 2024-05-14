@@ -92,7 +92,7 @@ minmax(State,Depth,Player,Best_score,Best_move):-
 
 % recursive case
 minmax(State,Depth,Player,Best_score,Best_move):-
-    possible_moves(Cards,Bikes,Moves),
+    possible_moves(State,Cards,Bikes,Moves),
     evaluate_moves(Moves,State,Depth,Player,Best_score,Best_move).
 
 evaluate_moves([],_,_,_,Best_score,Best_move).
@@ -127,35 +127,58 @@ evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score):-
     BestScore= min(Best_score,Temp_score),
     evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
     
+% test if one of the position ends the game
+terminal_state(State):-
+    nth0(0,State,Player1),
+    nth0(1,State,Player2),
+    nth0(1,Player1,Pos1),
+    nth0(1,Player2,Pos2),
+    append(Pos1,Pos2,Positions),
+    terminal_pos(Positions).
+    
+terminal_pos([]):-false,!.
+terminal_pos([Pos|Other_pos]):-
+    end(Pos),!.
 
-% TODO
-% aussi set le state, ça serait
-%  [ [ [cards Player max], [bikes player max] ] , [ [cards Player min] , [Bikes player min] ] ]
-% et donc selon quel joueur est l'IA, les 3 autres sont une équipe
+terminal_pos([Position|Other_pos]):-
+    terminal_pos(Other_pos).
 
-% + test_move
-terminal_state(State).
+% get game state structure for the IA
+game_state(Player1, Player2, Player3, Player4, Num_player_IA, IA, Others) :-
+    Num_player_IA= 1,
+    IA= Player1,
+    Others= [get_other_cards(Player2, Player3, Player4), get_other_bikes(Player2, Player3, Player4)].
+    
+game_state(Player1, Player2, Player3, Player4, Num_player_IA, IA, Others) :-
+    Num_player_IA= 2,
+    IA= Player2,
+    Others= [get_other_cards(Player1, Player3, Player4), get_other_bikes(Player2, Player3, Player4)].
+    
+game_state(Player1, Player2, Player3, Player4, Num_player_IA, IA, Others) :-
+    Num_player_IA= 3,
+    IA= Player3,
+    Others= [get_other_cards(Player1, Player2, Player4), get_other_bikes(Player2, Player3, Player4)].
+    
+game_state(Player1, Player2, Player3, Player4, Num_player_IA, IA, Others) :-
+    Num_player_IA= 4,
+    IA= Player4,
+    Others= [get_other_cards(Player1, Player2, Player3), get_other_bikes(Player2, Player3, Player4)].
+    
+get_other_cards(Player2, Player3, Player4) :-
+    nth0(0, Player2, Cards2),
+    nth0(0, Player3, Cards3),
+    nth0(0, Player4, Cards4),
+    append(Cards2, Cards3, Temp_card),
+    append(Cards4, Temp_card, Cards_other).
+          
+get_other_bikes(Player2, Player3, Player4) :-
+    nth0(1, Player2, Bike2),
+    nth0(1, Player3, Bike3),
+    nth0(1, Player4, Bike4),
+    append(Bike2, Bike3, Temp_bike),
+    append(Bike4, Temp_bike, Bike_other).
 
-make_move(State,Move,New_state).
 
-game_state(IA,Others,[IA,Others]).
-
-score(State,Score).
-
-
-% en gros pour chaque il faudrait prendre la liste des mouv "réalisés" et refaire un arbre depuis ça
-% alors là je sais pas
-% soit on appelle arbre d'ici
-% soit on met ça dans l'arbre, mais il doit créer un nouvel arbre pour chaque elem de la liste
-% donc en vrai peut-être mieux de call arbre d'ici
-%  du coup pour chacune, ça sera une position de vélo diff, donc passer les vélos de base et mixer les éléments
-% si on ne fait bien bouger qu'un vélo par tour
-new_hand([Branch|Other_branches],Hand,Turn,Hand2,Bikes2,Tree):-
-    Turn=0,
-    nth0(0,Branch,Used_card)
-    New_hand=select(Used_card, Hand,New_hand),
-   new_bikes(),
-   new_hand().
 
 % la main est déjà modif car fait au dessus, ici je veux repartir sur chaque vélo
 % et faudrait faire ça mais qui donne une val diff de new_pos à chaque fois
@@ -170,40 +193,40 @@ new_bikes(Used_card,Hand,New_pos,[Pos|Other_pos],Turn,Hand2,Bikes2,Tree):-
 
 % if moves without causing a fall possible, return those
 possible_moves(Cards,Bikes,Possible_moves):-
-    generate_moves(Cards,Bikes,All_moves,Candidate_moves),
+    select_moves(Cards,Bikes,All_moves,Candidate_moves),
     lenght(Candidate_moves,Number_moves),
     Number_moves>0,
     Possible_moves is Candidate_moves.
 
 % if not, return all
 possible_moves(Cards,Bikes,Possible_moves):-
-    generate_moves(Cards,Bikes,Possible_moves,_).
+    select_moves(State,Cards,Bikes,Possible_moves,_).
 
-% generate all moves for current hand and bikes position
-generate_moves(Cards,Bikes,Possible_moves,Moves):-
-    iterate_cards(Cards,Bikes,Possible_moves),
-    test_moves(Possible_moves,Moves).
-
-% test if a move can be played without causing a fall
-test_moves([],[]).
-% il faudra tester si on ne fait pas tomber d'autres vélos, donc surement passer le state en paramètre ici aussi
-test_moves([Current_move|Other_moves],Moves_without_fall).
+% select all moves for current hand and bikes position
+select_moves(Cards,Bikes,Possible_moves,Moves):-
+    create_moves(Cards,Bikes,Possible_moves),
+    test_moves(State,Possible_moves,Moves).
 
 
 % create all the possible next moves for each bike with each card in hand
-iterate_cards([],_,[]).
-iterate_cards([Card|Other_cards],Bikes,Possible_moves):-
-    iterate_bikes(Bikes,Card,Moves),
-    Possible_moves=[Card,Moves|Other_moves],
-    iterate_cards(Other_cards,Bikes,Other_moves).
+% create_moves([1,2,3],['1-A-left','2-A-left','2-A-left'],A).
+% A = [(1, ('2-A-left', '2-A-left', '2-A-left'), ('1-A-left', '3-A-left', '2-A-left'), '1-A-left', '2-A-left', '3-A-left'), (2, ('3-A-left', '2-A-left', '2-A-left'), ('1-A-left', '4-A-left', '2-A-left'), '1-A-left', '2-A-left', '4-A-left'), (3, ('4-A-left', '2-A-left', '2-A-left'), ('1-A-left', '5-A-left', '2-A-left'), '1-A-left', '2-A-left', '5-A-left')]
+create_moves([],_,[]).
+create_moves([Card|Other_cards],[Bike1,Bike2,Bike3],Possible_moves):-
+    get_next_position(Bike1,Card,New_pos_1),
+    get_next_position(Bike2,Card,New_pos_2),
+    get_next_position(Bike3,Card,New_pos_3),
+    Move_1=(New_pos_1,Bike2,Bike3),
+    Move_2=(Bike1,New_pos_2,Bike3),
+    Move_3=(Bike1,Bike2,New_pos_3),
+    Possible_moves=[(Card,Move_1,Move_2,Move_3)|Other_moves],
+    create_moves(Other_cards,[Bike1,Bike2,Bike3],Other_moves),!.
 
 iterate_bikes([],_,[]).
 iterate_bikes([Bike|Other_bikes],Card,Moves):-
     Moves=[Next_pos|Other_moves],
     get_next_position(Bike,Card,Next_pos),
     iterate_bikes(Other_bikes,Card,Other_moves).
-
-
 
 % gets the potential next positions of the player depending on the value of his cards
 get_next_position(Position,0,Position).
@@ -503,3 +526,40 @@ next('-8-A-left',['-9-A-left']).
 % voir comment on fait avec le fait que ça soit vide pour la dernière
 next('-9-A-left',[]).
 
+% end cases of the board
+end('0-A-left').
+end('-1-A-left').
+end('-2-A-left').
+end('-3-A-left').
+end('-4-A-left').
+end('-5-A-left').
+end('-6-A-left').
+end('-7-A-left').
+end('-8-A-left').
+end('-9-A-left').
+
+
+
+
+
+
+
+
+% TODO
+
+make_move(State,Move,New_state).
+    % faire en sorte que le state soit update avec le move
+    % ici je sais pas si on modifie le 1er le 2e le 3e en fct des ntho 0, 1 2
+    %  ou si on fait en sorte que le iterate garde les move pas modifs
+
+
+
+%  s'il est au dessus, 1, égalité 0, sinon -1
+% voir si score spécial si chute, en vrai mieux je pense
+score(State,Score).
+% surement split sur les - (mais si negatif ça va bug) et test si c'est plus grand ou pas
+
+% test if a move can be played without causing a fall
+test_moves([],[]).
+% il faudra tester si on ne fait pas tomber d'autres vélos, donc surement passer le state en paramètre ici aussi
+test_moves(State,[Current_move|Other_moves],Moves_without_fall).
