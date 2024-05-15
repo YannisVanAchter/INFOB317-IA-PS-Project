@@ -5,6 +5,11 @@
   --error-color: #a81e1e;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 html {
   background-color: var(--secondary-color);
   color: var(--primary-color);
@@ -54,8 +59,8 @@ p::after {
     align-items: center;
 
     .icon {
-      width: 10%;
-      height: 10%;
+      width: auto;
+      height: 2.5rem;
 
       margin-right: .5rem;
       transform: translateY(.5rem) rotateY(180deg) rotateZ(-20deg);
