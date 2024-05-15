@@ -381,6 +381,44 @@ function setUp() {
     return ctx;
 }
 
+function bot({ G, ctx }: Context ) {
+    // TODO: check with @Maragaux what AI will return
+    let moves: number[] = [];
+    const url = `http://localhost:8000/ai`;
+    axios.get(url, {
+        params: {
+            G: G,
+            ctx: ctx,
+        }
+    })
+    .then(response => {
+        return response.data.json();
+    })
+    .then((data: { moves: string[] }) => {
+        let destination: boardKey[] = data.moves;
+        // TODO: delete this loop if return only one move
+        for (let i = 0; i < destination.length; i++) {
+            // TODO: Depending on the return of the AI, we will have to change this loop definition
+            for (let j = 0; j < G.players[parseInt(ctx.currentPlayer)].hand.length; j++) {
+                const availableMoves = mockUseCardOnBike(G.players[parseInt(ctx.currentPlayer)].bikes[parseInt(ctx.currentPlayer)], G.players[parseInt(ctx.currentPlayer)].hand[j]);
+                if (availableMoves.includes(destination[i])) {
+                    moves.push(j);
+                }
+            }
+            if (moves.length > 0) {
+                break;
+            }
+        }
+
+        // Remove duplicates and sort in ascending order (for descending add " * (-1)" in the sort function)
+        moves = [...new Set(moves)].sort((a, b) => {return (a - b)});
+
+        return moves;
+    })
+    .catch(error => console.error(error));
+    return [];
+}
+
 const TourDeFrance = {
     setup: setUp,
 
@@ -411,46 +449,6 @@ const TourDeFrance = {
             context.G = useCardOnBike(context, bikeIndex, cardIndex, target);
         },
     },
-
-    ai: {
-        enumerate: (G: DCtx, ctx: Ctx) => {
-            // TODO: check with @Maragaux what AI will return
-            let moves: number[] = [];
-            const url = `http://localhost:8000/ai`;
-            axios.get(url, {
-                params: {
-                    G: G,
-                    ctx: ctx,
-                }
-            })
-            .then(response => {
-                return response.data.json();
-            })
-            .then((data: { moves: string[] }) => {
-                let destination: boardKey[] = data.moves;
-                // TODO: delete this loop if return only one move
-                for (let i = 0; i < destination.length; i++) {
-                    // TODO: Depending on the return of the AI, we will have to change this loop definition
-                    for (let j = 0; j < G.players[parseInt(ctx.currentPlayer)].hand.length; j++) {
-                        const availableMoves = mockUseCardOnBike(G.players[parseInt(ctx.currentPlayer)].bikes[parseInt(ctx.currentPlayer)], G.players[parseInt(ctx.currentPlayer)].hand[j]);
-                        if (availableMoves.includes(destination[i])) {
-                            moves.push(j);
-                        }
-                    }
-                    if (moves.length > 0) {
-                        break;
-                    }
-                }
-
-                // Remove duplicates and sort in ascending order (for descending add " * (-1)" in the sort function)
-                moves = [...new Set(moves)].sort((a, b) => {return (a - b)});
-
-                return moves;
-            })
-            .catch(error => console.error(error));
-            return [];
-        },
-    },
 }
 
-export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, Board };
+export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, bot, Board };
