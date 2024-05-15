@@ -19,7 +19,7 @@
 
 :- http_handler(root(bot/Question), answer(Question),[]).
 
-:- http_handler(root(ia/Board), answer_ia, []).
+:- http_handler(root(ia/Board), answer_ia(Board), []).
 
 home_page(_Request) :-
     reply_html_page(
@@ -32,15 +32,16 @@ answer(Question, _Request):-
     cors_enable, %pour régler le soucis de CORS
     reply_json(json([answer=Resp])).
         
-answer_ia(Request) :-
-    http_read_json_dict(Request, Board), %je sais pas si Board dans ./ia/Board est deja un JSON ou si il faut extraire le JSON depuis la requete
+answer_ia(Board, Request) :-
     write("Board: "), writeln(Board),
-    extract_board(Board, BoardData),
+    http_read_json_dict(Request, Dict), %je sais pas pas trop si il faut garder ca pcq du coup Board devient inutile
+    write("Dict: "), writeln(Dict),
+    extract_board(Dict, BoardData),
     get_move_IA(BoardData, Move), %A changer en fonction de l'IA
     cors_enable, %pour régler le soucis de CORS
     reply_json(json([response=Move])).
 
-get_move_IA(Board, Move) :-
+get_move_IA(Board, _Move) :-
     write("Board: "), writeln(Board). %en attendant que l'ia soit fonctionnel et pour éviter les problèmes dans ce code, à supprimer par la suite
 
 extract_board(Board, BoardData) :- 
