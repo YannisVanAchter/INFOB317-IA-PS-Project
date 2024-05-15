@@ -1,8 +1,7 @@
+import React, { createContext, useContext } from 'react';
+import { useParams } from '../hooks/useParams';
+
+const GameContext = createContext(null);
 
 
-function GameSettingsContext() {
-    // TODO : Implement the gameSettingsContext function
-    return null;
-}
-
-export { GameSettingsContext };
+export const useGameParams = () => useContext(GameContext);

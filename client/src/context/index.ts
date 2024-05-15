@@ -1,1 +1,1 @@
-export { GameSettingsContext } from './gameSettingsContext';
+export { useGameParams } from './gameSettingsContext';
