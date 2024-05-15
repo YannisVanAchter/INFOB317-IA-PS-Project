@@ -5,7 +5,7 @@
  * Simon L: c{numéro de case}_{éloignement par rapport au bord gauche de la route en partant de 0}
  */
 
-import { Board } from '../Game';
+import { Board } from '../data/board';
 import type { boardKey, svgId, svgSide, caseLetter, side } from '../types/board';
 
 /**

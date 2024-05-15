@@ -5,7 +5,7 @@ import { boardKey } from './utils/simonLTransform';
 
 import { Board } from './data/board';
 
-import { BoardCase, dico, Bike, Player, DCtx, Ctx, Context } from './types/game';
+import { BoardCase, Bike, Player, DCtx, Ctx, Context } from './types/game';
 import axios from 'axios';
 
 // Constants
@@ -333,7 +333,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '0-B-left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '3-A-left', reduce: 0, turn: 0 })),
         })),
     } as DCtx;
 
@@ -367,43 +367,50 @@ const TourDeFrance = {
     },
 
     moves: {
-        useCard: (context: any, bikeIndex: number) => {
+        useCard: (context: any, bikeIndex: number, target: boardKey) => {
             // console.log(context);
             // console.log(bikeIndex);
-            context.G = useCardOnBike(context, bikeIndex)},
+            context.G = useCardOnBike(context, bikeIndex, target);
+        },
     },
 
     ai: {
-        enumerate: async (G: DCtx, ctx: Ctx) => {
+        enumerate: (G: DCtx, ctx: Ctx) => {
             // TODO: check with @Maragaux what AI will return
             let moves: number[] = [];
             const url = `http://localhost:8000/ai`;
-            const response = await axios.get(url, {
+            axios.get(url, {
                 params: {
                     G: G,
                     ctx: ctx,
                 }
-            });
-
-            let destination: boardKey[] = response.data.moves;
-            // TODO: delete this loop if return only one move
-            for (let i = 0; i < destination.length; i++) {
-                // TODO: Depending on the return of the AI, we will have to change this loop definition
-                for (let j = 0; j < G.players[parseInt(ctx.currentPlayer)].hand.length; j++) {
-                    const availableMoves = mockUseCardOnBike(G.players[parseInt(ctx.currentPlayer)].bikes[parseInt(ctx.currentPlayer)], G.players[parseInt(ctx.currentPlayer)].hand[j]);
-                    if (availableMoves.includes(destination[i])) {
-                        moves.push(j);
+            })
+            .then(response => {
+                return response.data.json();
+            })
+            .then((data: { moves: string[] }) => {
+                let destination: boardKey[] = data.moves;
+                // TODO: delete this loop if return only one move
+                for (let i = 0; i < destination.length; i++) {
+                    // TODO: Depending on the return of the AI, we will have to change this loop definition
+                    for (let j = 0; j < G.players[parseInt(ctx.currentPlayer)].hand.length; j++) {
+                        const availableMoves = mockUseCardOnBike(G.players[parseInt(ctx.currentPlayer)].bikes[parseInt(ctx.currentPlayer)], G.players[parseInt(ctx.currentPlayer)].hand[j]);
+                        if (availableMoves.includes(destination[i])) {
+                            moves.push(j);
+                        }
+                    }
+                    if (moves.length > 0) {
+                        break;
                     }
                 }
-                if (moves.length > 0) {
-                    break;
-                }
-            }
 
-            // Remove duplicates and sort in ascending order (for descending add " * (-1)" in the sort function)
-            moves = [...new Set(moves)].sort((a, b) => {return (a - b)});
+                // Remove duplicates and sort in ascending order (for descending add " * (-1)" in the sort function)
+                moves = [...new Set(moves)].sort((a, b) => {return (a - b)});
 
-            return moves;
+                return moves;
+            })
+            .catch(error => console.error(error));
+            return [];
         },
     },
 }

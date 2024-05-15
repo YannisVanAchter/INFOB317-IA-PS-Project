@@ -69,7 +69,7 @@ function Page(props: TODO) {
         }
 
         if (availableCards.length === 1) {
-            props.moves.useCard({ ...props }, availableCards[0]);
+            props.moves.useCard({ ...props }, availableCards[0], target);
         }
         else {
             let cards = [availableCards[0]];
@@ -80,7 +80,7 @@ function Page(props: TODO) {
             }
 
             if (cards.length === 1) {
-                props.moves.useCard({ ...props }, cards[0]);
+                props.moves.useCard({ ...props }, cards[0], target);
                 return;
             }
 
