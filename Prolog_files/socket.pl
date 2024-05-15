@@ -24,7 +24,7 @@
 
 :- http_handler(root(bot/Question), answer(Question),[]).
 
-:- http_handler(root(ia/Board), answer_ia(Board)).
+:- http_handler(root(ia/Board), answer_ia, []).
 
 home_page(_Request) :-
     reply_html_page(
@@ -37,17 +37,31 @@ answer(Question, _Request):-
     cors_enable, %pour régler le soucis de CORS
     reply_json(json([answer=Resp])).
         
-answer_ia(Board, Request) :-
-    %http_read_json_dict(Request, Board),
+answer_ia(Request) :-
+    http_read_json_dict(Request, Board), %je sais pas si Board dans ./ia/Board est deja un JSON ou si il faut extraire le JSON depuis la requete
     write("Board: "), writeln(Board),
-    
-    get_move_IA(Board, Move), %en imaginant qu'il s'agit du prédicat à utiliser pr l'ia, on peut changer 
+    extract_board(Board, BoardData),
+    get_move_IA(BoardData, Move), %A changer en fonction de l'IA
     cors_enable, %pour régler le soucis de CORS
     reply_json(json([response=Move])).
 
 get_move_IA(Board, Move). %en attendant que l'ia soit fonctionnel et pour éviter les problèmes dans ce code, à supprimer par la suite
 
-% post
+extract_board(Board, BoardData) :- 
+    %Board est le contenu du JSON et on veut que BoardData soit une liste de liste contenant uniquement les infos nécéssaires pour l'IA
+    Players = Board.players,
+    %CurrentPlayer = Board.currentPlayer, %je sais pas si cet info est utile pour l'IA
+    maplist(extract_player, Players, BoardData).
+
+extract_player(Player, PlayerData) :-
+    PlayerID = Player.playerID,
+    Hand = Player.hand,
+    Bikes = Player.bikes,
+    maplist(bike_position, Bikes, BikePositions),
+    PlayerData = [PlayerID, Hand, BikePositions].
+    
+bike_position(Bike, Position) :-
+    Position = Bike.position.
 
 % ça pas encore fini, il faudra que nous on gère les requêtes post
 % je sais pas si ce handler est vrmt necéssaire du coup
