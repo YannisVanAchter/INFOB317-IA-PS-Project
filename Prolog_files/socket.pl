@@ -6,16 +6,11 @@
 :- use_module(library(http/http_cors)). %Test pour régler l'erreur "Reason: CORS header ‘Access-Control-Allow-Origin’ missing" 
 
 :- use_module(bot_TDF).
-:- use_module(ia).
-
-
-% je suppose que le echo servira pour la réponse...? Non ça aurait servi si on utilisait le protocole websocket mais c'est pas le cas ici
+%:- use_module(ia).
 
 :- initialization set_setting(http:cors, [*]). %On peut changer ici à qui on veut donner l'autorisation d'accès. '*' c'est pour accepter tt
 
 :- initialization http_server([port(8080)]).
-
-% get
 
 % différentes root 
 :- http_handler(root(.),http_redirect(moved, location_by_id(home_page)),[]).
@@ -45,7 +40,8 @@ answer_ia(Request) :-
     cors_enable, %pour régler le soucis de CORS
     reply_json(json([response=Move])).
 
-get_move_IA(Board, Move). %en attendant que l'ia soit fonctionnel et pour éviter les problèmes dans ce code, à supprimer par la suite
+get_move_IA(Board, Move) :-
+    write("Board: "), writeln(Board). %en attendant que l'ia soit fonctionnel et pour éviter les problèmes dans ce code, à supprimer par la suite
 
 extract_board(Board, BoardData) :- 
     %Board est le contenu du JSON et on veut que BoardData soit une liste de liste contenant uniquement les infos nécéssaires pour l'IA
