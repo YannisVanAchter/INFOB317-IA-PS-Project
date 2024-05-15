@@ -45,8 +45,6 @@ interface Player {
 interface DCtx {
     deck: CardValue[];
     discard: CardValue[];
-    turn: number;
-    currentPlayer: { playerID: number, bikeIndex: number };
     players: Player[];
 }
 

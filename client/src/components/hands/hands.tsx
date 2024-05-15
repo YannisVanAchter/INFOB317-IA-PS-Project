@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import CardFront from '../../assets/cardFront';
-import { DCtx, CardValue, playerID } from '../../types/game';
+import { DCtx, Ctx, CardValue, playerID } from '../../types/game';
 import { mockUseCardOnBike } from '../../Game';
 import { deepCopy } from '../../utils/deep_copy';
 
@@ -13,16 +13,19 @@ import './hands.css';
 
 type TODO = {
     G: DCtx,
+    ctx: Ctx,
     applyCardOnBike: (target: string) => void
 };
 
+
 function DisplayHands(props: TODO) {
-    const { G } = props;
-    const currentPlayer = G.currentPlayer.playerID;
-    const currentBikeIndex = G.currentPlayer.bikeIndex;
-    const currentBike = G.players[currentPlayer].bikes[currentBikeIndex];
+
+    const { G, ctx } = props;
+    const currentPlayer = parseInt(ctx.currentPlayer);
+
     const players = G.players;
 
+    const [currentBikeIndex, setCurrentBikeIndex] = useState(0);
     const [displayModal, setDisplayModal] = useState(false);
     const [modalCardValue, setModalCardValue] = useState(0);
 
@@ -65,7 +68,8 @@ function DisplayHands(props: TODO) {
     });
 
     const MultipleChoiceModal = () => {
-        const availableMoves = mockUseCardOnBike(currentBike, modalCardValue);
+        const bike = players[currentPlayer].bikes[currentBikeIndex];
+        const availableMoves = mockUseCardOnBike(bike, modalCardValue);
         if (availableMoves.length === 1) {
             props.applyCardOnBike(availableMoves[0]);
             setDisplayModal(false);
@@ -117,13 +121,22 @@ function DisplayHands(props: TODO) {
                             hand = [...left, -1, ...right];
                         }
                     }
+                    const isCurrentPlayer: boolean = player.playerID === currentPlayer;
                     return (
-                        <div key={i} className={`player ${currentPlayer === player.playerID ? 'current' : ''}`}>
-                            <h3>{PlayerRep[i as playerID].teamName}</h3>
+                        <div key={i} className={`player ${isCurrentPlayer ? 'current' : ''}`}>
+                            <div>
+                                <h3>{PlayerRep[i as playerID].teamName}</h3>
+                                {/* Choice bike on witch we apply the card (defautl in useState define to 0) */}
+                                {isCurrentPlayer && <select value={currentBikeIndex} onChange={(e) => setCurrentBikeIndex(parseInt(e.target.value))}>
+                                    {player.bikes.map((bike, index) => (
+                                        <option key={index} value={index}>{bike.position}</option>
+                                    ))}
+                                </select>}
+                            </div>
                             <ul className='cards'>
                                 {hand.map((card, j) => {
                                     if (card === -1) return (
-                                        <li
+                                        <li 
                                             id={`id-${player.playerID}-${j}`}
                                             key={j}
                                             className={`card empty-card`}

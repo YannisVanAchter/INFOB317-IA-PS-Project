@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 import { TourDeFrance, mockUseCardOnBike } from '../../Game';
-import { Context } from '../../types/game';
 import { Client } from 'boardgame.io/react';
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
@@ -111,6 +110,9 @@ function Page(props: TODO) {
 
     for (let i = 0; i < props.G.players[currentPlayer.playerID].hand.length; i++) {
         const availableMoves = mockUseCardOnBike(props.G.players[currentPlayer.playerID].bikes[currentPlayer.bikeIndex], props.G.players[currentPlayer.playerID].hand[i]);
+        console.log(props.G.players[currentPlayer.playerID]);
+        console.log(props.G.players[currentPlayer.playerID].hand[i]);
+        console.log(availableMoves);
         boardProps.availableMoves = [...boardProps.availableMoves, ...availableMoves];
     }
 
