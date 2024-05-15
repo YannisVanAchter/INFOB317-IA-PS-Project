@@ -76,14 +76,13 @@ function checkMove(currentBike: Bike, cardPlayed: number): boolean {
 
 /**
  * 
- * @param currentBike Current bike being moved
  * @param newPosition Current position of the bike
  * 
  * @returns The new position string
  */
-function lucky(currentBike: Bike, newSquare: string): string {
+function lucky(newSquare: string): string {
     let squareAfterLucky = newSquare;
-    if (Board[newSquare].luck.length === 0) return newSquare;
+    if (Board[newSquare].luck.length === 0) return squareAfterLucky;
     if (Board[newSquare].luck.length > 0) {
         for (let i = 0; i < Board[newSquare].luck.length; i++) {
             // Check if current square is gonna be a lucky square
@@ -271,12 +270,17 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
  * 
  *  Use the card on the bike
  */
-function useCardOnBike({ G, ctx }: Context, cardIndex: number, target: string) {
-    let myG = deepCopy(G); 
-    const player = myG.players[G.currentPlayer.playerID];
+function useCardOnBike(context: Context, cardIndex: number, target: string) {
+    console.log("----PARAMS----")
+    console.log(context);
+    console.log(cardIndex);
+    console.log(target);
+    console.log("---- END PARAM -----")
+    let myG = deepCopy(context.G); 
+    const player = myG.players[context.G.currentPlayer.playerID];
     const card = player.hand[cardIndex];
     // console.log(card);
-    const bike = player.bikes[G.currentPlayer.bikeIndex];
+    const bike = player.bikes[context.G.currentPlayer.bikeIndex];
     let oldPosition = bike.position;
     let numberedPosition = Board[bike.position].position + card;
     if (numberedPosition > nbCases) {
@@ -289,20 +293,33 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number, target: string) {
     }
     // Check every tile on the way is clear or has space
     if (!checkMove(bike, card)) {
-        // Move invalide, a voir comment si on les autorisent, dans tous les cas chutent si joué
+        // Check si il a la possibilité de jouer autre chose qui ne provoque pas de chute
+        // Sinon provoqué une chute
+    }
+
+    let possibleTiles = getPossibleTilesFromPosition(numberedPosition);
+    // console.log(test);
+    for (const tile of possibleTiles) {
+        if (checkAspiration(tile)) {
+            for (let i = 0; i < Board[tile].next.length; i++) {
+                possibleTiles.push(Board[tile].next[i]);
+            }
+        }
     }
     
-    // Check aspiration
-    // console.log(numberedPosition);
-    let test = getPossibleTilesFromPosition(numberedPosition);
-    // console.log(test);
-    if (checkAspiration(test[0])) { // Select first possible position, check in front how to handle
-        // Aspiration is allowed
-    } 
-
-    // Needs to choose which tile here, have to be done in front, for now default to the first possible one
-    const possibleTiles = getPossibleTilesFromPosition(numberedPosition);
-    let newTile = lucky(bike, possibleTiles[0]);
+    // Do the move
+    console.log(cardIndex);
+    console.log(card);
+    console.log(numberedPosition);
+    console.log(possibleTiles);
+    console.log(target);
+    const tileIndex = possibleTiles.findIndex((val) => (val === target))
+    console.log(tileIndex)
+    if (tileIndex === -1) throw new Error("Invalid position required");
+    let newTile = possibleTiles[tileIndex];
+    
+    // Apply luck from tile selected if applicable
+    newTile = lucky(newTile);
 
     // Put the person on the right square
     bike.position = newTile;
@@ -315,7 +332,7 @@ function useCardOnBike({ G, ctx }: Context, cardIndex: number, target: string) {
 
     // Draw cards if the player has no cards left in hand
     if (player.hand.length === 0) 
-        drawCards({ G: myG, ctx});
+        drawCards({ G: myG, ctx: context.ctx});
 
     return myG;
 }
@@ -367,10 +384,10 @@ const TourDeFrance = {
     },
 
     moves: {
-        useCard: (context: any, bikeIndex: number, target: boardKey) => {
+        useCard: (context: Context, cardIndex: number, target: boardKey) => {
             // console.log(context);
             // console.log(bikeIndex);
-            context.G = useCardOnBike(context, bikeIndex, target);
+            context.G = useCardOnBike(context, cardIndex, target);
         },
     },
 

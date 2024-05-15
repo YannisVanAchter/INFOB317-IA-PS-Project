@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { TourDeFrance, mockUseCardOnBike } from '../../Game';
+import { Context } from '../../types/game';
 import { Client } from 'boardgame.io/react';
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
@@ -69,7 +70,13 @@ function Page(props: TODO) {
         }
 
         if (availableCards.length === 1) {
-            props.moves.useCard({ ...props }, availableCards[0], target);
+            console.log("FROM GAME TSX");
+            console.log(availableCards[0]);
+            console.log("CALLING USE CARD WITH:");
+            console.log(availableCards[0]);
+            console.log(target);
+            console.log("CALLING NOW");
+            props.moves.useCard(availableCards[0], target);
         }
         else {
             let cards = [availableCards[0]];
@@ -80,7 +87,9 @@ function Page(props: TODO) {
             }
 
             if (cards.length === 1) {
-                props.moves.useCard({ ...props }, cards[0], target);
+                console.log("FROM GAMES TSX")
+                console.log(cards[0]);
+                props.moves.useCard(cards[0], target);
                 return;
             }
 
