@@ -57,6 +57,11 @@ svg {
     cursor: not-allowed;
 }
 
+.svg-map g.has-bike path, .svg-map g.has-bike#c33_1 rect {
+    opacity: 1;
+    cursor: not-allowed;
+}
+
 .svg-map > g.available-move {
     cursor: pointer;
 }

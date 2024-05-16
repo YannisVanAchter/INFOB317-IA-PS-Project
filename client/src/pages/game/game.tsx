@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { TourDeFrance, mockUseCardOnBike } from '../../Game';
+import { Local } from 'boardgame.io/multiplayer';
 import { Client } from 'boardgame.io/react';
+
+import { TourDeFrance, bot, mockUseCardOnBike } from '../../Game';
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
 import DisplayHands from '../../components/hands/hands';
 import SideBoard from '../../components/sideBoard/sideBoard';
+import { useGameParams } from '../../context';
+
+import type { param, params } from '../../types/params';
 
 import './game.css';
 
@@ -69,7 +75,13 @@ function Page(props: TODO) {
         }
 
         if (availableCards.length === 1) {
-            props.moves.useCard({ ...props }, availableCards[0], target);
+            console.log("FROM GAME TSX");
+            console.log(availableCards[0]);
+            console.log("CALLING USE CARD WITH:");
+            console.log(availableCards[0]);
+            console.log(target);
+            console.log("CALLING NOW");
+            props.moves.useCard(availableCards[0], target);
         }
         else {
             let cards = [availableCards[0]];
@@ -80,7 +92,9 @@ function Page(props: TODO) {
             }
 
             if (cards.length === 1) {
-                props.moves.useCard({ ...props }, cards[0], target);
+                console.log("FROM GAMES TSX")
+                console.log(cards[0]);
+                props.moves.useCard(cards[0], target);
                 return;
             }
 
@@ -102,6 +116,9 @@ function Page(props: TODO) {
 
     for (let i = 0; i < props.G.players[currentPlayer.playerID].hand.length; i++) {
         const availableMoves = mockUseCardOnBike(props.G.players[currentPlayer.playerID].bikes[currentPlayer.bikeIndex], props.G.players[currentPlayer.playerID].hand[i]);
+        console.log(props.G.players[currentPlayer.playerID]);
+        console.log(props.G.players[currentPlayer.playerID].hand[i]);
+        console.log(availableMoves);
         boardProps.availableMoves = [...boardProps.availableMoves, ...availableMoves];
     }
 
@@ -116,13 +133,37 @@ function Page(props: TODO) {
 }
 
 function Game(props: any) {
-    // TODO: build the game depending on the parameters (who is AI, who is human, etc.)
+    const p = useGameParams();
+    const navigate = useNavigate();
+    if (!p) {
+        alert("Entrez d'abord les paramètres du jeu");
+        navigate('/');
+        return null;
+    }
+    const {params}: { params: params} = p;
+
+    if (!params || params === undefined || params === null || params.length === 0) {
+        alert("Entrez d'abord les paramètres du jeu");
+        navigate('/home');
+        return null;
+    }
+
+    const AIPlayers = params.map(i => i).filter((param: param) => !param.isHuman).map((param: param) => param.id);
+
     const TourDeFranceClient = Client({
         game: TourDeFrance,
         board: Page,
         numPlayers: 4,
         // debug: isDebug,
         debug: false,
+        multiplayer: Local({
+            bots: {
+                '0': AIPlayers.includes(0) ? bot : null,
+                '1': AIPlayers.includes(1) ? bot : null,
+                '2': AIPlayers.includes(2) ? bot : null,
+                '3': AIPlayers.includes(3) ? bot : null,
+            }
+        })
     });
 
     return <div className='page'>

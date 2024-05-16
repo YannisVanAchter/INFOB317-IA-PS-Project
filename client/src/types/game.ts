@@ -3,7 +3,7 @@ import { boardKey } from "./board";
 type playerID = 0 | 1 | 2 | 3;
 
 type PlayerRep = {
-    [key in playerID]: {
+    [index: number]: {
         teamName: string,
         flag: string, // Emoticon used to represent the player on the board
     }
@@ -45,8 +45,6 @@ interface Player {
 interface DCtx {
     deck: CardValue[];
     discard: CardValue[];
-    turn: number;
-    currentPlayer: { playerID: number, bikeIndex: number };
     players: Player[];
 }
 

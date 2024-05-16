@@ -7,7 +7,7 @@
 }
 
 .title {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: bold;
 
     margin: 0;
@@ -15,26 +15,26 @@
 }
 
 .rules {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: var(--primary-color);
 
-    margin: 1rem;
+    margin: .5rem;
     padding: 0;
     max-width: 50rem;
 
     text-align: center;
 
     p {
-        margin: .5rem;
+        margin: .45rem;
         padding: 0;
     }
 }
 
 .start-game {
-    font-size: 1.3rem;
+    font-size: .8rem;
     color: var(--primary-color);
 
-    margin: 2rem;
+    margin: 1rem;
 
     display: flex;
     align-items: center;
@@ -60,21 +60,36 @@
     color: var(--secondary-color);
 }
 
-.modal {
-    margin-left: 47.5%;
-    /* margin-right: 33%; */
+.player-settings {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    margin: .5rem 0;
+    padding: 0;
 
     * {
-        margin: .5rem;
-        padding: 0.5rem;
+        margin: .1rem;
+        padding: 0;
+    
     }
+}
 
-    button {
-        background-color: var(--secondary-color);
-        color: var(--primary-color);
-        border: none;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        margin: 0.5rem;
-    }
+.modal-button {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: 0.1rem solid var(--secondary-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin: 0.5rem;
+
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.modal-button:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
 }
