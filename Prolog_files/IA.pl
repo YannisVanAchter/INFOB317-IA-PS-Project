@@ -17,14 +17,14 @@ get_infos_player([H_infos|_],Num_player,Infos):-
     nth0(1,H_infos,Hand),
     nth0(2,H_infos,Bikes),
     Num = Num_player,
-    Infos=[Hand,Bikes], !.
+    Infos=[Hand,Bikes],!.
 
 get_infos_player([H_infos|T_infos],Num_player,Infos):-
     get_infos_player(T_infos,Num_player,Infos).
 
 launch_minmax_process(IA,Player2,Player3,Player4,Depth,Result):-
-    get_all_sub_minmax(IA,[Player2,Player3,Player4],Depth,Moves),
-    get_best_move(Moves,Result).
+    get_all_sub_minmax(IA,[Player2,Player3,Player4],Depth,[Move1|Moves]),
+    get_best_move(Moves,Move1,Result).
 
 get_best_move([],Best_move,Best_move).
 get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
