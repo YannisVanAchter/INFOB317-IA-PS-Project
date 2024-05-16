@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const useParams = () => {
     const [params, setParams] = useState([
-        { id: 0, isHuman: false },
+        { id: 0, isHuman: true },
         { id: 1, isHuman: false },
         { id: 2, isHuman: false },
         { id: 3, isHuman: false }
