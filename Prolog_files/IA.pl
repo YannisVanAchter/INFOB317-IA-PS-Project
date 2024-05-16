@@ -1,66 +1,9 @@
 
-% players([cyclist(position(X1, Y1), Played1, Fallen1), cyclist(position(X2, Y2), Played2, Fallen2), cyclist(position(X3, Y3), Played3, Fallen3)]). %représente les 3 cyclistes joués par un joueur
-% cyclist(position(X, Y), Played, Fallen). %représente un cycliste
-% position(X, Y). %représente la position d'un cycliste, X est le numéro entre 1 et 95 du plateau, Y est la position sur la largeur
-% etats_joueurs(etat_joueur(EtatJoueur1, CartesJoueur1), etat_joueur(EtatJoueur2, CartesJoueur2), etat_joueur(EtatJoueur3, CartesJoueur3), etat_joueur(EtatJoueur4, CartesJoueur4)). %Etat des joueurs à un instant t
-
-% etat_joueur(Joueur, [Carte1|Cartes]) :- %représente l'état d'un joueur à un instant t
-%     %Cartes est une liste représentant les cartes que le joueur a en main
-%     %Joueur représente les 3 cyclistes joués par le joueur ce qui donne l'info des positions des cyclistes
-%     Joueur = players([
-%         cyclist(position(X1, Y1), Played1, Fallen1), 
-%         cyclist(position(X2, Y2), Played2, Fallen2), 
-%         cyclist(position(X3, Y3), Played3, Fallen3)
-%     ]).
-
-% action_joueur(EtatActuel, Cartes, IndiceCarte, IndiceCycliste, NouveauX) :- %Prédicat pour prendre une décision. Dans mon idée, ce prédicat peut etre utilisé dans l'arbre de décision pour représenter un noeud
-%     nth0(IndiceCarte, Cartes, Carte), %Récupérer la carte à jouer à partir de l'indice
-%     nth0(IndiceCycliste, EtatActuel, Cycliste), %Récupérer le cycliste à déplacer à partir de l'indice
-%     Cycliste = cyclist(position(X, _), _, _), %Récupérer la position actuelle du cycliste
-%     test_rule(X + Carte), % Vérifier si la nouvelle valeur de X est valide, dans le sens que le move est valide et qu'il ne traverse pas d'autres cyclistes etc
-%     (test_rule(X + Carte) -> NouveauX is X + Carte ; NouveauX = -1 ). %Si la règle est respectée, renvoyer la nouvelle valeur de X, sinon -1. 
-%     %Dans l'idée, l'arbre de décision que j'imagine serait un algorithme Max^4 et donc le but de chaque joueur serait de maximiser les X de ses cyclistes
-
-% %L'idée pour l'arbre minmax à 4 joueurs pourrait d'une part de partir sur le fait de maximiser un jour 
-% %et en contrepartie faire en sorte que les 3 autres veulent minimiser le joueur 1, mais on perd le côté optimal de l'algo
-% %On peut alors partir sur un algo où chaque joueur tente simplement de maximiser ses points
-% %Un joueur a alors 15 possibilités d'actions (5 cartes x 3 cyclistes) et pour chaque action, on a ensuite les 15 possibites du joueur 2 et ainsi de suite
-
-% %Exemple de situation: imaginons l'état du joueur 1 comme ceci:
-% %Cycliste 1: x = 6
-% %Cycliste 2: x = 8
-% %Cycliste 3: x = 9
-
-% %Cartes: 8, 4, 5, 9, 5
-
-% %On prend en premier cas la première carte valant 8 et le premier cycliste.
-% %On ajoute le 8 à la va'1-A-left'leur X donc ici on a 14. Si le move est legal, alors on garde la valeur, sinon on renvoie -1 et la branche ne continue pas plus loin, on remonte ou on passe à la suivante.
-% %Une fois qu'on remonte et qu'on veut comparer 2 branches, on essaye de maximiser la valeur. On compare donc les deux valeurs et on prend la plus proche de 95 (dernière case avant l'arrivée). 
-% %On peut utiliser le même principe que l'élagage Alpha bêta pour réduire des parties. Par exemple si la valeur de X 9+8 est possible sans poser de soucis par la suite, il y a pas moyen que la carte 4 vale une plus grande valeur. On peut donc directement supprimer cette branche.
-% %Cependant je vois un petit soucis avec cela, c'est que les actions des autres joueurs sont peu pris en compte dans la maximisation, et je ne sais pas trop comment changer ça.
-
-% arbre([ %Idée de structure de l'arbre de décision (l'idée est donc la même que celle que Youlan a proposé, elle me parait plutot adéquate 
-% %même si faut modifier pour avoir plus que deux branche comme c'est le cas dans cet exemple)
-%     [data1, data2], % Branche gauche
-%     [data3, data4] % Branche droite
-% ]).
-
-% %Prédicat pour parcourir l'arbre (pour le moment je fais juste des write pour montrer un exemple)
-% parcourir_arbre([]). %Cas de base: liste vide
-% parcourir_arbre([BrancheGauche, BrancheDroite]) :-
-%     write('Branche gauche: '), writeln(BrancheGauche),
-%     write('Branche droite: '), writeln(BrancheDroite),
-%     %Parcourir récursivement les branches gauche et droite
-%     parcourir_arbre(BrancheGauche),
-%     parcourir_arbre(BrancheDroite).
-
-
-
 % on a besoin de pour chaque joueur
 % liste avec en premier elem sa main, puis ses coureurs représentés par un tuple de coord [[num_player, [main], [(x1,y1), (x2,y2)]], num_player]
 %  ex: [[1,[1,1,1,1,1],['1','2','4']],[4,[4,4,4,4,4],['3','4','6']],[2,[2,2,2,2,2],['2','3','10a']],[3,[3,3,3,3,3],['4','5','22']]]
 % minmax à 2, l'heuristique ça serait d'être le premier
-get_move_IA(Infos,Move):-
+get_move_IA(Infos,Num_IA,Move):-
     nth0(0,Infos,Data),
     get_infos_player(Data,1,Player1),
     get_infos_player(Data,2,Player2),
@@ -79,268 +22,318 @@ get_infos_player([H_infos|_],Num_player,Infos):-
 get_infos_player([H_infos|T_infos],Num_player,Infos):-
     get_infos_player(T_infos,Num_player,Infos).
 
-    
+launch_minmax_process(IA,Player2,Player3,Player4,Depth,Result):-
+    get_all_sub_minmax(IA,[Player2,Player3,Player4],Depth,Moves),
+    get_best_move(Moves,Result).
 
-% player 0=min
-% player 1= max
+get_best_move([],Best_move,Best_move).
+get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
+    split_string(New_pos1,"-","",List_1),
+    split_string(Best_new_pos,"-","",List_best),
+    length(List_1,Len1),
+    length(List_best,Lenbest),
+    Len1=Lenbest,
+    Len1=3,
+    nth0(0,List_1,Value1),
+    nth0(0,List_best,Value2),
+    Value1=<Value2,
+    get_best_move(Other_moves,(Best_card,Best_new_pos,Best_old_pos),Best_move).
 
+get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
+    split_string(New_pos1,"-","",List_1),
+    split_string(Best_new_pos,"-","",List_best),
+    length(List_1,Len1),
+    length(List_best,Lenbest),
+    Len1=Lenbest,
+    Len1=3,
+    nth0(0,List_1,Value1),
+    nth0(0,List_best,Value2),
+    Value1>Value2,
+    get_best_move(Other_moves,(Card1,New_pos1,Old_pos_1),Best_move).
 
-% minmax([1,2],[[[1,2],['1-A-left','2-A-left']],[[1,1],['1-A-left','1-A-left']]],1,1,0,A)
-% State,Depth,Player,BestScore
-% base case: depth reached or terminal state reached
-minmax(State,0,_,Best_score,Best_move):-
-    print('b'),
-    score(State,Best_score).
+get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
+    split_string(New_pos1,"-","",List_1),
+    split_string(Best_new_pos,"-","",List_best),
+    length(List_1,Len1),
+    length(List_best,Lenbest),
+    Len1=Lenbest,
+    Len1=4,
+    nth0(0,List_1,Value1),
+    nth0(0,List_best,Value2),
+    Value1=<Value2,
+    get_best_move(Other_moves,(Best_card,Best_new_pos,Best_old_pos),Best_move).
 
-minmax(State,_,_,Best_score,Best_move):-
-    print('c'),
-    terminal_state(State),
-    score(State,Best_score).
+get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
+    split_string(New_pos1,"-","",List_1),
+    split_string(Best_new_pos,"-","",List_best),
+    length(List_1,Len1),
+    length(List_best,Lenbest),
+    Len1=Lenbest,
+    Len1=4,
+    nth0(1,List_1,Value1),
+    nth0(1,List_best,Value2),
+    Value1>Value2,
+    get_best_move(Other_moves,(Card1,New_pos1,Old_pos_1),Best_move).
 
-% recursive case
-% faudrait un minmax qui iète sur les cartes e,
-% du coup on iètre plus sur les cartes aèrs
-minmax(State,Depth,Player,Best_score,Best_move):-
-    print('a'),
-    Player=1,
-    nth0(0,State,Player_infos),
-    nth0(1,Player_infos,Bikes),
-    nth0(0,Player_infos,Cards),
-    nth0(0,Cards,Card),
-    possible_moves(State,Card,Bikes,Moves),
-    evaluate_moves(Moves,State,Depth,Player,Best_score,Best_move).
+get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
+    split_string(New_pos1,"-","",List_1),
+    split_string(Best_new_pos,"-","",List_best),
+    length(List_1,Len1),
+    length(List_best,Lenbest),
+    Len1>Lenbest,
+    get_best_move(Other_moves,(Card1,New_pos1,Old_pos_1),Best_move).
 
-minmax(State,Depth,Player,Best_score,Best_move):-
-    Player=0,
-    nth0(1,State,Player_infos),
-    nth0(1,Player_infos,Bikes),
-    nth0(0,Player_infos,Cards),
-    nth0(0,Cards,Card),
-    possible_moves(State,Card,Bikes,Moves),
-    evaluate_moves(Moves,State,Depth,Player,Best_score,Best_move).
-
-evaluate_moves([],_,_,_,Best_score,Best_move).
-
-evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score,Best_move):-
-    Player=1,
-    make_move(State,Move,Player,New_state),
-    Opponent= 0,
-    New_depth is Depth-1,
-    nth0(0,State,Player),
-    nth0(0,Player,Cards),
-    minmax(Cards,New_state, New_depth, Opponent, Temp_score,Best_move),
-    New_best_score= max(Best_score,Temp_score),
-    New_best_score>Best_score,
-    Best_move=Move,
-    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
-
-evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score,Best_move):-
-    Player=1,
-    make_move(State,Move,Player,New_state),
-    Opponent= 0,
-    New_depth is Depth-1,
-    nth0(0,State,Player),
-    nth0(0,Player,Cards),
-    minmax(Cards,New_state, New_depth, Opponent, Temp_score),
-    New_best_score= max(Best_score,Temp_score),
-    New_best_score=<Best_score,
-    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
-
-evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score):-
-    Player=0,
-    make_move(State,Move,Player,New_state),
-    Opponent= 1,
-    New_depth is Depth-1,
-    nth0(1,State,Player),
-    nth0(0,Player,Cards),
-    minmax(Cards,New_state, New_depth, Opponent, Temp_score),
-    New_best_score= min(Best_score, Temp_score),
-    New_best_score>Best_score,
-    Best_move=Move,
-    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
-
-evaluate_moves([Move|Other_moves],State,Depth,Player,Best_score):-
-    Player=0,
-    make_move(State,Move,Player,New_state),
-    Opponent= 1,
-    New_depth is Depth-1,
-    nth0(1,State,Player),
-    nth0(0,Player,Cards),
-    minmax(Cards,New_state, New_depth, Opponent, Temp_score),
-    New_best_score= min(Best_score, Temp_score),
-    New_best_score=<Best_score,
-    evaluate_moves(Other_moves,State,Depth,Player,Best_score,Best_move).
-    
-% test if one of the position ends the game
-terminal_state(State):-
-    nth0(0,State,Player1),
-    nth0(1,State,Player2),
-    nth0(1,Player1,Pos1),
-    nth0(1,Player2,Pos2),
-    append(Pos1,Pos2,Positions),
-    terminal_pos(Positions).
-    
-terminal_pos([]):-false,!.
-terminal_pos([Pos|Other_pos]):-
-    end(Pos),!.
-
-terminal_pos([Position|Other_pos]):-
-    terminal_pos(Other_pos).
-
-% get game state structure for the IA
-game_state(Player1, Player2, Player3, Player4, Num_player_IA, [IA, Others]) :-
-    Num_player_IA= 1,
-    IA= Player1,
-    Others= [get_other_cards(Player2, Player3, Player4), get_other_bikes(Player2, Player3, Player4)].
-    
-game_state(Player1, Player2, Player3, Player4, Num_player_IA, [IA, Others]) :-
-    Num_player_IA= 2,
-    IA= Player2,
-    Others= [get_other_cards(Player1, Player3, Player4), get_other_bikes(Player2, Player3, Player4)].
-    
-game_state(Player1, Player2, Player3, Player4, Num_player_IA, [IA, Others]) :-
-    Num_player_IA= 3,
-    IA= Player3,
-    Others= [get_other_cards(Player1, Player2, Player4), get_other_bikes(Player2, Player3, Player4)].
-    
-game_state(Player1, Player2, Player3, Player4, Num_player_IA, [IA, Others]) :-
-    Num_player_IA= 4,
-    IA= Player4,
-    Others= [get_other_cards(Player1, Player2, Player3), get_other_bikes(Player2, Player3, Player4)].
-    
-get_other_cards(Player2, Player3, Player4) :-
-    nth0(0, Player2, Cards2),
-    nth0(0, Player3, Cards3),
-    nth0(0, Player4, Cards4),
-    append(Cards2, Cards3, Temp_card),
-    append(Cards4, Temp_card, Cards_other).
-          
-get_other_bikes(Player2, Player3, Player4) :-
-    nth0(1, Player2, Bike2),
-    nth0(1, Player3, Bike3),
-    nth0(1, Player4, Bike4),
-    append(Bike2, Bike3, Temp_bike),
-    append(Bike4, Temp_bike, Bike_other).
-
-make_move(State,Move,Player,New_state):-
-    Player=1,
-    nth0(1,Move,Index),
-    nth0(3,Move,New_pos),
-    nth0(0,Move,Card),
-    nth0(0,State,Player1),
-    nth0(1,Player1,Old_bikes),
-    nth0(0,Player1,Cards),
-    nth0(1,State,Player2),
-    select(Card,Cards,New_Cards),
-    replace_position(Index,New_pos,0,Old_bikes,[],New_bikes),
-    New_state=[[New_Cards,New_bikes],Player2].
-    
-make_move(State,Move,Player,New_state):-
-    Player=0,
-    nth0(1,Move,Index),
-    nth0(3,Move,New_pos),
-    nth0(0,Move,Card),
-    nth0(0,State,Player1),
-    nth0(1,State,Player2),
-    nth0(0,Player2,Cards),
-    nth0(1,Player2,Old_bikes),
-    select(Card,Cards,New_Cards),
-    replace_position(Index,New_pos,0,Old_bikes,[],New_bikes),
-    New_state=[Player1,[New_Cards,New_bikes]].
-
-replace_position(Index,New_position,Iter_index,[Old_bike|Other_old_bikes],Acc,New_state_bikes):-
-    Iter_index=Index,
-    append(Acc,[New_position|Other_old_bikes],New_state_bikes),!.
-
-replace_position(Index,New_position,Iter_index,[Old_bike|Other_old_bikes],Acc,New_state_bikes):-
-    append(Acc,[Old_bike],New_acc),
-    New_iter_index is Iter_index+1,
-    replace_position(Index,New_position,New_iter_index,Other_old_bikes,New_acc,New_state_bikes).
-
-    
+get_best_move([(Card1,New_pos1,Old_pos_1)|Other_moves],(Best_card,Best_new_pos,Best_old_pos),Best_move):-
+    split_string(New_pos1,"-","",List_1),
+    split_string(Best_new_pos,"-","",List_best),
+    length(List_1,Len1),
+    length(List_best,Lenbest),
+    Len1<Lenbest,
+    get_best_move(Other_moves,(Best_card,Best_new_pos,Best_old_pos),Best_move).
 
 
-% la main est déjà modif car fait au dessus, ici je veux repartir sur chaque vélo
-% et faudrait faire ça mais qui donne une val diff de new_pos à chaque fois
-% faut aussi créer new_bikes, pour ça je pense que dégager l'elem à l'index et le remplacer ok
-new_bikes(Used_card,Hand,New_pos,[Pos|Other_pos],Turn,Hand2,Bikes2,Tree):-
-    New_turn,
-    New_bikes,
-    New_tree=[(Used_card,Position)],
-    arbre_d(Hand,New_bikes,Hand2,Bikes2,Turn,New_tree),
-    new_bikes().
+get_all_sub_minmax(_,[],_,Acc,Acc).
+get_all_sub_minmax(IA,[Player|Other_players],Depth,Acc,Results):-
+    get_sub_minmax(IA,Player,Depth,Moves),
+    append(Acc,Moves,New_acc),
+    get_all_sub_minmax(IA,Other_players,Depth,New_acc,Results).
 
+get_sub_minmax([Card1,Bikes1],[Card2,Bikes2],Depth,Results):-
+    combination_player(Card1,Bikes1,Card2,Bikes2,[],States),
+    sub_minmax(States,Depth,[],Results).
 
-% if moves without causing a fall possible, return those
-possible_moves(State,Card,Bikes,Possible_moves):-
-    select_moves(Card,Bikes,All_moves,Candidate_moves),
-    length(Candidate_moves,Number_moves),
-    Number_moves>0,
-    Possible_moves=Candidate_moves.
-
-% if not, return all
-possible_moves(State,Card,Bikes,Possible_moves):-
-    select_moves(State,Card,Bikes,Possible_moves).
-
-% select all moves for current hand and bikes position
-select_moves(Card,Bikes,Possible_moves,Moves):-
-    create_moves(Card,Bikes,0,[],Possible_moves),
-    test_moves(State,Possible_moves,Moves).
-
-
-% create all the possible next moves for each bike with each card in hand
-% create_moves([1,2,3],['1-A-left','2-A-left','2-A-left'],A).
-% A = [(1, ('2-A-left', '2-A-left', '2-A-left'), ('1-A-left', '3-A-left', '2-A-left'), '1-A-left', '2-A-left', '3-A-left'), (2, ('3-A-left', '2-A-left', '2-A-left'), ('1-A-left', '4-A-left', '2-A-left'), '1-A-left', '2-A-left', '4-A-left'), (3, ('4-A-left', '2-A-left', '2-A-left'), ('1-A-left', '5-A-left', '2-A-left'), '1-A-left', '2-A-left', '5-A-left')]
-% je vais pas pouvoir faire ça comme ça, parce que pour les 3 autres on en a 9 et pas 3 donc tendu
-
-% faudrait rendre un truc du genre
-% [ [carte, position, nouvelle_pos, [nouvel_ensemnble]], [carte, position, nouvelle pos, [nouvel ensemble]] ]
-% iterate_cards([],_,[]).
-% iterate_cards([Card|Other_cards],Bikes,Possible_moves):-
-%     get_bikes_positions(Bikes,Card,Moves_bikes,0),
-%     iterate_bikes(Card,Moves_bikes,Bikes,[],Moves),
-%     Possible_moves=[Moves|Other_moves],
-%     iterate_cards(Other_cards,[Bike1,Bike2,Bike3],Other_moves),!.
-
-% iterate_bikes(_,[],Acc,Acc).
-% iterate_bikes(Card,[Current_bike_move|Other_bikes_move],Bikes_pos,Acc,Moves):-
-%     nth0(1,Current_bike_move,Old_pos),
-%     nth0(2,Current_bike_move,New_pos),
-%     nth0(0,Current_bike_move,Index),
-%     % là ya des soucis
-%     Index_before is Index-1,
-%     Index_after is Index+1,
-%     findall(Elem,(between(0, Index_before, Index1), nth0(Index1,Bikes_pos,Elem)),Before),
-%     findall(Elem,(between(Index_after,Length,Index1),nth0(Index1,Bikes_pos,Elem)),After),
-%     length(Bikes_pos,Length),
-%     append(Before,[New_pos|After],New_bike_pos),
-%     append([Card,Old_pos,New_pos,New_bike_pos],Acc,New_acc),
-%     iterate_bikes(Card,Other_bikes_move,Bikes_pos,New_acc,Moves).
-    
-
-
-% % (index,pos_base,new_pos)
-% get_bikes_positions([],_,[]).
-% get_bikes_positions([Bike|Other_bikes],Card,Moves,Index_bike):-
-%     get_next_position(Bike,Card,New_pos),
-%     Moves=[(Index_bike,Bike,New_pos)|Other_moves],
-%     New_index is Index_bike+1,
-%     get_bikes_positions(Other_bikes,Card,Other_moves,New_index).
-
-
-% create_moves(1,['1-A-left','2-A-left'],0,[],A).
-% A = [[1, 0, '1-A-left', '2-A-left'], [1, 1, '2-A-left', '3-A-left']].
-create_moves(_,[],_,Acc,Acc).
-create_moves(Card,[Bike|Other_bikes],Index,Acc,Moves):-
-    get_next_position(Bike,Card,New_pos),
-    Move=[[Card,Index,Bike,New_pos]],
-    New_index is Index+1,
+sub_minmax([],_,Acc,Acc).
+sub_minmax([State|States],Depth,Acc,Res):-
+    minimax(State,Depth,1,0,Move),
     append(Acc,Move,New_acc),
-    create_moves(Card,Other_bikes,New_index,New_acc,Moves),!.
-% gets the potential next positions of the player depending on the value of his cards
+    sub_minmax(States,Depth,New_acc,Res).
+
+combination_player(_,[],_,_,Acc,Acc).
+combination_player(Card1,[Bike1|Bikes1],Card2,Bikes2,Acc,States):-
+    combination_player2(Card1,Bike1,Card2,Bikes2,[],Res),
+    append(Acc,Res,New_acc),
+    combination_player(Card1,Bikes1,Card2,Bikes2,New_acc,States).
+
+combination_player2(_,_,_,[],Acc,Acc).   
+combination_player2(Card1,Bike1,Card2,[Bike2|Bikes2],Acc,States):-
+    Res=[[Card1,Bike1],[Card2,Bike2]],
+    append(Acc,Res,New_acc),
+    combination_player2(Card1,Bike1,Card2,Bikes2,New_acc,States).
+
+
+    
+    % minimax([[[1,2],'1-A-left'],[[1,1],'1-A-left']],2,1,0,A).
+minimax(State,_,Player,Best_score,_):-
+    writeln(Best_score),
+    terminal_state(State),
+    score(State,Player,Best_score).
+
+minimax(State,0,Player,Best_score,_):-
+    writeln(Best_score),
+    score(State,Player,Best_score).
+
+minimax([[[],Bike1],Player2],_,Player,Best_score,_):-
+    score([[[],Bike1],Player2],Player,Best_score).
+minimax([Player1,[[],Bike2]],_,Player,Best_score,_):-
+    score([Player1,[[],Bike2]],Player,Best_score).
+
+minimax([[Cards,Bike],Player2], Depth, 1, Best_score, Best_move):-
+    writeln([[Cards,Bike],Player2]);
+    possible_moves(Cards,Bike,[],Moves),
+    evaluate_moves(Moves,[[Cards,Bike],Player2],Depth,1,Best_score,Best_move).
+
+minimax([Player1,[Cards,Bike]], Depth, 2, Best_score, Best_move):-
+    writeln([Player1,[Cards,Bike]]),
+    possible_moves(Cards,Bike,[],Moves),
+    evaluate_moves(Moves,[Player1,[Cards,Bike]],Depth,2,Best_score,Best_move).
+
+
+evaluate_moves([Move], State, Depth, 2,Best_score, _):-
+    % writeln(Best_score),
+    make_move(State,2,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 1, Temp_score, Move),
+    get_min(Best_score,Temp_score,New_best_score),
+    New_best_score>Best_score.
+
+evaluate_moves([Move], State, Depth, 2,Best_score, Best_move):-
+    % writeln(Best_score),
+    make_move(State,2,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 1, Temp_score, Best_move),
+    get_min(Best_score,Temp_score,New_best_score),
+    New_best_score=<Best_score.
+
+evaluate_moves([Move], State, Depth,1,Best_score, Best_move):-
+    % writeln(Best_score),
+    make_move(State,1,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 2, Temp_score, Best_move),
+    get_max(Best_score,Temp_score,New_best_score),
+    New_best_score=<Best_score.
+
+evaluate_moves([Move], State, Depth, 1,Best_score, _):-
+    % writeln(Best_score),
+    make_move(State,1,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 2, Temp_score, Move),
+    get_max(Best_score,Temp_score,New_best_score),
+    New_best_score>Best_score,
+    evaluate_moves([Move], State, New_depth, 1, Best_score, Move).
+
+evaluate_moves([Move | Moves], State, Depth, 2,Best_score, _):-
+    % writeln(Best_score),
+    make_move(State,2,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 1, Temp_score, Move),
+    get_min(Best_score,Temp_score,New_best_score),
+    New_best_score>Best_score,
+    evaluate_moves(Moves,State,Depth,2,Best_score,Move).
+
+evaluate_moves([Move | Moves], State, Depth, 2,Best_score, Best_move):-
+    % writeln(Best_score),
+    make_move(State,2,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 1, Temp_score, Best_move),
+    get_min(Best_score,Temp_score,New_best_score),
+    New_best_score=<Best_score,
+    evaluate_moves(Moves,State,Depth,2,Best_score,Best_move).
+
+evaluate_moves([Move | Moves], State, Depth,1,Best_score, Best_move):-
+    % writeln(Best_score),
+    make_move(State,1,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 2, Temp_score, Best_move),
+    get_max(Best_score,Temp_score,New_best_score),
+    New_best_score=<Best_score,
+    evaluate_moves(Moves,State,Depth,1,Best_score,Best_move).
+
+evaluate_moves([Move | Moves], State, Depth, 1,Best_score, _):-
+    % writeln(Best_score),
+    make_move(State,1,Move,New_state),
+    New_depth is Depth-1,
+    minimax(New_state, New_depth, 2, Temp_score, Move),
+    get_max(Best_score,Temp_score,New_best_score),
+    New_best_score>Best_score,
+    evaluate_moves(Moves,State,Depth,1,Best_score,Move).
+
+
+
+possible_moves([],_,Acc,Acc).
+possible_moves([Card|Other_cards],Bike,Acc,Moves):-
+    get_next_position(Bike,Card,New_position),
+    append(Acc,[(Card,New_position,Bike)],New_acc),
+    possible_moves(Other_cards,Bike,New_acc,Moves),!.
+
+make_move([[Cards,_],Player2],1,(Card,New_pos-Old_pos),[[New_cards,New_pos],Player2]):-
+    select(Card,Cards,New_cards).
+
+make_move([Player1,[Cards,_]],2,(Card,New_pos,Old_pos),[Player1,[New_cards,New_pos]]):-
+    select(Card,Cards,New_cards).
+
+terminal_state([[_,Bike],_]):-
+    end(Bike).
+
+terminal_state([_,[_,Bike]]):-
+    end(Bike).
+
+get_min(Value1,Value2,Value1):-
+    Value1=<Value2.
+get_min(_,Value2,Value2).
+
+get_max(Value1,Value2,Value1):-
+    Value1>=Value2.
+get_max(_,Value2,Value2).
+
+score([[_,Bike1],[_,Bike2]],Player,Score):-
+    split_string(Bike1,"-","",List_position1),
+    split_string(Bike2,"-","",List_position2),
+    length(List_position1,Length1),
+    length(List_position2,Lenght2),
+    compute_score(List_position1,List_position2,Length1,Lenght2,Player,Score).
+
+compute_score(_,_,Length1,Lenght2,1,Score):-
+    Score is 1,
+    Length1>Lenght2,!.
+
+compute_score(_,_,Length1,Lenght2,1,Score):-
+    Score is 0,
+    Length1<Lenght2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,1,Score):-
+    Score is 1,
+    Length1=Lenght2,
+    Length1=4,
+    nth0(1,List_position1,Value1),
+    nth0(1,List_position2,Value2),
+    Value1>Value2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,1,Score):-
+    Score is 0,
+    Length1=Lenght2,
+    Length1=4,
+    nth0(1,List_position1,Value1),
+    nth0(1,List_position2,Value2),
+    Value1=<Value2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,1,Score):-
+    Score is 0,
+    Length1=Lenght2,
+    Length1=3,
+    nth0(0,List_position1,Value1),
+    nth0(0,List_position2,Value2),
+    Value1=<Value2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,1,Score):-
+    Score is 1,
+    Length1=Lenght2,
+    Length1=3,
+    nth0(0,List_position1,Value1),
+    nth0(0,List_position2,Value2),
+    Value1>Value2,!.
+
+compute_score(_,_,Length1,Lenght2,2,Score):-
+    Score is 0,
+    Length1<Lenght2,!.
+
+compute_score(_,_,Length1,Lenght2,2,Score):-
+    Score is 1,
+    Length1>Lenght2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,2,Score):-
+    Score is 1,
+    Length1=Lenght2,
+    Length1=4,
+    nth0(1,List_position1,Value1),
+    nth0(1,List_position2,Value2),
+    Value1>=Value2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,2,Score):-
+    Score is 0,
+    Length1=Lenght2,
+    Length1=4,
+    nth0(1,List_position1,Value1),
+    nth0(1,List_position2,Value2),
+    Value1<Value2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,2,Score):-
+    Score is 1,
+    Length1=Lenght2,
+    Length1=3,
+    nth0(0,List_position1,Value1),
+    nth0(0,List_position2,Value2),
+    Value1>=Value2,!.
+
+compute_score(List_position1,List_position2,Length1,Lenght2,2,Score):-
+    Score is 0,
+    Length1=Lenght2,
+    Length1=3,
+    nth0(0,List_position1,Value1),
+    nth0(0,List_position2,Value2),
+    Value1<Value2,!.
+
+
 get_next_position(Position,0,Position).
-get_next_position(Position,Card_value,Position):-
-    end(Position).
 get_next_position(Position,Card_value,Res):-
     next(Position,List_Next),
     member(Next,List_Next),
@@ -493,6 +486,7 @@ available_places('-8-A-left',3).
 available_places('-9-A-left',3).
 
 % linked cases on the board
+next('0-B-left',['1-A-left']).
 next('1-A-left',['2-A-left']).
 next('2-A-left',['3-A-left']).
 next('3-A-left',['4-A-left']).
@@ -658,22 +652,18 @@ end('-9-A-left').
 
 
 % TODO
+
+
+% verif qu'on ne bouge pas si on est déjà sur une case fin
+
+% verif final state c'est pour tout le monde
+
+
+% et si on fait un minmax pour chaque combo de piece et on voit ce qui est le mieux?
+% genre on a les cartes et 1 pion pour chaque
+
+
 % rendre le code plus compréhensible en terme de noms de variables et commenter plus 
 
 
 % aspirations dans le make move, voir en fct des règles
-% voir si fini dès qu'un joueur en dehors et si on le considère comme restant sur le plateau ou non, mais ça devrait être ok avce le make move
-
-
-% test iterate bikes
-
-%  s'il est au dessus, 1, égalité 0, sinon -1
-% voir si score spécial si chute, en vrai mieux je pense
-score(State,1).
-% surement split sur les - (mais si negatif ça va bug) et test si c'est plus grand ou pas
-
-% test if a move can be played without causing a fall
-% test_moves([],[]).
-% % il faudra tester si on ne fait pas tomber d'autres vélos, donc surement passer le state en paramètre ici aussi
-% test_moves(State,[Current_move|Other_moves],Moves_without_fall).
-test_moves(State,Moves,Moves).
