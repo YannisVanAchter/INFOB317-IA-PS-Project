@@ -2,8 +2,7 @@
     "deck": [],
     "discard": [],
     "currentPlayer": {
-        "playerID": 0,
-        "bikeIndex": 1
+        "playerID": 0
     },
     "players": [
         {

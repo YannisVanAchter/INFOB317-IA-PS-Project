@@ -10,8 +10,5 @@ COPY . .
 # Installez les dépendances (si nécessaire)
 # RUN apt-get update && apt-get install -y <nom_du_paquet>
 
-# Exposez le port que votre API utilise
-EXPOSE 8080
-
 # Définissez la commande de démarrage
 CMD ["swipl", "socket.pl"]

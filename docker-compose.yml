@@ -5,8 +5,13 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    environment:
+      - REACT_APP_SERVER_URL=http://127.0.0.1:8080
+      - REACT_DEBUG=false
   
   server:
     build:
       context: ./Prolog_files
       dockerfile: Dockerfile
+    expose:
+      - 8080

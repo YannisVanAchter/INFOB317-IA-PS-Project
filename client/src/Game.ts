@@ -384,11 +384,11 @@ function setUp() {
 function bot({ G, ctx }: Context ) {
     // TODO: check with @Maragaux what AI will return
     let moves: number[] = [];
-    const url = `http://localhost:8000/ai`;
+    const url = `${process.env.REACT_APP_SERVER_URL}/ai/`;
     axios.get(url, {
         params: {
-            G: G,
-            ctx: ctx,
+            players: G.players,
+            currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
         }
     })
     .then(response => {

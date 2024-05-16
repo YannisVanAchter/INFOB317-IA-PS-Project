@@ -13,15 +13,8 @@ RUN npm install
 # Copy the rest of the app source code to the working directory
 COPY ./public ./public
 COPY ./src ./src
-COPY ./.env ./.env
 COPY ./custom.d.ts ./custom.d.ts
 COPY ./tsconfig.json ./tsconfig.json
-
-# Build the app
-# RUN npm run build
-
-# Expose the port that the app will run on
-EXPOSE 3000
 
 # Define the command to run the app
 CMD ["npm", "start"]
