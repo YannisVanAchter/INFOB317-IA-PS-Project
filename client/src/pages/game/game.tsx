@@ -31,6 +31,7 @@ type TODO = {
 function Page(props: TODO) {
     let players = props.G.players;
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
+    const { currentBikeIndex, currentCardIndex, setBikeIndex, handleChoiceCard, mockUseCard, applyCardOnBike } = useGame({ player: players[currentPlayer], useCard: props.moves.useCard });
 
     let boardProps = {
         G: props.G,
@@ -41,14 +42,20 @@ function Page(props: TODO) {
             { playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position) },
         ],
         currentPlayer: currentPlayer,
-        availableMoves: [] as string[],
+        availableMoves: [] as { boardKey: string, bikeIndex: number, cardIndex: number }[],
         mockUseCardOnBike: mockUseCardOnBike,
     };
 
     for (let i = 0; i < props.G.players[currentPlayer].bikes.length; i++) {
         for (let j = 0; j < props.G.players[currentPlayer].hand.length; j++) {
-            const availableMoves = mockUseCardOnBike(props.G.players[currentPlayer].bikes[i], props.G.players[currentPlayer].hand[i]);
-            boardProps.availableMoves = [...new Set([...boardProps.availableMoves, ...availableMoves])];
+            const bike = props.G.players[currentPlayer].bikes[i];
+            const card = props.G.players[currentPlayer].hand[j];
+            const moves = mockUseCardOnBike(bike, card);
+            if (moves.length > 0) {
+                moves.forEach((move) => {
+                    boardProps.availableMoves.push({ boardKey: move, bikeIndex: i, cardIndex: j });
+                });
+            }
         }
     }
 

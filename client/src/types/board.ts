@@ -12,7 +12,7 @@ type svgId = `c${position}_${svgSide}`;
 type BoardProps = {
     players: { playerID: playerID, bikes: boardKey[] }[],
     currentPlayer: playerID,
-    availableMoves: boardKey[],
+    availableMoves: { boardKey: boardKey, bikeIndex: number, cardIndex: number }[],
 };
 
 

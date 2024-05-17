@@ -14,8 +14,10 @@ interface Props {
 export function useGame({ player, useCard }: Props): GameContextType {
     let lastBikePosition = Math.max(...player.bikes.map(bike => Board[bike.position].position));
     let bikeIndexInit = player.bikes.findIndex(bike => Board[bike.position].position === lastBikePosition);
+    let maxCard = Math.max(...player.hand.map(card => card));
+    let cardIndexInit = player.hand.findIndex(card => card === maxCard);
     const [currentBikeIndex, setBike] = useState(bikeIndexInit);
-    const [currentCardIndex, setCardIndex] = useState(0);
+    const [currentCardIndex, setCardIndex] = useState(cardIndexInit);
 
     const applyCardOnBike = (target: boardKey) => {
         console.log("CALLING USE CARD WITH:");

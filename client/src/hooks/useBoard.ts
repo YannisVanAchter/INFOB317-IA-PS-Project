@@ -7,7 +7,7 @@ import { BoardProps, boardKey } from "../types/board";
 import { players } from "../data/player";
 
 const useBoard = (props: BoardProps) => {
-    const { applyCardOnBike } = useContext(GameContext);
+    const { setBikeIndex, handleChoiceCard, applyCardOnBike } = useContext(GameContext);
     // Add bikes to the map
     const addBikes = (svg: SVGSVGElement) => {
         if (svg === null) {
@@ -40,7 +40,7 @@ const useBoard = (props: BoardProps) => {
                 newText.style.fontFamily = 'Arial';
                 newText.style.stroke = 'black';
 
-                const textNode = document.createTextNode(`${player.playerID}`);
+                const textNode = document.createTextNode(`${index + 1}`);
                 newText.appendChild(textNode);
                 group.appendChild(newText);
 
@@ -87,11 +87,11 @@ const useBoard = (props: BoardProps) => {
         let usedMove: boardKey[] = [];
         props.availableMoves.forEach((move, index) => {
             let SvgID: string;
-            if (move === "0-B-left")
+            if (move.boardKey === "0-B-left")
                 SvgID = `start-${props.currentPlayer}`;
             else 
-                SvgID= fromMapToSVG(move, usedMove);
-            if (usedMove.includes(move))
+                SvgID= fromMapToSVG(move.boardKey, usedMove);
+            if (usedMove.includes(move.boardKey))
                 return;
 
             const element = svg.getElementById(SvgID);
@@ -103,9 +103,11 @@ const useBoard = (props: BoardProps) => {
             element.setAttributeNS(null, "class", 'available-move');
             element.addEventListener('click', () => {
                 console.log('clicked on', move);
-                applyCardOnBike(move);
+                setBikeIndex(move.bikeIndex);
+                handleChoiceCard(move.cardIndex);
+                applyCardOnBike(move.boardKey);
             });
-            usedMove.push(move);
+            usedMove.push(move.boardKey);
             // console.log('element', element, 'has been updated to the available moves', move);
         });
     }
