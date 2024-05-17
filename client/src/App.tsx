@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext, createContext } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 import './App.css';
 import bike from './assets/velo-icon.png';
+
+import { GameSettingsContext } from './context';
+import { useParams } from './hooks/useParams';
 
 import Home from './pages/home/home';
 import Game from './pages/game/game';
@@ -16,6 +19,7 @@ const NotFound = () => {
     <Link to="/">Go Home</Link>
   </>
 };
+
 
 function App() {
   return (
@@ -32,11 +36,13 @@ function App() {
           </nav>
         </header>
         
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/game" element={<Game />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <GameSettingsContext.Provider value={useParams()}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/game" element={<Game />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </GameSettingsContext.Provider>
       </BrowserRouter>
     </div>
   );

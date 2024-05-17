@@ -1,56 +1,47 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Modal } from '../../components/modal/modal';
+import { useGameParams } from '../../context/gameSettingsContext';
+import { players } from '../../data/player';
+import './home.css';
 
-import { Modal } from "../../components/modal/modal";
-import { useGameParams } from "../../context";
-import { useParams } from "../../hooks";
-
-import { players } from "../../data/player";
-import type { param } from "../../types/params";
-
-import "./home.css";
-
-function Home() {
+const Home: React.FC = () => {
     const [showSettingsModal, setShowSettingsModal] = useState(false);
-    const p = useGameParams();
+    const { params, setParam } = useGameParams();
     const navigate = useNavigate();
-    let { params, setParam }: any = useParams();
-
-    if (p) {
-        ({ params, setParam } = p);
-    }
 
     const handleModalDisplay = () => {
         setShowSettingsModal(!showSettingsModal);
-    }
+    };
 
     const handleStartGame = () => {
-        console.log("params 1", params);
-        for (let i = 0; i < params.length; i++) {
-            setParam(i, true);
-        }
-        console.log("params 2", params);
-        navigate("/game");
-    }
+        navigate('/game');
+    };
 
     return (
         <>
-            {showSettingsModal && <Modal >
-                <h2>Paramètre de la partie</h2>
-                {params.map((parameter: param, index: number) => (
-                    <div key={index} className="player-settings">
-                        <div>{players[index].teamName}</div>
-                        <label>
-                            <input type="checkbox" checked={parameter.isHuman} onChange={(e) => setParam(index, e.target.checked)} />
-                            Humain
-                        </label>
+            {showSettingsModal && (
+                <Modal>
+                    <h2>Paramètre de la partie</h2>
+                    {params.map((parameter, index) => (
+                        <div key={index} className="player-settings">
+                            <div>{players[index].teamName}</div>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={parameter.isHuman}
+                                    onChange={(e) => setParam(index, e.target.checked)}
+                                />
+                                Humain
+                            </label>
+                        </div>
+                    ))}
+                    <div>
+                        <button className="modal-button" onClick={handleStartGame}>Commencer</button>
+                        <button className="modal-button" onClick={handleModalDisplay}>Retour</button>
                     </div>
-                ))}
-                <div>
-                    <button className="modal-button" onClick={handleStartGame}>Commencer</button>
-                    <button className="modal-button" onClick={handleModalDisplay}>Retour</button>
-                </div>
-            </Modal>}
+                </Modal>
+            )}
             <div className="page home">
                 <div className="rules">
                     <h1 className="title">Règles</h1>
@@ -66,11 +57,13 @@ function Home() {
                 </div>
                 <div className="start-game">
                     <p>Cliquer sur "nouvelle partie" pour accèder au parametre de la partie</p>
-                    <button className={`modal-button ${showSettingsModal ? "active": ""}`} onClick={handleModalDisplay}>Nouvelle partie</button>
+                    <button className={`modal-button ${showSettingsModal ? "active" : ""}`} onClick={handleModalDisplay}>
+                        Nouvelle partie
+                    </button>
                 </div>
             </div>
         </>
     );
-}
+};
 
 export default Home;
