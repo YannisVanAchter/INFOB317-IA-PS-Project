@@ -7,7 +7,6 @@ import { useBoard } from '../../hooks';
 
 function TourDeFranceBoard(props: BoardProps) {
     const { addBikes, addPlayerMoves } = useBoard(props);
-    console.log("Board displayed");
     
     return <>
             {/* <Map id="svg-map" className="svg-map" /> */}

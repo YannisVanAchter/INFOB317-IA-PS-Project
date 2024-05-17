@@ -166,6 +166,7 @@ function DisplayHands(props: TODO) {
                                         <li
                                             id={`id-${player.playerID}-${j}`}
                                             className={`card`}
+                                            key={j}
                                             onClick={(e) => handleClickCard(e, player.playerID, card)}
                                         >
                                             <CardFront className={`value card-${j}`} number={card as CardValue} />

@@ -133,7 +133,19 @@ function checkAspiration(newPosition: string): boolean {
  * The first player is the player who has the bike with the highest position
  */
 function firstPlayer(context: Context): number {
-    let firstPlayer = 0
+    let firstPlayer = 0;
+    if (context.ctx.turn === 1) {
+        let highestCard = 0;
+        for (let i = 0; i < nbPlayers; i++) {
+            for (let j = 0; j < nbCards; j++) {
+                if (context.G.players[i].hand[j] > highestCard) {
+                    firstPlayer = i;
+                    highestCard = context.G.players[i].hand[j];
+                }
+            }
+        }
+        return firstPlayer;
+    }
     let firstBike = context.G.players[firstPlayer].bikes[0];
     for (let i = 0; i < nbPlayers; i++) {
         for (let j = 0; j < nbBikes; j++) {
@@ -156,6 +168,19 @@ function firstPlayer(context: Context): number {
 function nextPlayer(context: Context): number {
     const firstPlayer = parseInt(context.ctx.currentPlayer);
     let nextPlayer = parseInt(context.ctx.currentPlayer);
+    if (context.ctx.turn === 1) {
+        let highestCard = 0;
+        for (let i = 0; i < nbPlayers; i++) {
+            if (context.G.players[i].hand.length !== nbCards) continue; // Skip players who have already played their cards
+            for (let j = 0; j < nbCards; j++) {
+                if (context.G.players[i].hand[j] > highestCard) {
+                    nextPlayer = i;
+                    highestCard = context.G.players[i].hand[j];
+                }
+            }
+        }
+        return nextPlayer;
+    }
     let firstPlayerFirstBike: Bike = context.G.players[firstPlayer].bikes[0];
     for (let i = 1; i < nbBikes; i++) {
         if (Board[context.G.players[firstPlayer].bikes[i].position].position > Board[firstPlayerFirstBike.position].position) {
@@ -296,6 +321,7 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
 function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: string) {
     console.log("----PARAMS----")
     console.log(context);
+    console.log(bikeIndex);
     console.log(cardIndex);
     console.log(target);
     console.log("---- END PARAM -----")

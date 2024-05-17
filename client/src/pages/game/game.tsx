@@ -53,6 +53,9 @@ const Modal = ({selectedCard, applyCardOnBike, setMultipleCardsAllowed, G, ctx}:
 }
 
 function Page(props: TODO) {
+    console.log("FROM PAGE GAME TSX");
+    console.log(props);
+    console.log("END FROM PAGE GAME TSX");
     const [multipleCardsAllowed, setMultipleCardsAllowed] = useState(false) ;
     const [selectedCard, setSelectedCard] = useState<{bike: number, cardIndex: number}[]>([]) ;
     let players = props.G.players;
