@@ -1,24 +1,25 @@
-import React, {useEffect, useState} from "react";
+import React, { useContext } from "react";
 // import  from 'react-svg';
 
+import { GameContext } from "../context/gameContext";
 import { fromMapToSVG } from "../utils/simonLTransform";
 import { BoardProps, boardKey } from "../types/board";
 import { players } from "../data/player";
 
 const useBoard = (props: BoardProps) => {
-    const applyCardOnBike = props.applyCardOnBike;
+    const { applyCardOnBike } = useContext(GameContext);
     // Add bikes to the map
     const addBikes = (svg: SVGSVGElement) => {
+        if (svg === null) {
+            console.error('SVG not found');
+            return;
+        }
+        const svgNS = 'http://www.w3.org/2000/svg';
         let usedMove: boardKey[] = [];
         props.players.forEach(player => {
             player.bikes.forEach((bike, index) => {
-                // const svg: SVGSVGElement | null = document.getElementById('svg-map') as SVGSVGElement | null;
-                if (svg === null) {
-                    console.error('SVG not found');
-                    return;
-                }
+                // Credits to Simon Loir for the following code to add and place bikes on the map
                 // Create bike element
-                const svgNS = 'http://www.w3.org/2000/svg';
                 const group = document.createElementNS(svgNS, 'g');
                 const circle = document.createElementNS(svgNS, 'image');
 
@@ -28,12 +29,12 @@ const useBoard = (props: BoardProps) => {
                 circle.setAttributeNS(null, 'y', '-20');
                 circle.setAttributeNS(null, 'href', players[player.playerID].flag);
                 circle.setAttributeNS(null, 'fill', 'blue');
-                // circle.setAttributeNS(null, 'href', "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Flag_of_Belgium.svg/1200px-Flag_of_Belgium.svg.png");
                 group.setAttributeNS(null, 'id', `${players[player.playerID].teamName}-${index}`);
 
-                svg.appendChild(group); // Add bike to the map (somewhere)
                 group.appendChild(circle);
+                svg.appendChild(group); // Add bike to the map (somewhere)
 
+                // Add bike index in the bike
                 const newText = document.createElementNS(svgNS, 'text');
                 newText.style.fontSize = '20';
                 newText.style.fontFamily = 'Arial';
@@ -72,7 +73,6 @@ const useBoard = (props: BoardProps) => {
                 //@ts-ignore
                 offset = offset.matrixTransform(svg.getScreenCTM().inverse());
 
-                //console. log(offset, width, height);
                 group.setAttribute(
                     'transform',
                     `translate(${point.x + offset.x / 2}, ${point.y + offset.y / 2})`
@@ -103,25 +103,7 @@ const useBoard = (props: BoardProps) => {
             element.setAttributeNS(null, "class", 'available-move');
             element.addEventListener('click', () => {
                 console.log('clicked on', move);
-                const availableBikes: {bikeIndex: 0|1|2, cardIndex: number[]}[] = [];
-                props.G.players[props.currentPlayer].bikes.forEach((bike, bikeIndex) => {
-                    const cardIndex = props.G.players[props.currentPlayer].hand.map((card, index) => {
-                        if (props.mockUseCardOnBike(bike, card).includes(move)) {
-                            return index;
-                        }
-                    }).filter((index) => index !== undefined) as number[];
-                    if (cardIndex.length > 0) {
-                        availableBikes.push({bikeIndex: bikeIndex as 0|1|2, cardIndex: cardIndex});
-                    }
-                })
-                if (availableBikes.length === 0) {
-                    console.error(`No card found for target ${move}`);
-                    return;
-                }
-                if (availableBikes.length === 1) {
-                    applyCardOnBike(move);
-                    return;
-                }
+                applyCardOnBike(move);
             });
             usedMove.push(move);
             // console.log('element', element, 'has been updated to the available moves', move);

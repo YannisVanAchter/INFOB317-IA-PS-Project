@@ -11,8 +11,7 @@ import './sideBoard.css';
 type TODO = {
     G: DCtx
     ctx: Ctx,
-    moves: any,
-    className: string
+    className?: string
 };
 
 function SideBoard(props: TODO) {

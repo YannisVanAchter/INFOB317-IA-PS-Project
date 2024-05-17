@@ -1,6 +1,5 @@
 import React, { ReactNode, createContext, useContext } from 'react';
 
-import { useParams } from '../hooks/useParams';
 import { param } from '../types/params';
 
 interface GameContextType {

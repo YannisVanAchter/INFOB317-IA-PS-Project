@@ -284,7 +284,7 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         if (tempPos > nbReduceMax) {
             tempPos = nbReduceMax;
         }
-        const possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
+        let possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
         return [possiblePositions[tempPos-1]];
     }
 
@@ -292,7 +292,7 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         return [];
     }
 
-    let newPosition = getPossibleTilesFromPosition(numberedPosition);
+    let newPosition = getPossibleTilesFromPosition(numberedPosition) ?? [];
     let possiblePositions = [...newPosition];
     for (let i = 0; i < newPosition.length; i++) {
         if (checkAspiration(possiblePositions[i])) {
@@ -318,12 +318,12 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
  * 
  *  Use the card on the bike
  */
-function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: string) {
+function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: boardKey) {
     console.log("----PARAMS----")
-    console.log(context);
-    console.log(bikeIndex);
-    console.log(cardIndex);
-    console.log(target);
+    console.log("context: ", context);
+    console.log("bike index: ", bikeIndex);
+    console.log("card index: ", cardIndex);
+    console.log("target: ", target);
     console.log("---- END PARAM -----")
     let myG = deepCopy(context.G); 
     const player = myG.players[parseInt(context.ctx.currentPlayer)];
@@ -348,7 +348,6 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     }
 
     let possibleTiles = getPossibleTilesFromPosition(numberedPosition);
-    // console.log(test);
     for (const tile of possibleTiles) {
         if (checkAspiration(tile)) {
             for (let i = 0; i < Board[tile].next.length; i++) {
@@ -358,11 +357,9 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     }
     
     // Do the move
-    console.log(cardIndex);
-    console.log(card);
-    console.log(numberedPosition);
-    console.log(possibleTiles);
-    console.log(target);
+    console.log("card: ", card);
+    console.log("numbered position: ", numberedPosition);
+    console.log("possible tiles: ", possibleTiles);
     const tileIndex = possibleTiles.findIndex((val) => (val === target))
     console.log(tileIndex)
     if (tileIndex === -1) throw new Error("Invalid position required");

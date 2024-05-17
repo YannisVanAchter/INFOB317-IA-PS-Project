@@ -10,12 +10,9 @@ type svgId = `c${position}_${svgSide}`;
 
 
 type BoardProps = {
-    G: DCtx,
     players: { playerID: playerID, bikes: boardKey[] }[],
     currentPlayer: playerID,
     availableMoves: boardKey[],
-    applyCardOnBike: (target: boardKey) => void
-    mockUseCardOnBike: (bike: Bike, card: number) => boardKey[]
 };
 
 

@@ -9,7 +9,6 @@ function TourDeFranceBoard(props: BoardProps) {
     const { addBikes, addPlayerMoves } = useBoard(props);
     
     return <>
-            {/* <Map id="svg-map" className="svg-map" /> */}
             <div className='fill-complete'>
             <ReactSVG 
                 src="/map.svg"
