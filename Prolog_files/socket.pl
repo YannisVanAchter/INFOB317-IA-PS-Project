@@ -9,7 +9,7 @@
 :- use_module(bot_TDF). %module pour le bot
 %:- use_module(ia). %module pour l'ia
 
-:- initialization set_setting(http:cors, [*]). %On donne l'accès à tout le monde pour envoyer des requetes ici
+:- initialization set_setting(http:cors, [*]).
 
 :- initialization http_server([port(8080)]). 
 
@@ -33,6 +33,7 @@ answer(Question, _Request):- %predicat pour le bot
     cors_enable, 
     reply_json(json([answer=Resp])). %on renvoie la réponse du bot
 
+
 openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour les tests)
     open(File, read, Stream),
     json_read_dict(Stream, Dict),
@@ -51,7 +52,7 @@ answer_ia(Board, _Request) :- %predicat pour l'ia
     reply_json(json([response=Move])). %on renvoie la réponse de l'ia
 
 get_move_IA(Board, Move) :- %uniquement pour tester en attendant l'ia, à supprimer après
-    write("Board: "), writeln(Board), 
+    write("Board: "), writeln(Board), %pour tester
     %MoveResponse = "ROARRRRRRRRRRRRRRRRR", %pour tester une valeur de retour pour move
     Move = Board.
 
