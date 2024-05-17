@@ -370,7 +370,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '3-A-left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '0-B-left', reduce: 0, turn: 0 })),
         })),
     } as DCtx;
 

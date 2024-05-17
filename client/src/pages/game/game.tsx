@@ -20,7 +20,7 @@ document.title = 'Tour de France';
 // TODO: check why this is not working 
 // ! process.env.REACT_DEBUG is "undefined" when running "npm start"
 // ! Find a way to set the environment variable in the .env file and read it here
-const isDebug = process.env.REACT_DEBUG === "true" || true; // TODO: once working, replace "|| true" by "|| false" for production
+const isDebug = process.env.REACT_DEBUG === "true" ?? false; // TODO: once working, replace "|| true" by "|| false" for production
 // console.log(`process.env.REACT_DEBUG: ${process.env.REACT_DEBUG}, isDebug: ${isDebug}x`); // TODO: remove this line once working
 
 type TODO = {
@@ -108,6 +108,7 @@ function Page(props: TODO) {
     }
     
     let boardProps = {
+        G: props.G,
         players: [
             {playerID: 0 as 0, bikes: players[0].bikes.map((bike: any) => bike.position)},
             {playerID: 1 as 1, bikes: players[1].bikes.map((bike: any) => bike.position)},
@@ -116,15 +117,13 @@ function Page(props: TODO) {
         ],
         currentPlayer: currentPlayer,
         availableMoves: [] as string[],
-        applyCardOnBike: applyCardOnBike
+        applyCardOnBike: applyCardOnBike,
+        mockUseCardOnBike: mockUseCardOnBike,
     };
 
     for (let i = 0; i < props.G.players[currentPlayer].bikes.length; i++) {
         for (let j = 0; j < props.G.players[currentPlayer].hand.length; j++) {
             const availableMoves = mockUseCardOnBike(props.G.players[currentPlayer].bikes[i], props.G.players[currentPlayer].hand[i]);
-            // console.log(props.G.players[currentPlayer]);
-            // console.log(props.G.players[currentPlayer].hand[i]);
-            // console.log(availableMoves);
             boardProps.availableMoves = [...new Set([...boardProps.availableMoves, ...availableMoves])];
         }
     }
