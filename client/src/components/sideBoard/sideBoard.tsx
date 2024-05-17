@@ -25,7 +25,7 @@ function SideBoard(props: TODO) {
             <ol>
                 {winners.map((player) => (
                     <li key={player} className='player'>
-                        <span>{players[player].teamName}</span>
+                        {players[player.playerID].teamName} - {player.score} points
                     </li>
                 ))}
             </ol>
