@@ -10,7 +10,6 @@
 %:- use_module(ia). %module pour l'ia
 
 :- initialization set_setting(http:cors, [*]).
-
 :- initialization http_server([port(8080)]). 
 
 %différentes root 
@@ -27,12 +26,10 @@ home_page(_Request) :- %page d'accueil (uniquement pour tester)
     title('Demo server'),
     [ h1('test')]).
 
-
 answer(Question, _Request):- %predicat pour le bot
     produire_reponse(Question, Resp), %on récupère la réponse du bot
     cors_enable, 
     reply_json(json([answer=Resp])). %on renvoie la réponse du bot
-
 
 openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour les tests)
     open(File, read, Stream),
@@ -41,7 +38,7 @@ openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour le
     answer_ia(Dict, _).
 
 extract_json(Request) :- %predicat pour extraire le json de la requête
-    http_read_json_dict(Request, Dict), %extraire le json de la requête et le trasnforme en dictionnaire
+    http_read_json_dict(Request, Dict), 
     answer_ia(Dict, _Request). %on appelle le prédicat pour l'ia
         
 answer_ia(Board, _Request) :- %predicat pour l'ia
@@ -52,14 +49,22 @@ answer_ia(Board, _Request) :- %predicat pour l'ia
     reply_json(json([response=Move])). %on renvoie la réponse de l'ia
 
 get_move_IA(Board, Move) :- %uniquement pour tester en attendant l'ia, à supprimer après
-    write("Board: "), writeln(Board), %pour tester
+    write("Board: "), writeln(Board), 
     %MoveResponse = "ROARRRRRRRRRRRRRRRRR", %pour tester une valeur de retour pour move
     Move = Board.
 
 extract_board(Board, BoardData) :- %Board est un dict contenant le contenu du JSON et on veut que BoardData soit une liste de liste contenant uniquement les infos nécéssaires pour l'IA
     Players = Board.players, %On récupère les infos des joueurs
-    %CurrentPlayer = Board.currentPlayer, %je sais pas si cet info est utile pour l'IA
-    maplist(extract_player, Players, BoardData). %on applique le prédicat extract_player à chaque joueur pour récupérer les infos nécéssaires pour l'IA
+    CurrentPlayerID = Board.currentPlayer.playerID, %On récupère l'ID du joueur actuel
+    reorder_players(Players, CurrentPlayerID, ReorderedPlayers), %On réorganise les joueurs pour que le joueur actuel soit le premier
+    maplist(extract_player, ReorderedPlayers, BoardData). %on applique le prédicat extract_player à chaque joueur pour récupérer les infos nécéssaires pour l'IA
+
+reorder_players(Players, CurrentPlayerID, ReorderedPlayers) :- %prédicat pour réorganiser les joueurs
+    partition(current_player_ge(CurrentPlayerID), Players, CurrentAndGreater, LessThanCurrent), %On sépare les joueurs avec des ids > ou = à celui du joueur actuel des autres
+    append(CurrentAndGreater, LessThanCurrent, ReorderedPlayers). %On met le joueur actuel en premier dans la liste 
+    
+current_player_ge(CurrentPlayerID, Player) :- %prédicat pour vérifier si un joueur a un id supérieur ou égal à celui du joueur actuel
+    Player.playerID >= CurrentPlayerID.
 
 extract_player(Player, PlayerData) :- %Player est un dict contenant les infos d'un joueur 
     PlayerID = Player.playerID, %On récupère l'ID du joueur
