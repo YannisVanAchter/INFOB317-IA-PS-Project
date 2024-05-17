@@ -84,3 +84,19 @@ svg {
         fill: var(--primary-color);
     }
 }
+
+.selected-bike {
+    animation: hightLight 1.5s ease-in-out infinite;
+}
+
+@keyframes hightLight {
+    0% {
+        box-shadow: .1rem .1rem .5rem .5rem var(--primary-color);
+    }
+    50% {
+        box-shadow: .1rem .1rem .5rem .5rem var(--secondary-color);
+    }
+    100% {
+        box-shadow: .1rem .1rem .5rem .5rem var(--primary-color);
+    }
+}

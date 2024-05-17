@@ -36,6 +36,24 @@ function DisplayHands(props: TODO) {
         setDisplayModal(true);
     };
 
+    const handleChoiceBike = (e: any) => {
+        e.preventDefault();
+        const value = e.target.value;
+        setCurrentBikeIndex(value);
+
+        for (let index = 0; index < G.players[currentPlayer].bikes.length; index++) {
+            const bike = G.players[currentPlayer].bikes[index];
+            const id = `${PlayerRep[currentPlayer as playerID].teamName.toLowerCase()}-${index}`;
+            const boardCase = Array.from(document.getElementsByClassName(id)) as Element[];
+            boardCase.forEach((elem) => {
+                if (value !== bike.position) 
+                    elem.classList.remove('selected-bike');
+                else
+                    elem.classList.add('selected-bike');
+            })
+        }
+    }
+
     //  Effect that apply 1.2 scale to the card when hovered and 0.85 opacity when other cards are hovered
     useEffect(() => {
         const cards_0 = document.querySelectorAll('.card-0');
@@ -124,10 +142,10 @@ function DisplayHands(props: TODO) {
                     const isCurrentPlayer: boolean = player.playerID === currentPlayer;
                     return (
                         <div key={i} className={`player ${isCurrentPlayer ? 'current' : ''}`}>
-                            <div>
+                            <div className="hand-header">
                                 <h3>{PlayerRep[i as playerID].teamName}</h3>
                                 {/* Choice bike on witch we apply the card (defautl in useState define to 0) */}
-                                {isCurrentPlayer && <select value={currentBikeIndex} onChange={(e) => setCurrentBikeIndex(parseInt(e.target.value))}>
+                                {isCurrentPlayer && <select value={currentBikeIndex} onChange={handleChoiceBike}>
                                     {player.bikes.map((bike, index) => (
                                         <option key={index} value={index}>{bike.position}</option>
                                     ))}

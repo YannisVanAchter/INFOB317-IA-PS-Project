@@ -1,5 +1,6 @@
 import React from 'react';
 import './board.css';
+
 import Map from '../../assets/map';
 
 import { BoardProps } from '../../types/board'; 
