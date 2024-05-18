@@ -233,22 +233,19 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         }
     }
 
-    for (let position of possiblePositions) {
-        // Check if reachable
-        let currentPositions = Array(3);
-        currentPositions[0] = bike.position;
-        while(!currentPositions.includes(position)) {
-            for (let i = 0; i < 3; i++) {
-                if (currentPositions[i] === undefined) break;
-                let boardSquare = Board[currentPositions[i]]
-                for (let j = 0; i < boardSquare.next.length; j++) {
-                    // currentPositions[j] = 
-                }
-            }
+    let allPossibleReachablePositions = [bike.position]
+    let currentPos = [bike.position];
+    while (!currentPos.includes("95_A_left")) {
+        for (const pos of currentPos) {
+            allPossibleReachablePositions.push(...Board[pos].next)
+            currentPos = Board[pos].next;
         }
     }
-
-    return possiblePositions;
+    let valid = []
+    for (const potentialPos of possiblePositions) {
+        if (allPossibleReachablePositions.includes(potentialPos)) valid.push(potentialPos);
+    }
+    return valid;
 }
 
 /**
@@ -316,7 +313,6 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     const player = myG.players[parseInt(context.ctx.currentPlayer)];
     const card = player.hand[cardIndex];
     console.log(card);
-    // TODO: Check which bikes can 
     const bike = player.bikes[bikeIndex];
     let oldPosition = bike.position;
     let numberedPosition = Board[bike.position].position + card;
