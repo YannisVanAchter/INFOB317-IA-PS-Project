@@ -6,12 +6,19 @@
 get_move_IA(Infos,Move):-
     nth0(0,Infos,Data),
     get_infos_player(Infos,1,[Cards1,Bikes1]),
-    % get_infos_player(Infos,2,[_,Bikes2]),
-    % get_infos_player(Infos,3,[_,Bikes3]),
-    % get_infos_player(Infos,4,[_,Bikes4]),
+    get_infos_player(Infos,2,[_,Bikes2]),
+    get_infos_player(Infos,3,[_,Bikes3]),
+    get_infos_player(Infos,4,[_,Bikes4]),
     length(Cards1,Depth),
     get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
-    minimax(Bikes1,All_bikes,[Cards1,Bikes1],Depth,Move,_).
+    writeln(1),
+    writeln(All_bikes),
+    writeln('a'),
+    minimax(Bikes1,All_bikes,[Cards1,Bikes1],Depth,Move,_),!.
+
+    % get_move_IA([[1, [1, 2], ['1-A-left', '5-A-left']], [2,[2,4],['3-A-left','3-A-left']],[3,[1,5],['2-A-left','2-A-left']]],Move).
+% get_move_IA([[1, [1, 2], ['1-A-left', '2-A-left']], [2,[2,4],['3-A-left','3-A-left']],[3,[1,5],['2-A-left','2-A-left']]],Move).
+
 
     % minimax([[4,2],['4-A-left','4-A-left']],1,A,B). 
 % there is not base case since every player should be present one time only, and each shoul be present
@@ -29,7 +36,7 @@ get_infos_player([_|T_infos],Num_player,Infos):-
 get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All):-
     append(Bikes1,Bikes2,Acc),
     append(Acc,Bikes3,Acc2),
-    append(Acc3,Bikes4,All).
+    append(Acc2,Bikes4,All).
 
 get_count_elem(_,[],Acc,Acc).
 get_count_elem(Target,[Elem|Other_elems],Acc,Count):-
@@ -108,7 +115,6 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     make_move(State,Move,New_state),
     not(valid_move(Move,All_bikes)),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
-    Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
