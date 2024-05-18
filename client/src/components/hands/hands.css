@@ -102,10 +102,6 @@
 }
 
 .modal {
-    margin-left: 47.5%;
-    margin-bottom: 30%;
-    /* margin-right: 33%; */
-
     * {
         margin: .5rem;
         padding: 0;
@@ -115,6 +111,9 @@
         padding: 0;
         margin: 0;
         list-style: none;
+
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
 
         li {
             background-color: var(--secondary-color);

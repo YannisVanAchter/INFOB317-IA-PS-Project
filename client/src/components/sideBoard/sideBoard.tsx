@@ -16,6 +16,7 @@ type TODO = {
 
 function SideBoard(props: TODO) {
     const winners = winnerRanking({G: props.G, ctx: props.ctx});
+    console.log(winners);
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
     return (
         <aside className={`${props.className} winner`}>
@@ -23,10 +24,9 @@ function SideBoard(props: TODO) {
             <p className='player'>{players[currentPlayer].teamName}</p>
             <h2>Classement temporaire</h2>
             <ol>
-                {winners.map((player) => (
-                    <li key={player} className='player'>
-                        <span>{players[player].teamName}</span>
-                        {/* {players[player.playerID].teamName} - {player.score} points */}
+                {winners.map((player, index) => (
+                    <li key={index} className='player'>
+                        {players[player.playerID].teamName} - {player.score}
                     </li>
                 ))}
             </ol>

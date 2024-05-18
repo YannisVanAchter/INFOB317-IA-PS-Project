@@ -6,7 +6,7 @@ import { boardKey } from './utils/simonLTransform';
 import { Board } from './data/board';
 import { SprintsData } from './data/sprints';
 
-import { BoardCase, Bike, Player, DCtx, Ctx, Context } from './types/game';
+import { BoardCase, Bike, Player, DCtx, Ctx, Context, playerID } from './types/game';
 import axios from 'axios';
 
 // Constants
@@ -127,31 +127,6 @@ function checkAspiration(newPosition: string): boolean {
 }
 
 /**
- * 
- * @param {Context} context Context of the game
- * @returns The playerID of the first player
- * 
- * The first player is the player who has the bike with the highest position
- */
-function firstPlayer(context: Context): number {
-    return parseInt(context.ctx.playOrder[0]);
-}
-
-/**
- *  
- *  @param {Context} context Context of the game
- *  @returns The playerID of the next player
- *  
- *  The next player is the player who has the bike with the highest position after the current player
- */ 
-function nextPlayer(context: Context): number {
-    const firstPlayer = context.ctx.currentPlayer;
-    const nextPlayerIndex = context.ctx.playOrder.findIndex((playerID) => playerID === firstPlayer) + 1;
-    const nextPlayer = context.ctx.playOrder[nextPlayerIndex];
-    return parseInt(nextPlayer);
-}
-
-/**
  * @param {Context} context Context of the game
  * @returns True if the game is over, false otherwise
  * 
@@ -203,11 +178,12 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
             playersScore[currentSecondsAllBikes[i].playerID] += bikePoints[i];
         }
     }
+    console.log(playersScore);
 
-    const retrunArray = Array(4)
-        .map((v, i) => {return {playerID: i, score: playersScore[i]}})
-        .sort((a, b) => a.score - b.score);
-
+    const retrunArray = [];
+    for (let i = 0; i < playersScore.length; i++) 
+        retrunArray.push({playerID: i, score: playersScore[i]});
+    retrunArray.sort((a, b) => a.score - b.score);
 
     return retrunArray;
 }
@@ -407,7 +383,7 @@ function setUp() {
     } as DCtx;
 
     for (let i = 0; i < nbPlayers; i++) {
-        drawCards({G: ctx, ctx: {playOrder: [], turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
+        drawCards({G: ctx, ctx: {playOrderPos: 0, playOrder: [], turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
     }
 
     return ctx;
@@ -454,9 +430,9 @@ function bot({ G, ctx }: Context ) {
 const TourDeFrance = {
     setup: setUp,
 
-    players: {
-        moveLimit: 1,
-    },
+    // players: {
+    //     moveLimit: 1,
+    // },
 
     endIf: ({ G, ctx }: Context) => {
         if (isGameOver({ G, ctx })) {
@@ -466,8 +442,8 @@ const TourDeFrance = {
 
     turn: {
         order: {
-            first: (context: FnContext<DCtx, Record<string, unknown>>) => firstPlayer(context),
-            next: (context: FnContext<DCtx, Record<string, unknown>>) => nextPlayer(context),
+            first: () => 0,
+            next: ({ ctx }: Context) => (ctx.playOrderPos + 1) % ctx.numPlayers,
             playOrder: (context: Context) => {
                 // List of 1..nbPlayers
                 const basicOrder = Array.from(Array(nbPlayers).keys());
@@ -496,11 +472,14 @@ const TourDeFrance = {
         },
         minMoves: 0, // If all bike's player are at the finish line
         maxMoves: 1,
+        endIf: (context: Context) => {
+            return context.ctx.playOrder.findIndex(playerID => playerID === context.ctx.currentPlayer) === context.ctx.numPlayers - 1;
+        },
         //@ts-ignore
         onEnd: ({G, ctx, events}): DCtx => {
             G = handlePenalty({G, ctx});
             return G;
-        }
+        },
     },
 
     events: {
