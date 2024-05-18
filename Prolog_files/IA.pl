@@ -5,113 +5,148 @@
 % minmax à 2, l'heuristique ça serait d'être le premier
 get_move_IA(Infos,Move):-
     nth0(0,Infos,Data),
-    get_infos_player(Data,1,[Cards1,Bikes1]),
-    get_infos_player(Data,2,Player2),
-    get_infos_player(Data,3,Player3),
-    get_infos_player(Data,4,Player4),
+    get_infos_player(Infos,1,[Cards1,Bikes1]),
+    get_infos_player(Infos,2,[_,Bikes2]),
+    get_infos_player(Infos,3,[_,Bikes3]),
+    get_infos_player(Infos,4,[_,Bikes4]),
     length(Cards1,Depth),
-    minimax([Cards1,Bikes1],Depth,_,Move).
+    get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
+    minimax(Bikes1,All_bikes,[Cards1,Bikes1],Depth,Move,_).
 
     % minimax([[4,2],['4-A-left','4-A-left']],1,A,B). 
 % there is not base case since every player should be present one time only, and each shoul be present
 get_infos_player([H_infos|_],Num_player,Infos):-
+    writeln(H_infos),
     nth0(0,H_infos,Num),
     nth0(1,H_infos,Hand),
     nth0(2,H_infos,Bikes),
     Num = Num_player,
     Infos=[Hand,Bikes],!.
 
-get_infos_player([H_infos|T_infos],Num_player,Infos):-
+get_infos_player([_|T_infos],Num_player,Infos):-
     get_infos_player(T_infos,Num_player,Infos).
 
+get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All):-
+    append(Bikes1,Bikes2,Acc),
+    append(Acc,Bikes3,Acc2),
+    append(Acc3,Bikes4,All).
 
+get_unique_elements([],Acc,Acc).
+get_unique_elements([Elem|Other_elems],Acc,All_positions):-
+    member(Elem,Acc),
+    get_unique_elements(Other_elems,Acc,All_positions),!.
+get_unique_elements([Elem|Other_elems],Acc,All_positions):-
+    append(Acc,[Elem],New_acc),
+    get_unique_elements(Other_elems,New_acc,All_positions),!.
 
-minimax([Cards,Bike],Depth,Best_move,Min_score):-
+get_count_elem(_,[],Acc,Acc).
+get_count_elem(Target,[Elem|Other_elems],Acc,Count):-
+    Target=Elem,
+    New_acc is Acc+1,
+    get_count_elem(Target,Other_elems,New_acc,Count),!.
+get_count_elem(Target,[Elem|Other_elems],Acc,Count):-
+    get_count_elem(Target,Other_elems,Acc,Count),!.
+    
+
+minimax(Bikes_player,All_bikes,[Cards,Bike],Depth,Best_move,Min_score):-
     possible_moves(Bike,Cards,[],Moves),
     writeln(Moves),
-    evaluate_moves(Moves,[Cards,Bike],Depth,Min_score,Best_move),!.
+    evaluate_moves(Bikes_player,All_bikes,Moves,[Cards,Bike],Depth,Min_score,Best_move),!.
     % best_of(Moves,Min_score,BestMove,Score).
 
 % possible_moves('2-A-left', [2], [], _44446)
 % evaluate_moves([(1, '2-A-left', '1-A-left'), (2, '3-A-left', '1-A-left'), (1, '3-A-left', '2-A-left'), (2, '4-A-left', '2-A-left')], 2, _20634) 
-evaluate_moves([],_,_,0,_).
-evaluate_moves([Move|Other_moves],State,Depth,Best_score,Best_move):-
+evaluate_moves(_,_,[],_,_,0,_).
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     writeln(New_state),
     terminal_state(New_state),
     score(State,New_state,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,_),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
     Next_max_score<Score,
     Best_score=Score,
     Best_move=Move.
 
-evaluate_moves([Move|Other_moves],State,Depth,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     terminal_state(New_state),
     score(State,New_state,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,Next_best_move),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
     Next_max_score>=Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
-evaluate_moves([Move|Other_moves],State,0,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,0,Best_score,Best_move):-
     make_move(State,Move,New_state),
     score(State,New_state,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,_),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
     Next_max_score<Score,
     Best_score=Score,
     Best_move=Move.
 
-evaluate_moves([Move|Other_moves],State,0,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,0,Best_score,Best_move):-
     make_move(State,Move,New_state),
     score(State,New_state,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,Next_best_move),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
     Next_max_score>=Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
 
-evaluate_moves([Move|Other_moves],State,Depth,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     nth0(0,New_state,New_cards),
     length(New_cards,Lenght),
     Lenght=0,
     score(State,New_state,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,Next_best_move),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
     Next_max_score>=Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
-evaluate_moves([Move|Other_moves],State,Depth,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     nth0(0,New_state,New_cards),
     length(New_cards,Lenght),
     Lenght=0,
     score(State,New_state,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,_),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
     Next_max_score<Score,
     Best_score=Score,
     Best_move=Move.
 
-evaluate_moves([Move|Other_moves],State,Depth,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
+    make_move(State,Move,New_state),
+    not(valid_move(Move,All_bikes)),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
+    Next_max_score>=Score,
+    Best_score=Next_max_score,
+    Best_move=Next_best_move.
+
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     New_depth is Depth-1,
-    minimax(New_state,New_depth,_,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,_),
+    minimax(Bikes_player,All_bikes,New_state,New_depth,_,Score),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
     Next_max_score<Score,
     Best_score=Score,
     Best_move=Move.
 
-evaluate_moves([Move|Other_moves],State,Depth,Best_score,Best_move):-
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     New_depth is Depth-1,
-    minimax(New_state,New_depth,_,Score),
-    evaluate_moves(Other_moves,State,Depth,Next_max_score,Next_best_move),
+    minimax(Bikes_player,All_bikes,New_state,New_depth,_,Score),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
     Next_max_score>=Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
 make_move([Cards,_],(Card,New_pos,Old_pos),[New_cards,[New_pos]]):-
     select(Card,Cards,New_cards).
+
+valid_move((_,New_pos,_),All_bikes):-
+    get_count_elem(New_pos,All_bikes,0,Places_used),
+    available_places(New_pos,Actual_places),
+    Actual_places>Places_used.
 
 % make_move([[1, 2], ['1-A-left', '2-A-left']], (1, '2-A-left', '1-A-left'), _7356)
 % (1, '2-A-left', '1-A-left'), (2, '3-A-left', '1-A-left'), (1, '3-A-left', '2-A-left')
