@@ -199,7 +199,7 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
         const teamPoints = [40, 15, 5];
         const bikePoints = [15, 10, 5];
         for (let i = 0; i < allPlayersTime.length - 1; i++) {
-            playersScore[i] += teamPoints[i];
+            playersScore[allPlayersTime[i].playerID] += teamPoints[i];
             playersScore[currentSecondsAllBikes[i].playerID] += bikePoints[i];
         }
     }
