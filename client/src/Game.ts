@@ -456,8 +456,7 @@ const TourDeFrance = {
                         const cardB = Math.max(...playerB.hand);
                         return cardB - cardA;
                     });
-                }
-                else {
+                } else {
                     // After the first turn, sort by highest bike position
                     basicOrder.sort((a, b) => {
                         const playerA = context.G.players[a];
@@ -467,17 +466,16 @@ const TourDeFrance = {
                         return bikeBPosition - bikeAPosition;
                     });
                 }
-                return basicOrder.map((playerID) => playerID.toString());
+                return basicOrder.map(playerID => playerID.toString());
             },
         },
         minMoves: 0, // If all bike's player are at the finish line
         maxMoves: 1,
         endIf: (context: Context) => {
-            return context.ctx.playOrder.findIndex(playerID => playerID === context.ctx.currentPlayer) === context.ctx.numPlayers - 1;
+            return context.ctx.playOrderPos === context.ctx.numPlayers - 1;
         },
-        //@ts-ignore
-        onEnd: ({G, ctx, events}): DCtx => {
-            G = handlePenalty({G, ctx});
+        onEnd: ({ G, ctx }: Context) => {
+            G = handlePenalty({ G, ctx });
             return G;
         },
     },

@@ -23,7 +23,6 @@ export function useGame({ player, useCard, events }: Props): GameContextType {
     const applyCardOnBike = (target: boardKey) => {
         try {
             useCard(currentBikeIndex, currentCardIndex, target);
-            events.endTurn();
             return true;
         } catch (e) {
             console.error(e);
