@@ -4,8 +4,9 @@ import { deepCopy } from './utils/deep_copy';
 import { boardKey } from './utils/simonLTransform';
 
 import { Board } from './data/board';
+import { SprintsData } from './data/sprints';
 
-import { BoardCase, Bike, Player, DCtx, Ctx, Context } from './types/game';
+import { BoardCase, Bike, Player, DCtx, Ctx, Context, playerID } from './types/game';
 import axios from 'axios';
 
 // Constants
@@ -126,92 +127,6 @@ function checkAspiration(newPosition: string): boolean {
 }
 
 /**
- * 
- * @param {Context} context Context of the game
- * @returns The playerID of the first player
- * 
- * The first player is the player who has the bike with the highest position
- */
-function firstPlayer(context: Context): number {
-    let firstPlayer = 0;
-    if (context.ctx.turn === 1) {
-        let highestCard = 0;
-        for (let i = 0; i < nbPlayers; i++) {
-            for (let j = 0; j < nbCards; j++) {
-                if (context.G.players[i].hand[j] > highestCard) {
-                    firstPlayer = i;
-                    highestCard = context.G.players[i].hand[j];
-                }
-            }
-        }
-        return firstPlayer;
-    }
-    let firstBike = context.G.players[firstPlayer].bikes[0];
-    for (let i = 0; i < nbPlayers; i++) {
-        for (let j = 0; j < nbBikes; j++) {
-            if (Board[context.G.players[i].bikes[j].position].position > Board[firstBike.position].position) {
-                firstPlayer = i;
-                firstBike = context.G.players[i].bikes[j];
-            }
-        }
-    }
-    return firstPlayer;
-}
-
-/**
- *  
- *  @param {Context} context Context of the game
- *  @returns The playerID of the next player
- *  
- *  The next player is the player who has the bike with the highest position after the current player
- */ 
-function nextPlayer(context: Context): number {
-    const firstPlayer = parseInt(context.ctx.currentPlayer);
-    let nextPlayer = parseInt(context.ctx.currentPlayer);
-    if (context.ctx.turn === 1) {
-        let highestCard = 0;
-        for (let i = 0; i < nbPlayers; i++) {
-            if (context.G.players[i].hand.length !== nbCards) continue; // Skip players who have already played their cards
-            for (let j = 0; j < nbCards; j++) {
-                if (context.G.players[i].hand[j] > highestCard) {
-                    nextPlayer = i;
-                    highestCard = context.G.players[i].hand[j];
-                }
-            }
-        }
-        return nextPlayer;
-    }
-    let firstPlayerFirstBike: Bike = context.G.players[firstPlayer].bikes[0];
-    for (let i = 1; i < nbBikes; i++) {
-        if (Board[context.G.players[firstPlayer].bikes[i].position].position > Board[firstPlayerFirstBike.position].position) {
-            firstPlayerFirstBike = context.G.players[firstPlayer].bikes[i];
-        }
-    }
-    let playersInFront: number[] = [firstPlayer];
-    for (let i = 0; i < nbPlayers; i++) {
-        for (let j = 0; j < nbBikes; j++) {
-            if (i in playersInFront) break;
-            if (Board[context.G.players[i].bikes[j].position].position > Board[firstPlayerFirstBike.position].position) {
-                playersInFront.push(i);
-                break;
-            }
-        }
-    }
-    let greatestPositionFound: number = 0;
-    for (let i = 0; i < nbPlayers; i++) {
-        for (let j = 0; j < nbBikes; j++) {
-            if (i in playersInFront) break;
-            if ((Board[context.G.players[i].bikes[j].position].position < Board[firstPlayerFirstBike.position].position)
-            && (Board[context.G.players[i].bikes[j].position].position > greatestPositionFound)) {
-                greatestPositionFound = Board[context.G.players[i].bikes[j].position].position;
-                nextPlayer = i;
-            }
-        }
-    }
-    return nextPlayer;
-}
-
-/**
  * @param {Context} context Context of the game
  * @returns True if the game is over, false otherwise
  * 
@@ -230,29 +145,47 @@ function isGameOver({ G }: Context) {
  * If two players have the same sum of positions, the ranking is based on the reduce value
  * If two players have the same sum of positions and the same reduce value, the ranking is based on the sum of turns of the bikes of the player
  */
-function winnerRanking({ G, ctx }: Context) {
-    const sumPositionOfBikes = G.players.map(player => player.bikes.reduce((acc, bike) => acc + Board[bike.position].position, 0));
-    const applyReduce = G.players.map(player => player.bikes.reduce((acc, bike) => acc + bike.reduce, 0));
-    const sumTurnOfBikes = G.players.map(player => player.bikes.reduce((acc, bike) => acc + bike.turn, 0));
-
-    const ranking = G.players.map((player, index) => ({
-        ...player,
-        sumPosition: sumPositionOfBikes[index] - Math.abs(applyReduce[index]),
-        reduce: applyReduce[index],
-        sumTurn: sumTurnOfBikes[index],
-    }));
-
-    // Sort the ranking array based on the sum of positions and the reduce value
-    ranking.sort((a, b) => {
-        if (a.sumPosition === b.sumPosition) {
-            if (a.reduce === b.reduce)
-                return a.sumTurn - b.sumTurn;
-            return a.reduce - b.reduce;
+function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[] {
+    let playersScore = [0, 0, 0, 0];
+    let currentSecondsAllBikes = [];
+    for (const player of G.players) {
+        for (const bike of player.bikes) {
+            if (bike.reduce === 0) {
+                currentSecondsAllBikes.push({playerID: player.playerID, bike: bike, seconds: Board[bike.position].position - bike.bonusSeconds + bike.malusSeconds});
+            }
         }
-        return a.sumPosition - b.sumPosition;
-    });
+    }
+    currentSecondsAllBikes = currentSecondsAllBikes.sort((a, b) => a.seconds - b.seconds);
+    const points = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0];
+    for (let i = 0; i < currentSecondsAllBikes.length; i++) {
+        playersScore[currentSecondsAllBikes[i].playerID] += points[i];
+    }
 
-    return ranking.map(player => player.playerID);
+    for (let i = 0; i < G.players.length; i++) {
+        playersScore[i] += G.players[i].bonusPoints;
+    }
+
+    if (isGameOver({G , ctx})) {
+        let allPlayersTime = Array(4).map((v, i) => {return {playerID: i, time: 0}})
+        for (const bike of currentSecondsAllBikes) {
+            allPlayersTime[bike.playerID].time += bike.seconds;
+        }
+        allPlayersTime.sort((a, b) => a.time - b.time);
+        const teamPoints = [40, 15, 5];
+        const bikePoints = [15, 10, 5];
+        for (let i = 0; i < allPlayersTime.length - 1; i++) {
+            playersScore[allPlayersTime[i].playerID] += teamPoints[i];
+            playersScore[currentSecondsAllBikes[i].playerID] += bikePoints[i];
+        }
+    }
+    console.log(playersScore);
+
+    const retrunArray = [];
+    for (let i = 0; i < playersScore.length; i++) 
+        retrunArray.push({playerID: i, score: playersScore[i]});
+    retrunArray.sort((a, b) => a.score - b.score);
+
+    return retrunArray;
 }
 
 /**
@@ -300,7 +233,54 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         }
     }
 
+    for (let position of possiblePositions) {
+        // Check if reachable
+        let currentPositions = [bike.position];
+        while(!currentPositions.includes(position)) {
+            break;
+        }
+    }
+
     return possiblePositions;
+}
+
+/**
+ * Check if a bike won or got second at a sprint and adds the points and seconds accordingly.
+ * @param bike Bike that just had a turn.
+ * @param player Player that just had a turn.
+ */
+function handleSprints(context: Context, bike: Bike, player: Player) {
+    for (const sprint of SprintsData) {
+        if (sprint.firstBike === undefined) {
+            if (Board[bike.position].position > sprint.numberedPosition) {
+                sprint.firstBike = bike;
+                bike.bonusSeconds += sprint.firstGains.bonusSeconds;
+                player.bonusPoints += sprint.firstBike.bonusSeconds;
+            }
+        } else if (sprint.secondGains !== undefined && sprint.secondBike === undefined) {
+            if (Board[bike.position].position > sprint.numberedPosition) {
+                sprint.secondBike = bike;
+                bike.bonusSeconds += sprint.secondGains.bonusSeconds;
+                player.bonusPoints += sprint.secondGains.bonusPoints;
+            }
+        } else if (!context.G.oneBikeFinished && bike.reduce > 0) {
+            context.G.oneBikeFinished = true;
+        }
+    }
+}
+
+function handlePenalty(context: Context): DCtx {
+    let newG = deepCopy(context.G);
+    if (newG.oneBikeFinished) {
+        for (const player of newG.players) {
+            for (const bike of player.bikes) {
+                if (bike.reduce === 0) {
+                    bike.malusSeconds += 10;
+                }
+            }
+        }
+    }
+    return newG;
 }
 
 /**
@@ -382,6 +362,9 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     if (player.hand.length === 0) 
         drawCards({ G: myG, ctx: context.ctx});
 
+    // check if sprints has been reach
+    handleSprints(context, bike, player);
+
     return myG;
 }
 
@@ -392,13 +375,15 @@ function setUp() {
         players: [...Array(nbPlayers)].map((_, playerID) => ({ // generate each player
             playerID,
             hand: [],
+            bonusPoints: 0,
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '0_B_left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '0_B_left', reduce: 0, turn: 0, bonusSeconds: 0, malusSeconds: 0 })),
         })),
+        oneBikeFinished: false
     } as DCtx;
 
     for (let i = 0; i < nbPlayers; i++) {
-        drawCards({G: ctx, ctx: {turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
+        drawCards({G: ctx, ctx: {playOrderPos: 0, playOrder: [], turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
     }
 
     return ctx;
@@ -445,9 +430,9 @@ function bot({ G, ctx }: Context ) {
 const TourDeFrance = {
     setup: setUp,
 
-    players: {
-        moveLimit: 1,
-    },
+    // players: {
+    //     moveLimit: 1,
+    // },
 
     endIf: ({ G, ctx }: Context) => {
         if (isGameOver({ G, ctx })) {
@@ -457,11 +442,42 @@ const TourDeFrance = {
 
     turn: {
         order: {
-            first: (context: FnContext<DCtx, Record<string, unknown>>) => firstPlayer(context),
-            next: (context: FnContext<DCtx, Record<string, unknown>>) => nextPlayer(context),
+            first: () => 0,
+            next: ({ ctx }: Context) => (ctx.playOrderPos + 1) % ctx.numPlayers,
+            playOrder: (context: Context) => {
+                // List of 1..nbPlayers
+                const basicOrder = Array.from(Array(nbPlayers).keys());
+                if (context.ctx.turn < nbPlayers) {
+                    // On the first turn, sort by highest card
+                    basicOrder.sort((a, b) => {
+                        const playerA = context.G.players[a];
+                        const playerB = context.G.players[b];
+                        const cardA = Math.max(...playerA.hand);
+                        const cardB = Math.max(...playerB.hand);
+                        return cardB - cardA;
+                    });
+                } else {
+                    // After the first turn, sort by highest bike position
+                    basicOrder.sort((a, b) => {
+                        const playerA = context.G.players[a];
+                        const playerB = context.G.players[b];
+                        const bikeAPosition = Math.max(...playerA.bikes.map(bike => Board[bike.position].position));
+                        const bikeBPosition = Math.max(...playerB.bikes.map(bike => Board[bike.position].position));
+                        return bikeBPosition - bikeAPosition;
+                    });
+                }
+                return basicOrder.map(playerID => playerID.toString());
+            },
         },
         minMoves: 0, // If all bike's player are at the finish line
         maxMoves: 1,
+        endIf: (context: Context) => {
+            return context.ctx.playOrderPos === context.ctx.numPlayers - 1;
+        },
+        onEnd: ({ G, ctx }: Context) => {
+            G = handlePenalty({ G, ctx });
+            return G;
+        },
     },
 
     events: {
@@ -470,7 +486,7 @@ const TourDeFrance = {
 
     moves: {
         useCard: (context: Context, bikeIndex: number, cardIndex: number, target: boardKey) => {
-            context.G = useCardOnBike(context, bikeIndex, cardIndex, target);
+            context.G = useCardOnBike(context, bikeIndex, cardIndex, target); 
             return context.G;
         },
     },

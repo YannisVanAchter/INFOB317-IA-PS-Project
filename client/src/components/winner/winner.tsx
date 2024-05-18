@@ -25,31 +25,40 @@ export function Winner(props: TODO) {
     };
 
     return (
-        <Modal className={`${props.className} winner`}>
+        <Modal className="winner">
             <h2>Fin de la partie</h2>
             <h3>Classement final</h3>
             <ol>
-                {winners.map((player) => (
-                    <li key={player} className='player'>
-                        <span>{players[player].teamName}</span>
-                        {/* <table>
+                {winners.map((player, index) => (
+                    <li key={index} className='player'>
+                        <table>
                             <th>
                                 <td>{players[player.playerID].teamName}</td>
                                 <td>{player.score} points</td>
                             </th>
-                            {player.bikeScrore.map((score, index) =>
+                            {props.G.players[player.playerID].bikes.map((bike, index) => {
+                                    const score = bike.position;
+                                    return (
                                     <tr key={index}>
-                                        <td>Vélo: {index}</td>
-                                        <td>{score} points</td>
-                                    </tr>
-                            )}
-                        </table> */}
+                                        <td>Vélo {index}</td>
+                                        <td>{score}</td>
+                                    </tr>)
+                            })}
+                            {
+                                <tr>
+                                    <td>Points bonus</td>
+                                    <td>{props.G.players[player.playerID].bonusPoints}</td>
+                                </tr>
+                            }
+                        </table>
                     </li>
                 ))}
             </ol>
 
-            <button onClick={handleRestart}>Rejouer</button>
-            <button onClick={handleGoHome}>Retour à l'accueil</button>
+            <div>
+                <button onClick={handleRestart}>Rejouer</button>
+                <button onClick={handleGoHome}>Retour à l'accueil</button>
+            </div>
         </Modal>
     );
 }

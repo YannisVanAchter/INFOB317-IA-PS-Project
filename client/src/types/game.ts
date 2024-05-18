@@ -28,24 +28,39 @@ type dico<T>={
     [key: boardKey]:T;
 }
 
+interface SprintGains {
+    bonusPoints: number;
+    bonusSeconds: number;
+}
 
+interface Sprints {
+    numberedPosition: number;
+    firstGains: SprintGains;
+    secondGains?: SprintGains;
+    firstBike?: Bike;
+    secondBike?: Bike;
+}
 
 interface Bike {
     position: string;
     reduce: number;
     turn: number;
+    bonusSeconds: number;
+    malusSeconds: number;
 }
 
 interface Player {
     playerID: playerID
     hand: CardValue[];
     bikes: Bike[];
+    bonusPoints: number;
 }
 
 interface DCtx {
     deck: CardValue[];
     discard: CardValue[];
     players: Player[];
+    oneBikeFinished: boolean;
 }
 
 interface Ctx {
@@ -53,6 +68,8 @@ interface Ctx {
     currentPlayer: string;
     numPlayers: number;
     gameover?: any;
+    playOrder: string[];
+    playOrderPos: number;
 }
 
 interface Context {
@@ -69,4 +86,4 @@ interface GameContextType {
     applyCardOnBike: (target: boardKey) => boolean;
 }
 
-export type { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID, PlayerRep, CardValue, GameContextType };
+export type { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID, PlayerRep, CardValue, GameContextType, Sprints };
