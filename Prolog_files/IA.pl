@@ -6,9 +6,9 @@
 get_move_IA(Infos,Move):-
     nth0(0,Infos,Data),
     get_infos_player(Infos,1,[Cards1,Bikes1]),
-    get_infos_player(Infos,2,[_,Bikes2]),
-    get_infos_player(Infos,3,[_,Bikes3]),
-    get_infos_player(Infos,4,[_,Bikes4]),
+    % get_infos_player(Infos,2,[_,Bikes2]),
+    % get_infos_player(Infos,3,[_,Bikes3]),
+    % get_infos_player(Infos,4,[_,Bikes4]),
     length(Cards1,Depth),
     get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
     minimax(Bikes1,All_bikes,[Cards1,Bikes1],Depth,Move,_).
@@ -31,14 +31,6 @@ get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All):-
     append(Acc,Bikes3,Acc2),
     append(Acc3,Bikes4,All).
 
-get_unique_elements([],Acc,Acc).
-get_unique_elements([Elem|Other_elems],Acc,All_positions):-
-    member(Elem,Acc),
-    get_unique_elements(Other_elems,Acc,All_positions),!.
-get_unique_elements([Elem|Other_elems],Acc,All_positions):-
-    append(Acc,[Elem],New_acc),
-    get_unique_elements(Other_elems,New_acc,All_positions),!.
-
 get_count_elem(_,[],Acc,Acc).
 get_count_elem(Target,[Elem|Other_elems],Acc,Count):-
     Target=Elem,
@@ -52,7 +44,6 @@ minimax(Bikes_player,All_bikes,[Cards,Bike],Depth,Best_move,Min_score):-
     possible_moves(Bike,Cards,[],Moves),
     writeln(Moves),
     evaluate_moves(Bikes_player,All_bikes,Moves,[Cards,Bike],Depth,Min_score,Best_move),!.
-    % best_of(Moves,Min_score,BestMove,Score).
 
 % possible_moves('2-A-left', [2], [], _44446)
 % evaluate_moves([(1, '2-A-left', '1-A-left'), (2, '3-A-left', '1-A-left'), (1, '3-A-left', '2-A-left'), (2, '4-A-left', '2-A-left')], 2, _20634) 
@@ -61,33 +52,33 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     make_move(State,Move,New_state),
     writeln(New_state),
     terminal_state(New_state),
-    score(State,New_state,Score),
+    score(State,New_state,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
-    Next_max_score<Score,
+    Next_max_score=<Score,
     Best_score=Score,
     Best_move=Move.
 
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     terminal_state(New_state),
-    score(State,New_state,Score),
+    score(State,New_state,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
-    Next_max_score>=Score,
+    Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,0,Best_score,Best_move):-
     make_move(State,Move,New_state),
-    score(State,New_state,Score),
+    score(State,New_state,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
-    Next_max_score<Score,
+    Next_max_score=<Score,
     Best_score=Score,
     Best_move=Move.
 
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,0,Best_score,Best_move):-
     make_move(State,Move,New_state),
-    score(State,New_state,Score),
+    score(State,New_state,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
-    Next_max_score>=Score,
+    Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
@@ -97,9 +88,8 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     nth0(0,New_state,New_cards),
     length(New_cards,Lenght),
     Lenght=0,
-    score(State,New_state,Score),
+    score(State,New_state,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
-    Next_max_score>=Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
@@ -108,9 +98,9 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     nth0(0,New_state,New_cards),
     length(New_cards,Lenght),
     Lenght=0,
-    score(State,New_state,Score),
+    score(State,New_state,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
-    Next_max_score<Score,
+    Next_max_score=<Score,
     Best_score=Score,
     Best_move=Move.
 
@@ -118,7 +108,7 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     make_move(State,Move,New_state),
     not(valid_move(Move,All_bikes)),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
-    Next_max_score>=Score,
+    Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
@@ -127,7 +117,7 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     New_depth is Depth-1,
     minimax(Bikes_player,All_bikes,New_state,New_depth,_,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
-    Next_max_score<Score,
+    Next_max_score=<Score,
     Best_score=Score,
     Best_move=Move.
 
@@ -136,7 +126,7 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     New_depth is Depth-1,
     minimax(Bikes_player,All_bikes,New_state,New_depth,_,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
-    Next_max_score>=Score,
+    Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
@@ -150,40 +140,60 @@ valid_move((_,New_pos,_),All_bikes):-
 
 % make_move([[1, 2], ['1-A-left', '2-A-left']], (1, '2-A-left', '1-A-left'), _7356)
 % (1, '2-A-left', '1-A-left'), (2, '3-A-left', '1-A-left'), (1, '3-A-left', '2-A-left')
-score([_,[Bike1|_]],[_,[Bike2|_]],Score):-
+score([_,[Bike1|_]],[_,[Bike2|_]],Bikes,Score):-
     split_string(Bike1,"-","",List_position1),
     split_string(Bike2,"-","",List_position2),
     length(List_position1,Length1),
     length(List_position2,Lenght2),
-    compute_score(List_position1,List_position2,Length1,Lenght2,Score).
+    get_value_bike(Bike1,Value1),
+    get_value_bike(Bike2,Value2),
+    get_group_score(Bike1,Bike2,Bikes,Score_group),
+    compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score).
 
-compute_score(_,_,Length1,Lenght2,Score):-
+get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
+    Old_bike=Bike1,
+    get_value_bike(New_bike,Value1),
+    get_value_bike(Bike2,Value2),
+    get_value_bike(Bike3,Value3),
+    Score is 4+(Value1-Value2-Value3).
+get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
+    Old_bike=Bike2,
+    get_value_bike(New_bike,Value1),
+    get_value_bike(Bike1,Value2),
+    get_value_bike(Bike3,Value3),
+    Score is 4+(Value1-Value2-Value3).
+get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
+    Old_bike=Bike3,
+    get_value_bike(New_bike,Value1),
+    get_value_bike(Bike2,Value2),
+    get_value_bike(Bike3,Value1),
+    Score is 4+(Value1-Value2-Value3).
+    
+get_value_bike(Bike,Value):-
+    split_string(Bike,"-","",List_bike),
+    length(List_bike,Length),
+    Length=4,
+    nth0(1,List_bike,Value_string),
+    number_string(Value,String).
+get_value_bike(Bike,Value):-
+    split_string(Bike,"-","",List_bike),
+    length(List_bike,Length),
+    Length=3,
+    nth0(0,List_bike,Value_string),
+    number_string(Value,Value_string).
+
+compute_score(_,_,Length1,Lenght2,Score_group,Score):-
     Score is 0,
     Length1>Lenght2,!.
 
-compute_score(_,List_position2,Length1,Lenght2,Score):-
+compute_score(_,Value2,Length1,Lenght2,Score_group,Score):-
     Length1<Lenght2,
-    nth0(1,List_position2,String2),
-    number_string(Value2, String2),
-    Score is Value2+30,!.
+    Score is Value2+30+Score_group,!.
 
-compute_score(List_position1,List_position2,Length1,Lenght2,Score):-
+compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score):-
     Length1=Lenght2,
-    Length1=4,
-    nth0(1,List_position1,String1),
-    number_string(Value1, String1),
-    nth0(1,List_position2,String2),
-    number_string(Value2, String2),
-    Score is Value2-Value1.
+    Score is Value2-Value1+Score_group,!.
 
-compute_score(List_position1,List_position2,Length1,Lenght2,Score):-
-    Length1=Lenght2,
-    Length1=3,
-    nth0(0,List_position1,String1),
-    number_string(Value1, String1),
-    nth0(0,List_position2,String2),
-    number_string(Value2, String2),
-    Score is Value2-Value1.
 
 
 
