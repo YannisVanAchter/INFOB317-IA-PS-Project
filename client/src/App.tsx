@@ -31,7 +31,7 @@ function App() {
               <img className='icon' src={bike} alt="velo" />
               <h1>Tour de France</h1>
             </Link>
-            <Link to="/" className='link'>Home</Link>
+            <Link to="/" className='link'>Accueil</Link>
             <Link to="/game" className='link'>Jeu</Link>
           </nav>
         </header>
