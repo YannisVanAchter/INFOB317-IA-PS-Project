@@ -14,9 +14,9 @@ import type { boardKey, svgId, svgSide, caseLetter, side } from '../types/board'
  * @return the id in the SVG
  */
 function fromMapToSVG(key: boardKey, alreadyUsed: boardKey[] = []) {
-    if (key === "0-B-left") return "start";
+    if (key === "0_B_left") return "start";
 
-    let [position, caseLetter, _] = key.split('-');
+    let [position, caseLetter, _] = key.split('_');
     let svgSide = alreadyUsed.filter((k) => k === key).length as svgSide;
 
     // read caseLetter

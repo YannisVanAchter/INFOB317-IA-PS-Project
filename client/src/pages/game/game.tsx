@@ -3,11 +3,15 @@ import React, { useState } from 'react';
 import { Local } from 'boardgame.io/multiplayer';
 import { Client } from 'boardgame.io/react';
 
-import { TourDeFrance, bot, mockUseCardOnBike } from '../../Game';
+import { TourDeFrance, bot, mockUseCardOnBike, nbPlayers } from '../../Game';
+import { players } from '../../data/player';
+
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
 import DisplayHands from '../../components/hands/hands';
 import SideBoard from '../../components/sideBoard/sideBoard';
+import { Winner } from '../../components/winner/winner';
+
 import { useGameParams, GameContext } from '../../context';
 import { useGame } from '../../hooks/useGame';
 
@@ -26,12 +30,12 @@ type TODO = {
     G: DCtx,
     ctx: Ctx,
     moves: any,
+    events: any,
 };
 
 function Page(props: TODO) {
     let players = props.G.players;
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
-    const { currentBikeIndex, currentCardIndex, setBikeIndex, handleChoiceCard, mockUseCard, applyCardOnBike } = useGame({ player: players[currentPlayer], useCard: props.moves.useCard });
 
     let boardProps = {
         G: props.G,
@@ -59,14 +63,20 @@ function Page(props: TODO) {
         }
     }
 
+    // If no moves are available, the player has already finish the game
+    if (boardProps.availableMoves.length === 0) {
+        props.events.pass();
+    }
+
     const currentPlayerPlayer = props.G.players[currentPlayer];
 
     return (
         <div className='board-game'>
-            <GameContext.Provider value={useGame({ player: currentPlayerPlayer, useCard: props.moves.useCard })}>
+            <GameContext.Provider value={useGame({ player: currentPlayerPlayer, useCard: props.moves.useCard, events: props.events })}>
                 <SideBoard {...props} />
                 <TourDeFranceBoard {...boardProps} />
                 <DisplayHands {...props} />
+                {props.ctx.gameover && <Winner G={props.G} ctx={props.ctx} />}
             </GameContext.Provider>
         </div>
     );
@@ -81,24 +91,33 @@ function Game(props: any) {
     }
 
     const AIPlayers = params.filter((param: param) => !param.isHuman).map((param: param) => param.id);
+    const playerConfig = Array.from({ length: nbPlayers }, (_, i) => {
+        return {
+            name: players[i].teamName,
+            id: i,
+            bot: AIPlayers.includes(i) ? bot : undefined,
+        };
+    });
 
     const TourDeFranceClient = Client({
         game: TourDeFrance,
         board: Page,
-        numPlayers: 4,
+        numPlayers: nbPlayers,
         debug: isDebug,
-        // multiplayer: Local({
-        //     bots: {
-        //         '0': AIPlayers.includes(0) ? bot : null,
-        //         '1': AIPlayers.includes(1) ? bot : null,
-        //         '2': AIPlayers.includes(2) ? bot : null,
-        //         '3': AIPlayers.includes(3) ? bot : null,
-        //     }
-        // })
+        // players: playerConfig,
+        // multiplayer: {
+        //     local: true,
+        //     bots: AIPlayers,
+        // }
     });
+
+    // const BoardWithEffects = EffectsBoardWrapper(Page, {
+    //     updateStateAfterEffects: true,
+    // });
 
     return <div className='page'>
         <TourDeFranceClient />
+        {/* <BoardWithEffects /> */}
         <ChatBot />
     </div>;
 }

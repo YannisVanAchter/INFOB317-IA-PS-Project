@@ -8,10 +8,11 @@ import { boardKey } from '../types/board';
 
 interface Props {
     player: Player,
-    useCard: (bikeIndex: number, cardIndex: number, target: string) => void
+    useCard: (bikeIndex: number, cardIndex: number, target: string) => void,
+    events: any
 }
 
-export function useGame({ player, useCard }: Props): GameContextType {
+export function useGame({ player, useCard, events }: Props): GameContextType {
     let lastBikePosition = Math.max(...player.bikes.map(bike => Board[bike.position].position));
     let bikeIndexInit = player.bikes.findIndex(bike => Board[bike.position].position === lastBikePosition);
     let maxCard = Math.max(...player.hand.map(card => card));
@@ -20,16 +21,12 @@ export function useGame({ player, useCard }: Props): GameContextType {
     const [currentCardIndex, setCardIndex] = useState(cardIndexInit);
 
     const applyCardOnBike = (target: boardKey) => {
-        console.log("CALLING USE CARD WITH:");
-        console.log({ currentBikeIndex, currentCardIndex, target });
-        console.log("CALLING NOW");
         try {
             useCard(currentBikeIndex, currentCardIndex, target);
-            console.log("AFTER CALLING USE CARD SUCCESS");
+            // events.endTurn();
             return true;
         } catch (e) {
             console.error(e);
-            console.log("AFTER CALLING USE CARD ERROR");
             return false;
         }
     }

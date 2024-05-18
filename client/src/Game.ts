@@ -319,16 +319,16 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
  *  Use the card on the bike
  */
 function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: boardKey) {
-    console.log("----PARAMS----")
+    console.log("----PARAMS----");
     console.log("context: ", context);
     console.log("bike index: ", bikeIndex);
     console.log("card index: ", cardIndex);
     console.log("target: ", target);
-    console.log("---- END PARAM -----")
+    console.log("---- END PARAM -----");
     let myG = deepCopy(context.G); 
     const player = myG.players[parseInt(context.ctx.currentPlayer)];
     const card = player.hand[cardIndex];
-    // console.log(card);
+    console.log(card);
     // TODO: Check which bikes can 
     const bike = player.bikes[bikeIndex];
     let oldPosition = bike.position;
@@ -393,7 +393,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '0-B-left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '0_B_left', reduce: 0, turn: 0 })),
         })),
     } as DCtx;
 
@@ -449,7 +449,6 @@ const TourDeFrance = {
         moveLimit: 1,
     },
 
-    // Side effects, re organize the turn order at the end of each full turns.
     endIf: ({ G, ctx }: Context) => {
         if (isGameOver({ G, ctx })) {
             return { winner: winnerRanking({ G, ctx })[0] };
@@ -465,13 +464,20 @@ const TourDeFrance = {
         maxMoves: 1,
     },
 
+    events: {
+        endGame: false,
+    },
+
     moves: {
         useCard: (context: Context, bikeIndex: number, cardIndex: number, target: boardKey) => {
-            // console.log(context);
-            // console.log(bikeIndex);
             context.G = useCardOnBike(context, bikeIndex, cardIndex, target);
+            return context.G;
         },
     },
+
+    // ai: {
+    //     enumerate: bot,
+    // },
 }
 
-export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, bot, Board };
+export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, bot, Board, nbPlayers };

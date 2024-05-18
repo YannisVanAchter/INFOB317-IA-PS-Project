@@ -52,6 +52,7 @@ interface Ctx {
     turn: number;
     currentPlayer: string;
     numPlayers: number;
+    gameover?: any;
 }
 
 interface Context {

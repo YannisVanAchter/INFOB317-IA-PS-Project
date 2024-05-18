@@ -102,7 +102,6 @@ const useBoard = (props: BoardProps) => {
 
             element.setAttributeNS(null, "class", 'available-move');
             element.addEventListener('click', () => {
-                console.log('clicked on', move);
                 setBikeIndex(move.bikeIndex);
                 handleChoiceCard(move.cardIndex);
                 applyCardOnBike(move.boardKey);
