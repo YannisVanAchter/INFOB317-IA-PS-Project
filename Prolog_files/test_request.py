@@ -6,7 +6,7 @@ data = {
     "deck": [],
     "discard": [],
     "currentPlayer": {
-        "playerID": 2
+        "playerID": 1
     },
     "players": [
         {
