@@ -1,12 +1,3 @@
-svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-    padding: 0;
-}
-
 .svg-map {
     position: fixed;
     top: 12.5%;
@@ -19,6 +10,8 @@ svg {
     min-height: 240px;
     height: 67.5%;
     max-height: 650px;
+
+    object-fit: fill;
 
     resize: both;
 
@@ -57,16 +50,11 @@ svg {
     cursor: not-allowed;
 }
 
-.svg-map g.has-bike path, .svg-map g.has-bike#c33_1 rect {
-    opacity: 1;
-    cursor: not-allowed;
-}
-
-.svg-map > g.available-move {
+g.available-move {
     cursor: pointer;
 }
 
-.svg-map > g.available-move path {
+g.available-move path {
     opacity: .75;
     cursor: pointer;
 
@@ -82,5 +70,21 @@ svg {
     }
     100% {
         fill: var(--primary-color);
+    }
+}
+
+.selected-bike {
+    animation: hightLight 1.5s ease-in-out infinite;
+}
+
+@keyframes hightLight {
+    0% {
+        box-shadow: .1rem .1rem .5rem .5rem var(--primary-color);
+    }
+    50% {
+        box-shadow: .1rem .1rem .5rem .5rem var(--secondary-color);
+    }
+    100% {
+        box-shadow: .1rem .1rem .5rem .5rem var(--primary-color);
     }
 }

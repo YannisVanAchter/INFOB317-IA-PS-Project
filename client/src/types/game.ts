@@ -52,6 +52,7 @@ interface Ctx {
     turn: number;
     currentPlayer: string;
     numPlayers: number;
+    gameover?: any;
 }
 
 interface Context {
@@ -59,4 +60,13 @@ interface Context {
     ctx: Ctx;
 }
 
-export type { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID, PlayerRep, CardValue };
+interface GameContextType {
+    currentBikeIndex: number;
+    currentCardIndex: number;
+    setBikeIndex: (nexIndex: number) => void;
+    handleChoiceCard: (nexIndex: number) => void;
+    mockUseCard: () => boardKey[];
+    applyCardOnBike: (target: boardKey) => boolean;
+}
+
+export type { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID, PlayerRep, CardValue, GameContextType };

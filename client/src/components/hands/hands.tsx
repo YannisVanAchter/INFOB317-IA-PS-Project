@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import CardFront from '../../assets/cardFront';
 import { DCtx, Ctx, CardValue, playerID } from '../../types/game';
-import { mockUseCardOnBike } from '../../Game';
 import { deepCopy } from '../../utils/deep_copy';
+
+import { useGameContext } from '../../context/gameContext';
 
 import { players as PlayerRep } from '../../data/player';
 
@@ -14,7 +15,6 @@ import './hands.css';
 type TODO = {
     G: DCtx,
     ctx: Ctx,
-    applyCardOnBike: (target: string) => void
 };
 
 
@@ -25,16 +25,21 @@ function DisplayHands(props: TODO) {
 
     const players = G.players;
 
-    const [currentBikeIndex, setCurrentBikeIndex] = useState(0);
     const [displayModal, setDisplayModal] = useState(false);
-    const [modalCardValue, setModalCardValue] = useState(0);
+    const { currentBikeIndex, currentCardIndex, setBikeIndex, handleChoiceCard, mockUseCard, applyCardOnBike } = useGameContext()
 
-    const handleClickCard = (e: any, playerID: number, cardValue: number) => {
+    const handleClickCard = (e: any, playerID: number, cardIndex: number) => {
         e.preventDefault();
         if (playerID !== currentPlayer) return;
-        setModalCardValue(cardValue);
+        handleChoiceCard(cardIndex);
         setDisplayModal(true);
     };
+
+    const handleChoiceBike = (e: any) => {
+        e.preventDefault();
+        const value = e.target.value;
+        setBikeIndex(value);
+    }
 
     //  Effect that apply 1.2 scale to the card when hovered and 0.85 opacity when other cards are hovered
     useEffect(() => {
@@ -68,23 +73,23 @@ function DisplayHands(props: TODO) {
     });
 
     const MultipleChoiceModal = () => {
-        const bike = players[currentPlayer].bikes[currentBikeIndex];
-        const availableMoves = mockUseCardOnBike(bike, modalCardValue);
+        const card = players[currentPlayer].hand[currentCardIndex];
+        const availableMoves = mockUseCard();
         if (availableMoves.length === 1) {
-            props.applyCardOnBike(availableMoves[0]);
+            applyCardOnBike(availableMoves[0]);
             setDisplayModal(false);
         }
 
         const handleChoice = (e: any, move: string) => {
             e.preventDefault();
-            props.applyCardOnBike(move);
+            applyCardOnBike(move);
             setDisplayModal(false);
         }
 
         return <>
             <Modal className="modal">
-                <h2>Carte jouée: {modalCardValue}</h2>
-                <p>L'équipe {PlayerRep[currentPlayer as playerID].teamName} a joué la carte: {modalCardValue}</p>
+                <h2>Carte jouée: {card}</h2>
+                <p>L'équipe {PlayerRep[currentPlayer as playerID].teamName} a joué la carte: {card}</p>
                 <p>Cette carte mene à plusieurs endroit</p>
                 <p>Choisissez la destination</p>
                 <ul>
@@ -124,10 +129,10 @@ function DisplayHands(props: TODO) {
                     const isCurrentPlayer: boolean = player.playerID === currentPlayer;
                     return (
                         <div key={i} className={`player ${isCurrentPlayer ? 'current' : ''}`}>
-                            <div>
+                            <div className="hand-header">
                                 <h3>{PlayerRep[i as playerID].teamName}</h3>
                                 {/* Choice bike on witch we apply the card (defautl in useState define to 0) */}
-                                {isCurrentPlayer && <select value={currentBikeIndex} onChange={(e) => setCurrentBikeIndex(parseInt(e.target.value))}>
+                                {isCurrentPlayer && <select value={currentBikeIndex} onChange={handleChoiceBike}>
                                     {player.bikes.map((bike, index) => (
                                         <option key={index} value={index}>{bike.position}</option>
                                     ))}
@@ -148,7 +153,8 @@ function DisplayHands(props: TODO) {
                                         <li
                                             id={`id-${player.playerID}-${j}`}
                                             className={`card`}
-                                            onClick={(e) => handleClickCard(e, player.playerID, card)}
+                                            key={j}
+                                            onClick={(e) => handleClickCard(e, player.playerID, j)}
                                         >
                                             <CardFront className={`value card-${j}`} number={card as CardValue} />
                                         </li>

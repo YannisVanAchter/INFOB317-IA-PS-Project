@@ -11,8 +11,7 @@ import './sideBoard.css';
 type TODO = {
     G: DCtx
     ctx: Ctx,
-    moves: any,
-    className: string
+    className?: string
 };
 
 function SideBoard(props: TODO) {
@@ -27,6 +26,7 @@ function SideBoard(props: TODO) {
                 {winners.map((player) => (
                     <li key={player} className='player'>
                         <span>{players[player].teamName}</span>
+                        {/* {players[player.playerID].teamName} - {player.score} points */}
                     </li>
                 ))}
             </ol>

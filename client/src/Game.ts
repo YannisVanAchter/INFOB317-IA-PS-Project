@@ -133,7 +133,19 @@ function checkAspiration(newPosition: string): boolean {
  * The first player is the player who has the bike with the highest position
  */
 function firstPlayer(context: Context): number {
-    let firstPlayer = 0
+    let firstPlayer = 0;
+    if (context.ctx.turn === 1) {
+        let highestCard = 0;
+        for (let i = 0; i < nbPlayers; i++) {
+            for (let j = 0; j < nbCards; j++) {
+                if (context.G.players[i].hand[j] > highestCard) {
+                    firstPlayer = i;
+                    highestCard = context.G.players[i].hand[j];
+                }
+            }
+        }
+        return firstPlayer;
+    }
     let firstBike = context.G.players[firstPlayer].bikes[0];
     for (let i = 0; i < nbPlayers; i++) {
         for (let j = 0; j < nbBikes; j++) {
@@ -156,6 +168,19 @@ function firstPlayer(context: Context): number {
 function nextPlayer(context: Context): number {
     const firstPlayer = parseInt(context.ctx.currentPlayer);
     let nextPlayer = parseInt(context.ctx.currentPlayer);
+    if (context.ctx.turn === 1) {
+        let highestCard = 0;
+        for (let i = 0; i < nbPlayers; i++) {
+            if (context.G.players[i].hand.length !== nbCards) continue; // Skip players who have already played their cards
+            for (let j = 0; j < nbCards; j++) {
+                if (context.G.players[i].hand[j] > highestCard) {
+                    nextPlayer = i;
+                    highestCard = context.G.players[i].hand[j];
+                }
+            }
+        }
+        return nextPlayer;
+    }
     let firstPlayerFirstBike: Bike = context.G.players[firstPlayer].bikes[0];
     for (let i = 1; i < nbBikes; i++) {
         if (Board[context.G.players[firstPlayer].bikes[i].position].position > Board[firstPlayerFirstBike.position].position) {
@@ -259,7 +284,7 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         if (tempPos > nbReduceMax) {
             tempPos = nbReduceMax;
         }
-        const possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
+        let possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
         return [possiblePositions[tempPos-1]];
     }
 
@@ -267,7 +292,7 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         return [];
     }
 
-    let newPosition = getPossibleTilesFromPosition(numberedPosition);
+    let newPosition = getPossibleTilesFromPosition(numberedPosition) ?? [];
     let possiblePositions = [...newPosition];
     for (let i = 0; i < newPosition.length; i++) {
         if (checkAspiration(possiblePositions[i])) {
@@ -293,16 +318,17 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
  * 
  *  Use the card on the bike
  */
-function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: string) {
-    console.log("----PARAMS----")
-    console.log(context);
-    console.log(cardIndex);
-    console.log(target);
-    console.log("---- END PARAM -----")
+function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: boardKey) {
+    console.log("----PARAMS----");
+    console.log("context: ", context);
+    console.log("bike index: ", bikeIndex);
+    console.log("card index: ", cardIndex);
+    console.log("target: ", target);
+    console.log("---- END PARAM -----");
     let myG = deepCopy(context.G); 
     const player = myG.players[parseInt(context.ctx.currentPlayer)];
     const card = player.hand[cardIndex];
-    // console.log(card);
+    console.log(card);
     // TODO: Check which bikes can 
     const bike = player.bikes[bikeIndex];
     let oldPosition = bike.position;
@@ -322,7 +348,6 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     }
 
     let possibleTiles = getPossibleTilesFromPosition(numberedPosition);
-    // console.log(test);
     for (const tile of possibleTiles) {
         if (checkAspiration(tile)) {
             for (let i = 0; i < Board[tile].next.length; i++) {
@@ -332,11 +357,9 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     }
     
     // Do the move
-    console.log(cardIndex);
-    console.log(card);
-    console.log(numberedPosition);
-    console.log(possibleTiles);
-    console.log(target);
+    console.log("card: ", card);
+    console.log("numbered position: ", numberedPosition);
+    console.log("possible tiles: ", possibleTiles);
     const tileIndex = possibleTiles.findIndex((val) => (val === target))
     console.log(tileIndex)
     if (tileIndex === -1) throw new Error("Invalid position required");
@@ -370,7 +393,7 @@ function setUp() {
             playerID,
             hand: [],
             // generate each bike by player
-            bikes: [...Array(nbBikes)].map(() => ({ position: '3-A-left', reduce: 0, turn: 0 })),
+            bikes: [...Array(nbBikes)].map(() => ({ position: '0_B_left', reduce: 0, turn: 0 })),
         })),
     } as DCtx;
 
@@ -426,7 +449,6 @@ const TourDeFrance = {
         moveLimit: 1,
     },
 
-    // Side effects, re organize the turn order at the end of each full turns.
     endIf: ({ G, ctx }: Context) => {
         if (isGameOver({ G, ctx })) {
             return { winner: winnerRanking({ G, ctx })[0] };
@@ -442,13 +464,20 @@ const TourDeFrance = {
         maxMoves: 1,
     },
 
+    events: {
+        endGame: false,
+    },
+
     moves: {
         useCard: (context: Context, bikeIndex: number, cardIndex: number, target: boardKey) => {
-            // console.log(context);
-            // console.log(bikeIndex);
             context.G = useCardOnBike(context, bikeIndex, cardIndex, target);
+            return context.G;
         },
     },
+
+    // ai: {
+    //     enumerate: bot,
+    // },
 }
 
-export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, bot, Board };
+export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, bot, Board, nbPlayers };
