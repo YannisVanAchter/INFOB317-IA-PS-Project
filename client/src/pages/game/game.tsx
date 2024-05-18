@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { Local } from 'boardgame.io/multiplayer';
 import { Client } from 'boardgame.io/react';
 
 import { TourDeFrance, bot, mockUseCardOnBike, nbPlayers } from '../../Game';
-import { players } from '../../data/player';
 
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
@@ -31,14 +30,45 @@ type TODO = {
     ctx: Ctx,
     moves: any,
     events: any,
+    isMultiplayer: boolean,
+
+    // AIPlayers: number[],
+    // [key: string]: any,
 };
 
 function Page(props: TODO) {
-    console.log("props: ", props);
-    let players = props.G.players;
-    console.log("player id: ", props.ctx.currentPlayer);    
+    let players = props.G.players;  
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
-    console.log(`currentPlayer: ${currentPlayer}`);
+
+    const currentPlayerPlayer = props.G.players[currentPlayer];
+
+    const { currentBikeIndex, currentCardIndex, setBikeIndex, handleChoiceCard, mockUseCard, applyCardOnBike } = useGame({ 
+            player: currentPlayerPlayer, 
+            useCard: props.moves.useCard, 
+            events: props.events, 
+        })
+
+    const { params } = useGameParams();
+
+    if (params.length === 0) {
+        alert("Vous devez d'abort définir les paramètres du jeu");
+        window.location.href = '/';
+        return <></>;
+    }
+
+    const AIPlayers = params.filter((param: param) => !param.isHuman).map((param: param) => param.id.toString());
+
+    useEffect(() => {
+        if (AIPlayers.includes(currentPlayer.toString())) {
+            console.log("AIPlayers.includes(currentPlayer)");
+            const { bikeIndex, cardIndex, target } = bot(props.G, props.ctx, currentPlayer.toString());
+            console.log("bikeIndex: ", bikeIndex);
+            console.log("cardIndex: ", cardIndex);
+            console.log("target: ", target);
+            setBikeIndex(bikeIndex);
+            handleChoiceCard(cardIndex);
+            applyCardOnBike(target);
+    }});
 
     let boardProps = {
         G: props.G,
@@ -70,16 +100,9 @@ function Page(props: TODO) {
         props.events.pass();
     }
 
-    const currentPlayerPlayer = props.G.players[currentPlayer];
-
     return (
         <div className='board-game'>
-            <GameContext.Provider value={
-                    useGame({ 
-                            player: currentPlayerPlayer, 
-                            useCard: props.moves.useCard, 
-                            events: props.events, 
-                        })}>
+            <GameContext.Provider value={{ currentBikeIndex, currentCardIndex, mockUseCard, setBikeIndex, handleChoiceCard, applyCardOnBike }}>
                 <SideBoard {...props} />
                 <TourDeFranceBoard {...boardProps} />
                 <DisplayHands {...props} />
@@ -90,41 +113,15 @@ function Page(props: TODO) {
 }
 
 function Game(props: any) {
-    const { params } = useGameParams();
-    if (params.length === 0) {
-        alert("Vous devez d'abort définir les paramètres du jeu");
-        window.location.href = '/';
-        return <></>;
-    }
-
-    const AIPlayers = params.filter((param: param) => !param.isHuman).map((param: param) => param.id);
-    const playerConfig = Array.from({ length: nbPlayers }, (_, i) => {
-        return {
-            name: players[i].teamName,
-            id: i,
-            bot: AIPlayers.includes(i) ? bot : undefined,
-        };
-    });
-
     const TourDeFranceClient = Client({
         game: TourDeFrance,
         board: Page,
         numPlayers: nbPlayers,
         debug: isDebug,
-        // players: playerConfig,
-        // multiplayer: {
-        //     local: true,
-        //     bots: AIPlayers,
-        // }
     });
-
-    // const BoardWithEffects = EffectsBoardWrapper(Page, {
-    //     updateStateAfterEffects: true,
-    // });
 
     return <div className='page'>
         <TourDeFranceClient />
-        {/* <BoardWithEffects /> */}
         <ChatBot />
     </div>;
 }

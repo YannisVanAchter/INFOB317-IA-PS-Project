@@ -39,7 +39,6 @@ const useBot = (props: any) => {
 
         try {
             const response = await axios.get(url);
-            console.log(response)
             const botResponse: Message = {
                 id: messages.length,
                 content: response.data.answer,

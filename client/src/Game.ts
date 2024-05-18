@@ -178,7 +178,6 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
             playersScore[currentSecondsAllBikes[i].playerID] += bikePoints[i];
         }
     }
-    console.log(playersScore);
 
     const retrunArray = [];
     for (let i = 0; i < playersScore.length; i++) 
@@ -303,16 +302,9 @@ function handlePenalty(context: Context): DCtx {
  *  Use the card on the bike
  */
 function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, target: boardKey) {
-    console.log("----PARAMS----");
-    console.log("context: ", context);
-    console.log("bike index: ", bikeIndex);
-    console.log("card index: ", cardIndex);
-    console.log("target: ", target);
-    console.log("---- END PARAM -----");
     let myG = deepCopy(context.G); 
     const player = myG.players[parseInt(context.ctx.currentPlayer)];
     const card = player.hand[cardIndex];
-    console.log(card);
     const bike = player.bikes[bikeIndex];
     let oldPosition = bike.position;
     let numberedPosition = Board[bike.position].position + card;
@@ -340,11 +332,7 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     }
     
     // Do the move
-    console.log("card: ", card);
-    console.log("numbered position: ", numberedPosition);
-    console.log("possible tiles: ", possibleTiles);
     const tileIndex = possibleTiles.findIndex((val) => (val === target))
-    console.log(tileIndex)
     if (tileIndex === -1) throw new Error("Invalid position required");
     let newTile = possibleTiles[tileIndex];
     bike.turn = context.ctx.turn;
@@ -392,50 +380,30 @@ function setUp() {
     return ctx;
 }
 
-function bot({ G, ctx }: Context ) {
+function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardIndex: number, target: boardKey } {
     // TODO: check with @Maragaux what AI will return
     let moves: number[] = [];
     const url = `${process.env.REACT_APP_SERVER_URL}/ai/`;
     axios.get(url, {
-        params: {
-            players: G.players,
-            currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
-        }
-    })
-    .then(response => {
-        return response.data.json();
-    })
-    .then((data: { moves: string[] }) => {
-        let destination: boardKey[] = data.moves;
-        // TODO: delete this loop if return only one move
-        for (let i = 0; i < destination.length; i++) {
-            // TODO: Depending on the return of the AI, we will have to change this loop definition
-            for (let j = 0; j < G.players[parseInt(ctx.currentPlayer)].hand.length; j++) {
-                const availableMoves = mockUseCardOnBike(G.players[parseInt(ctx.currentPlayer)].bikes[parseInt(ctx.currentPlayer)], G.players[parseInt(ctx.currentPlayer)].hand[j]);
-                if (availableMoves.includes(destination[i])) {
-                    moves.push(j);
-                }
+            headers: { 'Content-Type': 'application/json' },
+            params: {
+                players: G.players,
+                currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
             }
-            if (moves.length > 0) {
-                break;
-            }
-        }
-
-        // Remove duplicates and sort in ascending order (for descending add " * (-1)" in the sort function)
-        moves = [...new Set(moves)].sort((a, b) => {return (a - b)});
-
-        return moves;
-    })
-    .catch(error => console.error(error));
-    return [];
+        })
+        .then(response => {
+            return response.data.json();
+        })
+        .then((data: any) => {
+            console.log("response data: ", data);
+            return data;
+        })
+        .catch(error => console.error(error));
+    return { bikeIndex: 0, cardIndex: moves[0], target: "" };
 }
 
 const TourDeFrance = {
     setup: setUp,
-
-    // players: {
-    //     moveLimit: 1,
-    // },
 
     endIf: ({ G, ctx }: Context) => {
         if (isGameOver({ G, ctx })) {
@@ -450,7 +418,7 @@ const TourDeFrance = {
             playOrder: (context: Context) => {
                 // List of 1..nbPlayers
                 const basicOrder = Array.from(Array(nbPlayers).keys());
-                if (context.ctx.turn < nbPlayers) {
+                if (context.ctx.turn < 1) {
                     // On the first turn, sort by highest card
                     basicOrder.sort((a, b) => {
                         const playerA = context.G.players[a];
@@ -493,10 +461,6 @@ const TourDeFrance = {
             return context.G;
         },
     },
-
-    // ai: {
-    //     enumerate: bot,
-    // },
 }
 
 export { TourDeFrance, winnerRanking, useCardOnBike, mockUseCardOnBike, getBoardCase, bot, Board, nbPlayers };
