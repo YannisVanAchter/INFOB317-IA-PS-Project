@@ -112,6 +112,12 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     Best_move=Next_best_move.
 
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
+    not(valid_pos(Move)),
+    evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
+    Best_score=Next_max_score,
+    Best_move=Next_best_move.
+
+evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     New_depth is Depth-1,
     minimax(Bikes_player,All_bikes,New_state,New_depth,_,Score),
@@ -132,10 +138,10 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
 make_move([Cards,_],(Card,New_pos,_),[New_cards,[New_pos]]):-
     select(Card,Cards,New_cards).
 
-valid_move((_,_,Old_pos),_):-
+valid_pos((_,_,Old_pos)):-
     split_string(Old_pos,"-","",List_pos),
     length(List_pos,Lenght),
-    Lenght=3.
+    Lenght=3,!.
 valid_move((_,New_pos,_),All_bikes):-
     get_count_elem(New_pos,All_bikes,0,Places_used),
     available_places(New_pos,Actual_places),
