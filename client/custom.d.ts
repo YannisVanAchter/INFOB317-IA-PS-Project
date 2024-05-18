@@ -2,6 +2,10 @@ declare module "*/*.svg" {
     const content: string;
     export default content;
 }
+declare module 'react-lottie-web' {
+    const content: any;
+    export default content;
+};
 
 const webpack = require('webpack');
 
