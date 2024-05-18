@@ -7,7 +7,7 @@
 :- use_module(library(http/http_cors)). %module pour éviter l'erreur "Reason: CORS header ‘Access-Control-Allow-Origin’ missing" 
 
 :- use_module(bot_TDF). %module pour le bot
-%:- use_module(ia). %module pour l'ia
+:- use_module(ia). %module pour l'ia
 
 :- initialization set_setting(http:cors, [*]).
 :- initialization http_server([port(8080)]). 
@@ -42,16 +42,16 @@ extract_json(Request) :- %predicat pour extraire le json de la requête
     answer_ia(Dict, _Request). %on appelle le prédicat pour l'ia
         
 answer_ia(Board, _Request) :- %predicat pour l'ia
-    write("Board: "), writeln(Board), %pour tester
+    %write("Board: "), writeln(Board), %pour tester
     extract_board(Board, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
     get_move_IA(BoardData, Move), %A changer pour le predicat qui renvoie la réponse de l'ia
     cors_enable,
     reply_json(json([response=Move])). %on renvoie la réponse de l'ia
 
-get_move_IA(Board, Move) :- %uniquement pour tester en attendant l'ia, à supprimer après
-    write("Board: "), writeln(Board), 
+%get_move_IA(Board, Move) :- %uniquement pour tester en attendant l'ia, à supprimer après
+%    write("Board: "), writeln(Board), 
     %MoveResponse = "ROARRRRRRRRRRRRRRRRR", %pour tester une valeur de retour pour move
-    Move = Board.
+%    Move = Board.
 
 extract_board(Board, BoardData) :- %Board est un dict contenant le contenu du JSON et on veut que BoardData soit une liste de liste contenant uniquement les infos nécéssaires pour l'IA
     Players = Board.players, %On récupère les infos des joueurs
