@@ -21,10 +21,18 @@
 
 :- http_handler(root(ia), extract_json, []). %root pour l'ia
 
-home_page(_Request) :- %page d'accueil (uniquement pour tester)
+home_page(_Request) :- %page d'accueil permetaant de voir la documentation de notre API
     reply_html_page(
-    title('Demo server'),
-    [ h1('test')]).
+    title('API Tour de France Documentation'),
+    [ 
+        h1('API Tour de France Documentation'),
+        p('This is the API for the Tour de France project.'),
+        h2('Bot'),
+        p('To use the bot, go to /bot/Question where Question is the question you want to ask the bot.'),
+        p('The bot will return the answer to the question throught a JSON file. The answer is in the field "answer".'),
+        h2('IA'),
+        p('To use the IA, send a get request to /ia with the JSON data of the game board.')
+    ]).
 
 answer(Question, _Request):- %predicat pour le bot
     produire_reponse(Question, Resp), %on récupère la réponse du bot
