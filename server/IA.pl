@@ -1,8 +1,9 @@
 :- module(ia, [get_move_IA/2]).
-% on a besoin de pour chaque joueur
-% liste avec en premier elem sa main, puis ses coureurs représentés par un tuple de coord [[num_player, [main], [(x1,y1), (x2,y2)]], num_player]
-%  ex: [[1,[1,1,1,1,1],['1','2','4']],[4,[4,4,4,4,4],['3','4','6']],[2,[2,2,2,2,2],['2','3','10a']],[3,[3,3,3,3,3],['4','5','22']]]
-% minmax à 2, l'heuristique ça serait d'être le premier
+
+% get_move_IA(Infos,Move)/2
+% main predicate that receive the state of the board and returns the move
+    % Infos : list
+    % Move : tuple
 get_move_IA(Infos,Move):-
     get_infos_player(Infos,0,[Cards1,Bikes1]),
     get_infos_player(Infos,1,[_,Bikes2]),
@@ -12,12 +13,12 @@ get_move_IA(Infos,Move):-
     get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
     minimax(Bikes1,All_bikes,[Cards1,Bikes1],Depth,Move,_),!.
 
-    % get_move_IA([[1, [1, 2], ['1-A-left', '5-A-left']], [2,[2,4],['3-A-left','3-A-left']],[3,[1,5],['2-A-left','2-A-left']]],Move).
-% get_move_IA([[1, [1, 2], ['1-A-left', '2-A-left']], [2,[2,4],['3-A-left','3-A-left']],[3,[1,5],['2-A-left','2-A-left']]],Move).
-
-
-    % minimax([[4,2],['4-A-left','4-A-left']],1,A,B). 
+% get_infos_player(State,Num_player,Infos)/3
 % there is not base case since every player should be present one time only, and each shoul be present
+% extracts the infos of the player from the global data
+    % State : list
+    % Num_player : int
+    % Infos : list
 get_infos_player([H_infos|_],Num_player,Infos):-
     nth0(0,H_infos,Num),
     nth0(1,H_infos,Hand),
@@ -28,32 +29,62 @@ get_infos_player([H_infos|_],Num_player,Infos):-
 get_infos_player([_|T_infos],Num_player,Infos):-
     get_infos_player(T_infos,Num_player,Infos).
 
+% get_all_bikes(Bike1,Bike2,Bike3,Bike4,All)/5
+% gets a list of all the current bikes on the board
+    % Bike1 : list
+    % Bike2 : list
+    % Bike3 : list
+    % Bike4 : list
+    % All : list
 get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All):-
     append(Bikes1,Bikes2,Acc),
     append(Acc,Bikes3,Acc2),
     append(Acc2,Bikes4,All).
 
+% get_count_elem(Target,Elements,Acc,Count)/4
+% gets the number of occurences of an element in a list
+    % Target : atom
+    % Elements : list
+    % Acc : int
+    % Count : int
 get_count_elem(_,[],Acc,Acc).
+
 get_count_elem(Target,[Elem|Other_elems],Acc,Count):-
     Target=Elem,
     New_acc is Acc+1,
     get_count_elem(Target,Other_elems,New_acc,Count),!.
+
 get_count_elem(Target,[_|Other_elems],Acc,Count):-
     get_count_elem(Target,Other_elems,Acc,Count),!.
     
-
+% minimax(Bikes_player,All_bikes,State,Depth,Best_move,Min_score)/6
+% creates and explore the three
+    % Bikes_player : list
+    % All_bikes : list 
+    % State : list
+    % Depth : int
+    % Best_move : tuple
+    % Min_score : int
 minimax(Bikes_player,All_bikes,[Cards,Bike],Depth,Best_move,Min_score):-
     writeln([Cards,Bike]),
     possible_moves(Bike,Cards,[],Moves),
     evaluate_moves(Bikes_player,All_bikes,Moves,[Cards,Bike],Depth,Min_score,Best_move),!.
 
-% possible_moves('2-A-left', [2], [], _44446)
-% evaluate_moves([(1, '2-A-left', '1-A-left'), (2, '3-A-left', '1-A-left'), (1, '3-A-left', '2-A-left'), (2, '4-A-left', '2-A-left')], 2, _20634) 
+% evaluate_move(Bikes_player,All_bike,Moves,State,Depth,Best_score,Best_move)/7
+% evalues a move in the three
+    % Bikes_player : list
+    % All_bike : list
+    % Moves : list
+    % State : list
+    % Depth : int
+    % Best_score : int
+    % Best_move : tuple
 evaluate_moves(_,_,[],_,_,0,_).
+
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     terminal_state(New_state),
-    score(State,New_state,Bikes_player,Score),
+    score(Move,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
     Next_max_score=<Score,
     Best_score=Score,
@@ -62,34 +93,32 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     terminal_state(New_state),
-    score(State,New_state,Bikes_player,Score),
+    score(Move,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
     Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
+
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,0,Best_score,Best_move):-
-    make_move(State,Move,New_state),
-    score(State,New_state,Bikes_player,Score),
+    score(Move,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,0,Next_max_score,_),
     Next_max_score=<Score,
     Best_score=Score,
     Best_move=Move.
 
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,0,Best_score,Best_move):-
-    make_move(State,Move,New_state),
-    score(State,New_state,Bikes_player,Score),
+    score(Move,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,0,Next_max_score,Next_best_move),
     Next_max_score>Score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
-
 
 evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,Best_move):-
     make_move(State,Move,New_state),
     nth0(0,New_state,New_cards),
     length(New_cards,Lenght),
     Lenght=0,
-    score(State,New_state,Bikes_player,_),
+    score(Move,Bikes_player,_),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,Next_best_move),
     Best_score=Next_max_score,
     Best_move=Next_best_move.
@@ -99,7 +128,7 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     nth0(0,New_state,New_cards),
     length(New_cards,Lenght),
     Lenght=0,
-    score(State,New_state,Bikes_player,Score),
+    score(Move,Bikes_player,Score),
     evaluate_moves(Bikes_player,All_bikes,Other_moves,State,Depth,Next_max_score,_),
     Next_max_score=<Score,
     Best_score=Score,
@@ -135,55 +164,84 @@ evaluate_moves(Bikes_player,All_bikes,[Move|Other_moves],State,Depth,Best_score,
     Best_score=Next_max_score,
     Best_move=Next_best_move.
 
+% make_move(State,Move,New_state)/3
+% update the current state to the new state using the move done
+    % State : list
+    % Move : tuple
+    % New_state : list
 make_move([Cards,_],(Card,New_pos,_),[New_cards,[New_pos]]):-
     select(Card,Cards,New_cards).
 
+% valid_pos(Move)/1
+% test if a move is not made on a bike that has finished the game
+    % Move : tuple
 valid_pos((_,_,Old_pos)):-
     split_string(Old_pos,"-","",List_pos),
     length(List_pos,Lenght),
     Lenght=3,!.
+
+% valid_move(Move,All_bikes)/2
+% test if a move is valid
+    % Move : tuple
+    % All_bikes : list
 valid_move((_,New_pos,_),All_bikes):-
     get_count_elem(New_pos,All_bikes,0,Places_used),
     available_places(New_pos,Actual_places),
     Actual_places>Places_used.
 
-% make_move([[1, 2], ['1-A-left', '2-A-left']], (1, '2-A-left', '1-A-left'), _7356)
-% (1, '2-A-left', '1-A-left'), (2, '3-A-left', '1-A-left'), (1, '3-A-left', '2-A-left')
-score([_,[Bike1|_]],[_,[Bike2|_]],Bikes,Score):-
-    split_string(Bike1,"-","",List_position1),
-    split_string(Bike2,"-","",List_position2),
+% score(Move,Bikes,Score)/3
+% gets the score of a leaf
+    % Move : tuple
+    % Bikes : list
+    % Score : int
+score((_,New_pos,Old_pos),Bikes,Score):-
+    split_string(New_pos,"-","",List_position1),
+    split_string(Old_pos,"-","",List_position2),
     length(List_position1,Length1),
     length(List_position2,Lenght2),
-    get_value_bike(Bike1,Value1),
-    get_value_bike(Bike2,Value2),
-    get_group_score(Bike1,Bike2,Bikes,Score_group),
+    get_value_bike(New_pos,Value1),
+    get_value_bike(Old_pos,Value2),
+    get_group_score(Old_pos,New_pos,Bikes,Score_group),
     compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score).
 
+% get_group_score(Old_bike,New_bike,Bikes_player,Score)/4
+% gets the score depending of the distance between the bikes of the player
+    % Old_bike : string
+    % New_bike : string
+    % Bikes_player : string
+    % Score : int
 get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     Old_bike=Bike1,
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike2,Value2),
     get_value_bike(Bike3,Value3),
     Score is 4+(Value1-Value2-Value3).
+
 get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     Old_bike=Bike2,
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike1,Value2),
     get_value_bike(Bike3,Value3),
     Score is 4+(Value1-Value2-Value3).
+
 get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     Old_bike=Bike3,
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike2,Value2),
     get_value_bike(Bike1,Value3),
     Score is 4+(Value1-Value2-Value3).
-    
+
+% get_value_bike(Bike,Value)/2
+% get the value of the position of a bike
+    % Bike : string
+    % Value : int
 get_value_bike(Bike,Value):-
     split_string(Bike,"-","",List_bike),
     length(List_bike,Length),
     Length=4,
     nth0(1,List_bike,Value_string),
     number_string(Value,Value_string).
+
 get_value_bike(Bike,Value):-
     split_string(Bike,"-","",List_bike),
     length(List_bike,Length),
@@ -191,6 +249,14 @@ get_value_bike(Bike,Value):-
     nth0(0,List_bike,Value_string),
     number_string(Value,Value_string).
 
+% compute_score(Value1,Value2,Length1,Length2,Score_group,Score)/6
+% compute the score for a leaf of the three
+    % Value1 : int
+    % Value2 : int
+    % Length1 : int
+    % Lenght2 : int
+    % Score_group : int
+    % Score : int
 compute_score(_,_,Length1,Lenght2,_,Score):-
     Score is 0,
     Length1>Lenght2,!.
@@ -203,38 +269,45 @@ compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score):-
     Length1=Lenght2,
     Score is Value2-Value1+Score_group,!.
 
-
-
-
+% possible_moves(Bikes,Cards,Acc,Moves)/4
+% gets all the possible moves with the actual hand and position of the bikes
+    % Bikes : list
+    % Cards : list
+    % Acc : list
+    % Moves : list
 possible_moves([],_,Acc,Acc).
+
 possible_moves([Bike|Other_bike],Cards,Acc,Moves):-
     iterate_card(Cards,Bike,[],Moves_bike),
     append(Acc,Moves_bike,New_acc),
     possible_moves(Other_bike, Cards, New_acc, Moves).
 
+% iterate_card(CardsnBike,Acc,Moves)/4
+% find the next position with a recursion on the value of the card
+    % Cards : list
+    % Bike : string
+    % Acc : list
+    % Moves : list
 iterate_card([],_,Acc,Acc).
+
 iterate_card([Card|Other_cards],Bike,Acc,Moves):-
     get_next_position(Bike,Card,New_position),
     append(Acc,[(Card,New_position,Bike)],New_acc),
     iterate_card(Other_cards,Bike,New_acc,Moves),!.
 
-
-% terminal_state([_,[Bike]]):-
-%     end(Bike).
-
+% terminal_state(State)/1
+% test if the state is terminal
+    % State : list
 terminal_state([_,[Bike,_]]):-
     end(Bike).
 
-
-get_min(Value1,Value2,Value1):-
-    Value1=<Value2.
-get_min(_,Value2,Value2).
-
-get_max(Value1,Value2,Value1):-
-    Value1>=Value2.
-get_max(_,Value2,Value2).
-
+% get_next_position(Position,Card_value,Res)/3
+% gets the next position of a bike for a certain card
+    % Position : string
+    % Card_value : int
+    % Res : String
 get_next_position(Position,0,Position).
+
 get_next_position(Position,Card_value,Res):-
     next(Position,List_Next),
     member(Next,List_Next),
@@ -529,8 +602,6 @@ next('-5-A-left',['-6-A-left']).
 next('-6-A-left',['-7-A-left']).
 next('-7-A-left',['-8-A-left']).
 next('-8-A-left',['-9-A-left']).
-% voir comment on fait avec le fait que ça soit vide pour la dernière
-% il boucle sur lui-même :)
 next('-9-A-left',['9-A-left']).
 
 % end cases of the board
