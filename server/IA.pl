@@ -176,7 +176,7 @@ make_move([Cards,_],(Card,New_pos,_),[New_cards,[New_pos]]):-
 % test if a move is not made on a bike that has finished the game
     % Move : tuple
 valid_pos((_,_,Old_pos)):-
-    split_string(Old_pos,"-","",List_pos),
+    split_string(Old_pos,"_","",List_pos),
     length(List_pos,Lenght),
     Lenght=3,!.
 
@@ -195,8 +195,8 @@ valid_move((_,New_pos,_),All_bikes):-
     % Bikes : list
     % Score : int
 score((_,New_pos,Old_pos),Bikes,Score):-
-    split_string(New_pos,"-","",List_position1),
-    split_string(Old_pos,"-","",List_position2),
+    split_string(New_pos,"_","",List_position1),
+    split_string(Old_pos,"_","",List_position2),
     length(List_position1,Length1),
     length(List_position2,Lenght2),
     get_value_bike(New_pos,Value1),
@@ -243,7 +243,7 @@ get_value_bike(Bike,Value):-
     number_string(Value,Value_string).
 
 get_value_bike(Bike,Value):-
-    split_string(Bike,"-","",List_bike),
+    split_string(Bike,"_","",List_bike),
     length(List_bike,Length),
     Length=3,
     nth0(0,List_bike,Value_string),
