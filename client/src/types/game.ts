@@ -53,6 +53,7 @@ interface Ctx {
     currentPlayer: string;
     numPlayers: number;
     gameover?: any;
+    playOrder: string[];
 }
 
 interface Context {

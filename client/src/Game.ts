@@ -133,29 +133,7 @@ function checkAspiration(newPosition: string): boolean {
  * The first player is the player who has the bike with the highest position
  */
 function firstPlayer(context: Context): number {
-    let firstPlayer = 0;
-    if (context.ctx.turn === 1) {
-        let highestCard = 0;
-        for (let i = 0; i < nbPlayers; i++) {
-            for (let j = 0; j < nbCards; j++) {
-                if (context.G.players[i].hand[j] > highestCard) {
-                    firstPlayer = i;
-                    highestCard = context.G.players[i].hand[j];
-                }
-            }
-        }
-        return firstPlayer;
-    }
-    let firstBike = context.G.players[firstPlayer].bikes[0];
-    for (let i = 0; i < nbPlayers; i++) {
-        for (let j = 0; j < nbBikes; j++) {
-            if (Board[context.G.players[i].bikes[j].position].position > Board[firstBike.position].position) {
-                firstPlayer = i;
-                firstBike = context.G.players[i].bikes[j];
-            }
-        }
-    }
-    return firstPlayer;
+    return parseInt(context.ctx.playOrder[0]);
 }
 
 /**
@@ -166,49 +144,10 @@ function firstPlayer(context: Context): number {
  *  The next player is the player who has the bike with the highest position after the current player
  */ 
 function nextPlayer(context: Context): number {
-    const firstPlayer = parseInt(context.ctx.currentPlayer);
-    let nextPlayer = parseInt(context.ctx.currentPlayer);
-    if (context.ctx.turn === 1) {
-        let highestCard = 0;
-        for (let i = 0; i < nbPlayers; i++) {
-            if (context.G.players[i].hand.length !== nbCards) continue; // Skip players who have already played their cards
-            for (let j = 0; j < nbCards; j++) {
-                if (context.G.players[i].hand[j] > highestCard) {
-                    nextPlayer = i;
-                    highestCard = context.G.players[i].hand[j];
-                }
-            }
-        }
-        return nextPlayer;
-    }
-    let firstPlayerFirstBike: Bike = context.G.players[firstPlayer].bikes[0];
-    for (let i = 1; i < nbBikes; i++) {
-        if (Board[context.G.players[firstPlayer].bikes[i].position].position > Board[firstPlayerFirstBike.position].position) {
-            firstPlayerFirstBike = context.G.players[firstPlayer].bikes[i];
-        }
-    }
-    let playersInFront: number[] = [firstPlayer];
-    for (let i = 0; i < nbPlayers; i++) {
-        for (let j = 0; j < nbBikes; j++) {
-            if (i in playersInFront) break;
-            if (Board[context.G.players[i].bikes[j].position].position > Board[firstPlayerFirstBike.position].position) {
-                playersInFront.push(i);
-                break;
-            }
-        }
-    }
-    let greatestPositionFound: number = 0;
-    for (let i = 0; i < nbPlayers; i++) {
-        for (let j = 0; j < nbBikes; j++) {
-            if (i in playersInFront) break;
-            if ((Board[context.G.players[i].bikes[j].position].position < Board[firstPlayerFirstBike.position].position)
-            && (Board[context.G.players[i].bikes[j].position].position > greatestPositionFound)) {
-                greatestPositionFound = Board[context.G.players[i].bikes[j].position].position;
-                nextPlayer = i;
-            }
-        }
-    }
-    return nextPlayer;
+    const firstPlayer = context.ctx.currentPlayer;
+    const nextPlayerIndex = context.ctx.playOrder.findIndex((playerID) => playerID === firstPlayer) + 1;
+    const nextPlayer = context.ctx.playOrder[nextPlayerIndex];
+    return parseInt(nextPlayer);
 }
 
 /**
@@ -398,7 +337,7 @@ function setUp() {
     } as DCtx;
 
     for (let i = 0; i < nbPlayers; i++) {
-        drawCards({G: ctx, ctx: {turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
+        drawCards({G: ctx, ctx: {playOrder: [], turn: 0, currentPlayer: i.toString(), numPlayers: nbPlayers}});
     }
 
     return ctx;
@@ -459,6 +398,31 @@ const TourDeFrance = {
         order: {
             first: (context: FnContext<DCtx, Record<string, unknown>>) => firstPlayer(context),
             next: (context: FnContext<DCtx, Record<string, unknown>>) => nextPlayer(context),
+            playOrder: (context: Context) => {
+                // List of 1..nbPlayers
+                const basicOrder = Array.from(Array(nbPlayers).keys());
+                if (context.ctx.turn < nbPlayers) {
+                    // On the first turn, sort by highest card
+                    basicOrder.sort((a, b) => {
+                        const playerA = context.G.players[a];
+                        const playerB = context.G.players[b];
+                        const cardA = Math.max(...playerA.hand);
+                        const cardB = Math.max(...playerB.hand);
+                        return cardB - cardA;
+                    });
+                }
+                else {
+                    // After the first turn, sort by highest bike position
+                    basicOrder.sort((a, b) => {
+                        const playerA = context.G.players[a];
+                        const playerB = context.G.players[b];
+                        const bikeAPosition = Math.max(...playerA.bikes.map(bike => Board[bike.position].position));
+                        const bikeBPosition = Math.max(...playerB.bikes.map(bike => Board[bike.position].position));
+                        return bikeBPosition - bikeAPosition;
+                    });
+                }
+                return basicOrder.map((playerID) => playerID.toString());
+            },
         },
         minMoves: 0, // If all bike's player are at the finish line
         maxMoves: 1,

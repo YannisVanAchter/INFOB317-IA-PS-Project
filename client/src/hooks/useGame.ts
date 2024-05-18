@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 
-import { mockUseCardOnBike } from '../Game';
+import { mockUseCardOnBike, nbPlayers } from '../Game';
 import { Board } from '../Game';
 
-import { Player, GameContextType } from '../types/game';
+import { Player, GameContextType, Context } from '../types/game';
 import { boardKey } from '../types/board';
 
 interface Props {
     player: Player,
     useCard: (bikeIndex: number, cardIndex: number, target: string) => void,
-    events: any
+    events: any,
 }
 
 export function useGame({ player, useCard, events }: Props): GameContextType {
@@ -23,7 +23,7 @@ export function useGame({ player, useCard, events }: Props): GameContextType {
     const applyCardOnBike = (target: boardKey) => {
         try {
             useCard(currentBikeIndex, currentCardIndex, target);
-            // events.endTurn();
+            events.endTurn();
             return true;
         } catch (e) {
             console.error(e);

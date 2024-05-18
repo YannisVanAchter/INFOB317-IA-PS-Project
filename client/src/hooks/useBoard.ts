@@ -39,6 +39,7 @@ const useBoard = (props: BoardProps) => {
                 newText.style.fontSize = '20';
                 newText.style.fontFamily = 'Arial';
                 newText.style.stroke = 'black';
+                newText.style.transform = 'translate(-5px, 5.5px)';
 
                 const textNode = document.createTextNode(`${index + 1}`);
                 newText.appendChild(textNode);

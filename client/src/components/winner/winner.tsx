@@ -25,7 +25,7 @@ export function Winner(props: TODO) {
     };
 
     return (
-        <Modal className={`${props.className} winner`}>
+        <Modal className="winner">
             <h2>Fin de la partie</h2>
             <h3>Classement final</h3>
             <ol>

@@ -34,8 +34,11 @@ type TODO = {
 };
 
 function Page(props: TODO) {
+    console.log("props: ", props);
     let players = props.G.players;
+    console.log("player id: ", props.ctx.currentPlayer);    
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
+    console.log(`currentPlayer: ${currentPlayer}`);
 
     let boardProps = {
         G: props.G,
@@ -46,6 +49,7 @@ function Page(props: TODO) {
             { playerID: 3 as 3, bikes: players[3].bikes.map((bike: any) => bike.position) },
         ],
         currentPlayer: currentPlayer,
+        turn: props.ctx.turn,
         availableMoves: [] as { boardKey: string, bikeIndex: number, cardIndex: number }[],
         mockUseCardOnBike: mockUseCardOnBike,
     };
@@ -55,11 +59,9 @@ function Page(props: TODO) {
             const bike = props.G.players[currentPlayer].bikes[i];
             const card = props.G.players[currentPlayer].hand[j];
             const moves = mockUseCardOnBike(bike, card);
-            if (moves.length > 0) {
-                moves.forEach((move) => {
-                    boardProps.availableMoves.push({ boardKey: move, bikeIndex: i, cardIndex: j });
-                });
-            }
+            moves.forEach((move) => {
+                boardProps.availableMoves.push({ boardKey: move, bikeIndex: i, cardIndex: j });
+            });
         }
     }
 
@@ -72,7 +74,12 @@ function Page(props: TODO) {
 
     return (
         <div className='board-game'>
-            <GameContext.Provider value={useGame({ player: currentPlayerPlayer, useCard: props.moves.useCard, events: props.events })}>
+            <GameContext.Provider value={
+                    useGame({ 
+                            player: currentPlayerPlayer, 
+                            useCard: props.moves.useCard, 
+                            events: props.events, 
+                        })}>
                 <SideBoard {...props} />
                 <TourDeFranceBoard {...boardProps} />
                 <DisplayHands {...props} />
