@@ -203,9 +203,13 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
             playersScore[currentSecondsAllBikes[i].playerID] += bikePoints[i];
         }
     }
-    return Array(4).map((v, i) => {
-        return {playerID: i, score: playersScore[i]};
-    }).sort((a, b) => a.score - b.score);
+
+    const retrunArray = Array(4)
+        .map((v, i) => {return {playerID: i, score: playersScore[i]}})
+        .sort((a, b) => a.score - b.score);
+
+
+    return retrunArray;
 }
 
 /**
@@ -250,6 +254,14 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
     for (let i = 0; i < newPosition.length; i++) {
         if (checkAspiration(possiblePositions[i])) {
             possiblePositions.push(...Board[possiblePositions[i]].next);
+        }
+    }
+
+    for (let position of possiblePositions) {
+        // Check if reachable
+        let currentPositions = [bike.position];
+        while(!currentPositions.includes(position)) {
+            break;
         }
     }
 
