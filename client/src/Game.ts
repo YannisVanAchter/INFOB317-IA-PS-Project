@@ -235,9 +235,16 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
 
     for (let position of possiblePositions) {
         // Check if reachable
-        let currentPositions = [bike.position];
+        let currentPositions = Array(3);
+        currentPositions[0] = bike.position;
         while(!currentPositions.includes(position)) {
-            break;
+            for (let i = 0; i < 3; i++) {
+                if (currentPositions[i] === undefined) break;
+                let boardSquare = Board[currentPositions[i]]
+                for (let j = 0; i < boardSquare.next.length; j++) {
+                    // currentPositions[j] = 
+                }
+            }
         }
     }
 
