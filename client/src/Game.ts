@@ -6,7 +6,7 @@ import { boardKey } from './utils/simonLTransform';
 import { Board } from './data/board';
 import { SprintsData } from './data/sprints';
 
-import { BoardCase, Bike, Player, DCtx, Ctx, Context, playerID } from './types/game';
+import { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID } from './types/game';
 import { AIMove } from './types/bot';
 import axios from 'axios';
 
@@ -52,12 +52,13 @@ function getBoardCase(position: string): BoardCase {
 function getPossibleTilesFromPosition(position: number): boardKey[] {
     // console.log(position);
     let possibleTiles: string[] = [];
-    for (const key in Board) {
+    console.log(Object.keys(Board));
+    for (const key of Object.keys(Board)) {
         // console.log(Board[key]);
         // console.log(Board[key].position);
         // console.log(Board[key].nbBikes);
         // console.log(Board[key].nbBikesMax);
-        if (Board[key].position === position && Board[key].nbBikes < Board[key].nbBikesMax) {
+        if (Board[key].position == position && Board[key].nbBikes < Board[key].nbBikesMax) {
             possibleTiles.push(key);
         }
     }
@@ -139,6 +140,21 @@ function checkAspiration(newPosition: string): boolean {
  */
 function isGameOver({ G }: Context) {
     return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases));
+}
+
+function fixBoard(board: dico<BoardCase>, players: Player[]) {
+    let allPositionsUsed = []
+    for (const player of players) {
+        for (const bike of player.bikes) {
+            allPositionsUsed.push(bike.position);
+        }
+    }
+    for (const key of Object.keys(board)) {
+        board[key].nbBikes = 0;
+    }
+    for (const position of allPositionsUsed) {
+        board[position].nbBikes++;
+    }
 }
 
 /**
@@ -239,7 +255,7 @@ function mockUseCardOnBike(bike: Bike, card: number): boardKey[] {
         }
     }
 
-    let allPossibleReachablePositions = [bike.position]
+    let allPossibleReachablePositions = [bike.position];
     let currentPos = [bike.position];
     while (!currentPos.includes("95_A_left")) {
         for (const pos of currentPos) {
@@ -302,9 +318,9 @@ function handlePenalty(context: Context): DCtx {
  * 
  * 
  *  @returns The new game state with following effects
- *  effects: delete the card from the hand of the player and add the card to the discard pile
- *  effects: move the bike of the player by the value of the card
- *  effects: if the bike is at the finish line, the bike is reduced by the overflow of the card
+ *  @modifies delete the card from the hand of the player and add the card to the discard pile
+ *  @modifies move the bike of the player by the value of the card
+ *  @modifies if the bike is at the finish line, the bike is reduced by the overflow of the card
  * 
  *  Use the card on the bike
  */
@@ -315,13 +331,19 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     const bike = player.bikes[bikeIndex];
     let oldPosition = bike.position;
     let numberedPosition = Board[bike.position].position + card;
+    fixBoard(Board, myG.players);
     if (numberedPosition > nbCases) {
         bike.reduce = numberedPosition + card - nbCases;
         if (bike.reduce > nbReduceMax) {
             bike.reduce = nbReduceMax;
         }
-        const possiblePositions = getPossibleTilesFromPosition(nbCases + 1);
-        bike.position = possiblePositions[bike.reduce-1];
+        if (numberedPosition > 105) numberedPosition = 105;
+        let possiblePositions = getPossibleTilesFromPosition(numberedPosition);
+        possiblePositions = [...possiblePositions, ...getPossibleTilesFromPosition(numberedPosition - 1)];
+        console.log("USE CARD ON BIKE");
+        console.log(possiblePositions);
+        bike.position = possiblePositions[0];
+        return myG;
     }
     // Check every tile on the way is clear or has space
     if (!checkMove(bike, card)) {
@@ -345,6 +367,8 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     }
     
     // Do the move
+    console.log(myG.players);
+    console.log(Board);
     const tileIndex = possibleTiles.findIndex((val) => (val === target))
     if (tileIndex === -1) throw new Error("Invalid position required");
     let newTile = possibleTiles[tileIndex];
@@ -368,7 +392,6 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
 
     // check if sprints has been reach
     handleSprints(context, bike, player);
-
     return myG;
 }
 
