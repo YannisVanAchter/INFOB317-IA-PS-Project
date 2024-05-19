@@ -354,6 +354,7 @@ get_next_position(Position,Card_value,Res):-
     get_next_position(Next, New_value,Res).
 
 % number of places available on the board
+available_places('0_B_left',15).
 available_places('1_A_left',3).
 available_places('2_A_left',3).
 available_places('3_A_left',3).
