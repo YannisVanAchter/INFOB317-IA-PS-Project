@@ -15,7 +15,6 @@ import type { boardKey, svgId, svgSide, caseLetter, side } from '../types/board'
  */
 function fromMapToSVG(key: boardKey, alreadyUsed: boardKey[] = []) {
     if (key === "0_B_left") return "start";
-
     let [position, caseLetter, _] = key.split('_');
     let svgSide = alreadyUsed.filter((k) => k === key).length as svgSide;
 
@@ -32,6 +31,8 @@ function fromMapToSVG(key: boardKey, alreadyUsed: boardKey[] = []) {
             break;
     }
 
+    svgSide += Board[key].nbBikes - 1
+    
     svgSide = svgSide as svgSide;
 
     return `c${position}_${svgSide}`;
