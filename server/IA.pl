@@ -6,7 +6,6 @@
     % Move : tuple
 get_move_IA(Infos,Move):-
     get_infos_player(Infos,0,[Cards1,Bikes1]),
-    writeln(Cards1),
     get_infos_player(Infos,1,[_,Bikes2]),
     get_infos_player(Infos,2,[_,Bikes3]),
     get_infos_player(Infos,3,[_,Bikes4]),
