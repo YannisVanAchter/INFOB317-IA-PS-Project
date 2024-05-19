@@ -12,7 +12,14 @@ get_move_IA(Infos,Move):-
     length(Cards1,Depth),
     check_num_cards_ia(Cards1,Depth,New_cards),
     get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
-    minimax(Bikes1,All_bikes,[New_cards,Bikes1],Depth,Move,_),!.
+    minimax(Bikes1,All_bikes,[New_cards,Bikes1],Depth,Move,_),
+    test_move(Move),!.
+
+% test_move(Move)/1
+% checks if the three found a move
+    % Cards : tuple
+test_move(Move):-
+    Move=(_,_,_).
 
 % check_num_cards_ia(Cards,Number_cards,New_cards)/3
 % checks if the hand of the player has more than one card and if not, decuplates the actual card and creates a new hand
@@ -23,7 +30,6 @@ check_num_cards_ia(Cards1,1,New_cards):-
     nth0(0,Cards1,Value),
     New_cards=[Value,Value],!.
 
-check_num_cards_ia(Cards1,_,Cards1).
 
 % get_infos_player(State,Num_player,Infos)/3
 % there is not base case since every player should be present one time only, and each shoul be present
