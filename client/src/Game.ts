@@ -475,6 +475,7 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
                 };
                 console.log("NEWDATA");
                 console.log(newData);
+                if (currentPlayer == undefined) throw new Error("Some real shit is happening (from bot 2)");
                 resolve(
                     {
                         bikeIndex: getBikeIndexFromPlayerAndPos(currentPlayer, newData.origin),
