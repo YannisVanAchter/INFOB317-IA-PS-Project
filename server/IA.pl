@@ -216,21 +216,21 @@ get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike2,Value2),
     get_value_bike(Bike3,Value3),
-    Score is 4+(Value1-Value2-Value3).
+    Score is 4+(Value3-Value2-Value1).
 
 get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     Old_bike=Bike2,
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike1,Value2),
     get_value_bike(Bike3,Value3),
-    Score is 4+(Value1-Value2-Value3).
+    Score is 4+(Value3-Value2-Value1).
 
 get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     Old_bike=Bike3,
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike2,Value2),
     get_value_bike(Bike1,Value3),
-    Score is 4+(Value1-Value2-Value3).
+    Score is 4+(Value3-Value2-Value1).
 
 % get_value_bike(Bike,Value)/2
 % get the value of the position of a bike
