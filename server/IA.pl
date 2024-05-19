@@ -66,7 +66,6 @@ get_count_elem(Target,[_|Other_elems],Acc,Count):-
     % Best_move : tuple
     % Min_score : int
 minimax(Bikes_player,All_bikes,[Cards,Bike],Depth,Best_move,Min_score):-
-    writeln([Cards,Bike]),
     possible_moves(Bike,Cards,[],Moves),
     evaluate_moves(Bikes_player,All_bikes,Moves,[Cards,Bike],Depth,Min_score,Best_move),!.
 
@@ -305,8 +304,10 @@ iterate_card([Card|Other_cards],Bike,Acc,Moves):-
 % terminal_state(State)/1
 % test if the state is terminal
     % State : list
-terminal_state([_,[Bike,_]]):-
-    end(Bike).
+terminal_state([_,[Bike1,Bike2,Bike3]]):-
+    end(Bike1);
+    end(Bike2);
+    end(Bike3).
 
 % get_next_position(Position,Card_value,Res)/3
 % gets the next position of a bike for a certain card
