@@ -66,10 +66,14 @@ function getPossibleTilesFromPosition(position: number): boardKey[] {
 }
 
 function checkMove(currentBike: Bike, cardPlayed: number): boolean {
+    console.log("CHECK MOVE");
+    console.log(currentBike);
+    console.log(cardPlayed);
     let tilesToCheck = [];
     for (let i = 0; i < cardPlayed; i++) {
         tilesToCheck.push(Board[currentBike.position].next[0]); // For now ignore secondary path will need to see how we handle it in the front
     }
+    console.log(tilesToCheck);
     for (const tiles of tilesToCheck) {
         if (Board[tiles].nbBikes >= Board[tiles].nbBikesMax) return false;
     }
