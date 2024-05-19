@@ -87,6 +87,7 @@ function Page(props: TODO) {
         turn: props.ctx.turn,
         availableMoves: [] as { boardKey: string, bikeIndex: number, cardIndex: number }[],
         mockUseCardOnBike: mockUseCardOnBike,
+        board: props.G.board
     };
 
     for (let i = 0; i < props.G.players[currentPlayer].bikes.length; i++) {

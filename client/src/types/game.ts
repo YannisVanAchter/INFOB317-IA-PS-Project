@@ -62,6 +62,7 @@ interface DCtx {
     discard: CardValue[];
     players: Player[];
     oneBikeFinished: boolean;
+    board: dico<BoardCase>;
 }
 
 interface Ctx {

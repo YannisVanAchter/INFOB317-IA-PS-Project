@@ -40,7 +40,7 @@ function fromMapToSVG(key: boardKey, Board: dico<BoardCase>, alreadyUsed: boardK
  * @param id from the SVG
  * @return the key in the board variable in Game.ts
  */
-function fromSVGToMap(id: svgId) {
+function fromSVGToMap(id: svgId, Board: dico<BoardCase>) {
     let [position, side] = id.replace('c', '').split('_');
     let caseLetter: caseLetter = 'A';
     let boardSide: side = 'left';
