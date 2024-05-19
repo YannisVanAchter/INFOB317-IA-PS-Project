@@ -13,7 +13,6 @@ type BoardProps = {
     players: { playerID: playerID, bikes: boardKey[] }[],
     currentPlayer: playerID,
     availableMoves: { boardKey: boardKey, bikeIndex: number, cardIndex: number }[],
-    Board: dico<Boar
 };
 
 
