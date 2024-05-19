@@ -7,6 +7,8 @@ import { useBoard } from '../../hooks';
 
 function TourDeFranceBoard(props: BoardProps) {
     const { addBikes, addPlayerMoves } = useBoard(props);
+
+    console.log('TourDeFranceBoard props', props);
     
     return <>
             <div className='fill-complete'>

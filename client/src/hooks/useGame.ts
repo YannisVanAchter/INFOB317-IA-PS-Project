@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { mockUseCardOnBike } from '../Game';
 import { Board } from '../Game';
 
-import { useGameParams } from '../context';
-
 import { Player, GameContextType, Context } from '../types/game';
 import { boardKey } from '../types/board';
 
@@ -21,10 +19,8 @@ export function useGame({ player, useCard, events }: Props): GameContextType {
     let cardIndexInit = player.hand.findIndex(card => card === maxCard);
     const [currentBikeIndex, setBike] = useState(bikeIndexInit);
     const [currentCardIndex, setCardIndex] = useState(cardIndexInit);
-    const { params } = useGameParams();
 
     const applyCardOnBike = (target: boardKey) => {
-        if (!params[player.playerID].isHuman) return true;
         try {
             useCard(currentBikeIndex, currentCardIndex, target);
             return true;
