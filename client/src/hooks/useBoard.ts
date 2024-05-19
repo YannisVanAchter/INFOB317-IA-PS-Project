@@ -2,12 +2,14 @@ import React, { useContext } from "react";
 // import  from 'react-svg';
 
 import { GameContext } from "../context/gameContext";
+import { useGameParams } from "../context";
 import { fromMapToSVG } from "../utils/simonLTransform";
 import { BoardProps, boardKey } from "../types/board";
 import { players } from "../data/player";
 
 const useBoard = (props: BoardProps) => {
     const { setBikeIndex, handleChoiceCard, applyCardOnBike } = useContext(GameContext);
+    const { params } = useGameParams();
     // Add bikes to the map
     const addBikes = (svg: SVGSVGElement) => {
         if (svg === null) {
@@ -85,6 +87,8 @@ const useBoard = (props: BoardProps) => {
 
     // Add player moves to the map
     const addPlayerMoves = (svg: SVGSVGElement) => {
+        if (!params[props.currentPlayer].isHuman) return;
+        
         let usedMove: boardKey[] = [];
         props.availableMoves.forEach((move, index) => {
             let SvgID: string;
