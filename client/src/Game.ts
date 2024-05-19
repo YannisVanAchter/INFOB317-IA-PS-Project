@@ -138,8 +138,8 @@ function checkAspiration(newPosition: string): boolean {
  * 
  * The game is over if all the bikes of all the players are at the finish line
  */
-function isGameOver({ G }: Context) {
-    return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases));
+function isGameOver({ G, ctx }: Context) {
+    return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases)) || ctx.turn > 300;
 }
 
 function fixBoard(board: dico<BoardCase>, players: Player[]) {
@@ -188,15 +188,21 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
     }
 
     if (isGameOver({G , ctx})) {
-        let allPlayersTime = Array(4).map((v, i) => {return {playerID: i, time: 0}})
+        let allPlayersTime = []
+        for (let i = 0; i < nbPlayers; i++) {
+            allPlayersTime.push({playerID: i, time: 0})
+        }
+        console.log(allPlayersTime);
         for (const bike of currentSecondsAllBikes) {
+            console.log(bike.playerID);
             allPlayersTime[bike.playerID].time += bike.seconds;
         }
         allPlayersTime.sort((a, b) => a.time - b.time);
         const teamPoints = [40, 15, 5];
         const bikePoints = [15, 10, 5];
-        for (let i = 0; i < allPlayersTime.length - 1; i++) {
+        for (let i = 0; i < 3; i++) {
             playersScore[allPlayersTime[i].playerID] += teamPoints[i];
+            console.log(currentSecondsAllBikes);
             playersScore[currentSecondsAllBikes[i].playerID] += bikePoints[i];
         }
     }
@@ -397,6 +403,7 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
 
 function setUp() {
     let ctx = {
+        board: Board,
         deck: shuffle(CardsDeck),
         discard: [],
         players: [...Array(nbPlayers)].map((_, playerID) => ({ // generate each player
@@ -518,6 +525,7 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
                     destination: rawData[1],
                     card: parseInt(rawData[0])
                 };
+                if (newData.card === 0) resolve({bikeIndex: 0, cardIndex: 0, target: "0_B_left"});
                 console.log("NEWDATA");
                 console.log(newData);
                 if (currentPlayer == undefined) throw new Error("Some real shit is happening (from bot 2)");
@@ -577,7 +585,9 @@ const TourDeFrance = {
             return context.ctx.playOrderPos === context.ctx.numPlayers - 1;
         },
         onEnd: ({ G, ctx }: Context) => {
-            G = handlePenalty({ G, ctx });
+            if (ctx.turn % nbPlayers) {
+                G = handlePenalty({ G, ctx });
+            }
             return G;
         },
     },

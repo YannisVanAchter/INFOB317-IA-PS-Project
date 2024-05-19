@@ -47,7 +47,7 @@ const useBoard = (props: BoardProps) => {
                 newText.appendChild(textNode);
                 group.appendChild(newText);
 
-                let SvgID = fromMapToSVG(bike, usedMove);
+                let SvgID = fromMapToSVG(bike, props.board, usedMove);
                 if (SvgID === "start") 
                     SvgID = `start-${player.playerID}`;
 
@@ -95,7 +95,7 @@ const useBoard = (props: BoardProps) => {
             if (move.boardKey === "0-B-left")
                 SvgID = `start-${props.currentPlayer}`;
             else 
-                SvgID= fromMapToSVG(move.boardKey, usedMove);
+                SvgID= fromMapToSVG(move.boardKey, props.board, usedMove);
             if (usedMove.includes(move.boardKey))
                 return;
 

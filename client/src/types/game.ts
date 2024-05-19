@@ -1,3 +1,4 @@
+import { Events } from "boardgame.io/dist/types/src/plugins/events/events";
 import { boardKey } from "./board";
 
 type playerID = 0 | 1 | 2 | 3;
@@ -75,6 +76,7 @@ interface Ctx {
 interface Context {
     G: DCtx;
     ctx: Ctx;
+    events?: any;
 }
 
 interface GameContextType {

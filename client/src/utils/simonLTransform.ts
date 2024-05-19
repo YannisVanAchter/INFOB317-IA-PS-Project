@@ -4,16 +4,15 @@
  * 
  * Simon L: c{numéro de case}_{éloignement par rapport au bord gauche de la route en partant de 0}
  */
-
-import { Board } from '../data/board';
 import type { boardKey, svgId, svgSide, caseLetter, side } from '../types/board';
+import type { dico, BoardCase } from '../types/game';
 
 /**
  * Transform a key from the map to the SVG
  * @param key from de board variable in Game.ts
  * @return the id in the SVG
  */
-function fromMapToSVG(key: boardKey, alreadyUsed: boardKey[] = []) {
+function fromMapToSVG(key: boardKey, Board: dico<BoardCase>, alreadyUsed: boardKey[] = []) {
     if (key === "0_B_left") return "start";
     let [position, caseLetter, _] = key.split('_');
     let svgSide = alreadyUsed.filter((k) => k === key).length as svgSide;
