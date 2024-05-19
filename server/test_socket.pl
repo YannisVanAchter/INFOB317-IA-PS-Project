@@ -18,7 +18,7 @@
 :- http_handler(root(.),http_redirect(moved, location_by_id(home_page)),[]). %redirige vers la page d'accueil
 :- http_handler(root(home), home_page, []). %page d'accueil (documentation de l'API)
 :- http_handler(root(bot/Question), answer(Question),[]). %root pour le bot
-:- http_handler(root(ia), extract_json(Method), [method(Method), methods([post, options])]). %root pour l'ia
+:- http_handler(root(ia), answer_ia(Method), [method(Method), methods([post, options])]). %root pour l'ia
 
 home_page(_Request) :- %page d'accueil permetaant de voir la documentation de notre API
     reply_html_page(
@@ -45,14 +45,43 @@ answer(Question, _Request):- %predicat pour le bot
 openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour les tests)
     open(File, read, Stream),
     json_read_dict(Stream, Dict),
-    close(Stream).
-    %answer_ia(Dict, 2).
+    close(Stream),
+    answer_ia(Dict, _).
 
-extract_json(post, Request) :- %predicat pour extraire le json de la requête
+test_char_input(Char) :-
+    string_to_list(Char, List), answer_ia_2(List).
+
+string_to_list(String, List) :-
+    % Séparer la chaîne de caractères en sous-chaînes entre les virgules et les crochets
+    split_string(String, ",[]", ",[]", Substrings),
+    % Convertir chaque sous-chaîne en élément de la liste
+    maplist(convert_to_list_element, Substrings, List).
+    
+% Prédicat pour convertir une sous-chaîne en un élément de liste approprié
+convert_to_list_element(SubString, Element) :-
+    % Si la sous-chaîne est un nombre, la convertir en nombre
+    atom_number(SubString, Element), !.
+convert_to_list_element(SubString, Element) :-
+    % Si la sous-chaîne est un atome, la garder en tant qu'atome
+    atom_string(Element, SubString).
+
+answer_ia_2(Board) :-
+    write("Board: "), writeln(Board),
+    is_list(Board).
+
+
+answer_ia(options, Request) :- %predicat pour extraire le json de la requête
+    write("Request: "), writeln(Request),
+    option(method(options), Request), !,
+    cors_enable(Request, [ methods([post]) ]),
+    % format('Access-Control-Allow-Origin: *~n'), %on renvoie une réponse vide pour les requêtes options
+    format('Content-type: application/json~n'),
+    format('~n').
+answer_ia(post, Request) :- %predicat pour extraire le json de la requête
     cors_enable,
-    http_read_data(Request, Data, []),
-    %extract_board(Data, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
-    write("Data: "), writeln(Data),
+    http_read_json_dict(Request, Dict),
+    extract_board(Dict, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
+    write("BoardData: "), writeln(BoardData),
     get_move_IA(BoardData, Move), %On recupère le move de l'ia
     write("Move: "), writeln(Move),
     format_move(Move, NewMove), %on met les infos du move dans une liste
@@ -119,4 +148,3 @@ move_to_char(Move, String) :- %predicat pour transformer le move en String
     List = [NumChar, String1, String2],
     atomic_list_concat(List, ', ', String),
     write("String: "), writeln(String).
-
