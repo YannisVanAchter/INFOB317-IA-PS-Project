@@ -409,25 +409,19 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
     //             currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
     //         }
     //     })
-    // @ts-ignore
     let currentPlayer = G.players.find(p => p.playerID === parseInt(ctx.currentPlayer));
-
+    if (currentPlayer === undefined) throw new Error("Some real shit is happening (from bot)");
+    
     let currentPlayerArray = "0.";
-    // @ts-ignore
-    for (let i = 0; i < currentPlayer?.hand.length; i++) {
-        // @ts-ignore
+    for (let i = 0; i < currentPlayer.hand.length; i++) {
         currentPlayerArray += currentPlayer.hand[i].toString();
-        // @ts-ignore
         if (i < currentPlayer.hand.length - 1) {
             currentPlayerArray += ";";
         }
     }
     currentPlayerArray += ".";
-    // @ts-ignore
     for (let i = 0; i < currentPlayer.bikes.length; i++) {
-        // @ts-ignore
         currentPlayerArray += currentPlayer.bikes[i].position
-        // @ts-ignore
         if (i < currentPlayer.bikes.length - 1) currentPlayerArray += ";"
     }
     // currentPlayerArray += "*";
@@ -481,7 +475,6 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
                 };
                 console.log("NEWDATA");
                 console.log(newData);
-                if (currentPlayer == undefined) throw new Error("Some real shit is happening (from bot)");
                 resolve(
                     {
                         bikeIndex: getBikeIndexFromPlayerAndPos(currentPlayer, newData.origin),
