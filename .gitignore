@@ -8,4 +8,7 @@
 # Environment variables (client)
 .env
 
+# Python virtual environment (server, test requests)
+*.venv/
+
 /test-local

@@ -18,7 +18,7 @@
 :- http_handler(root(.),http_redirect(moved, location_by_id(home_page)),[]). %redirige vers la page d'accueil
 :- http_handler(root(home), home_page, []). %page d'accueil (uniquement pour tester)
 :- http_handler(root(bot/Question), answer(Question),[]). %root pour le bot
-:- http_handler(root(ia), extract_json, []). %root pour l'ia
+:- http_handler(root(ia), extract_json, [methods([post])]). %root pour l'ia
 
 home_page(_Request) :- %page d'accueil permetaant de voir la documentation de notre API
     reply_html_page(
@@ -49,15 +49,19 @@ openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour le
     answer_ia(Dict, 2).
 
 extract_json(Request) :- %predicat pour extraire le json de la requête
-    http_read_json_dict(Request, Dict), 
-    answer_ia(Dict, 1). %on appelle le prédicat pour l'ia
+    member(method(post), Request), %on vérifie que la méthode est post (pour éviter les erreurs 405 Method Not Allowed)
+    http_read_json_dict(Request, Dict),
+    Board = Dict,
+%    answer_ia(Dict, 1). %on appelle le prédicat pour l'ia
 
 %ia
-answer_ia(Board, _Request) :- %predicat pour l'ia
+%answer_ia(Board, _Request) :- %predicat pour l'ia
     extract_board(Board, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
     write("BoardData: "), writeln(BoardData),
     get_move_IA(BoardData, Move), %On recupère le move de l'ia
-    cors_enable,
+    cors_enable(Request,
+                [ methods([get,post,delete])
+                ]),
     write("Move: "), writeln(Move),
     format_move(Move, NewMove), %on met les infos du move dans une liste
     move_to_char(NewMove, Response), %on tranforme la liste en string
@@ -123,12 +127,4 @@ move_to_char(Move, String) :- %predicat pour transformer le move en String
     List = [NumChar, String1, String2],
     atomic_list_concat(List, ', ', String),
     write("String: "), writeln(String).
-
-%---------------------------------------
-%A supprimer après
-
-get_move_IA_test(Board, Move) :- %uniquement pour tester en attendant l'ia, à supprimer après
-    write("Board: "), writeln(Board), 
-    %MoveResponse = "ROARRRRRRRRRRRRRRRRR", %pour tester une valeur de retour pour move
-    Move = Board.
 

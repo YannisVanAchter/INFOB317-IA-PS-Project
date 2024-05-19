@@ -383,10 +383,10 @@ function setUp() {
 function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardIndex: number, target: boardKey } {
     // TODO: check with @Maragaux what AI will return
     let moves: number[] = [];
-    const url = `${process.env.REACT_APP_SERVER_URL}/ai/`;
-    axios.get(url, {
+    const url = `${process.env.REACT_APP_SERVER_URL}/ia/`;
+    axios.post(url, {
             headers: { 'Content-Type': 'application/json' },
-            params: {
+            body: {
                 players: G.players,
                 currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
             }
