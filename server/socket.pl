@@ -42,23 +42,24 @@ answer(Question, _Request):- %predicat pour le bot
 
 %---------------------------------------
 %ia (extraire données)
-openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour les tests)
-    open(File, read, Stream),
-    json_read_dict(Stream, Dict),
-    close(Stream).
+% openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour les tests)
+%     open(File, read, Stream),
+%     json_read_dict(Stream, Dict),
+%     close(Stream).
     %answer_ia(Dict, 2).
 
 extract_json(post, Request) :- %predicat pour extraire le json de la requête
     cors_enable,
+    % writeln("Blah"),
     http_read_data(Request, Data, []),
     %extract_board(Data, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
-    write("Data: "), writeln(Data),
-    get_move_IA(BoardData, Move), %On recupère le move de l'ia
-    write("Move: "), writeln(Move),
-    format_move(Move, NewMove), %on met les infos du move dans une liste
-    move_to_char(NewMove, Response), %on tranforme la liste en string
-    write("Response: "), writeln(Response),
-    reply_json(json([response=Response])). %on renvoie le json
+    % write("Data: "), writeln(Data),
+    % get_move_IA(BoardData, Move), %On recupère le move de l'ia
+    % write("Move: "), writeln(Move),
+    % format_move(Move, NewMove), %on met les infos du move dans une liste
+    % move_to_char(NewMove, Response), %on tranforme la liste en string
+    % write("Response: "), writeln(Response),
+    reply_json(json([response=Data])). %on renvoie le json
 
 %---------------------------------------
 %changer le format des données du JSON pour que l'IA puisse les utiliser (extract_board)

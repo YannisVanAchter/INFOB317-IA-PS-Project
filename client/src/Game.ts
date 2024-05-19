@@ -395,27 +395,25 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardInde
     // @ts-ignore
     let currentPlayer = G.players.find(p => p.playerID === parseInt(ctx.currentPlayer));
 
-    let currentPlayerArray = "[0,[";
+    let currentPlayerArray = "0.";
     // @ts-ignore
     for (let i = 0; i < currentPlayer?.hand.length; i++) {
         // @ts-ignore
         currentPlayerArray += currentPlayer.hand[i].toString();
         // @ts-ignore
         if (i < currentPlayer.hand.length - 1) {
-            currentPlayerArray += ",";
+            currentPlayerArray += ";";
         }
     }
-    currentPlayerArray += "],[";
+    currentPlayerArray += ".";
     // @ts-ignore
     for (let i = 0; i < currentPlayer.bikes.length; i++) {
-        currentPlayerArray += "\"";
         // @ts-ignore
         currentPlayerArray += currentPlayer.bikes[i].position
-        currentPlayerArray += "\""
         // @ts-ignore
-        if (i < currentPlayer.bikes.length - 1) currentPlayerArray += ","
+        if (i < currentPlayer.bikes.length - 1) currentPlayerArray += ";"
     }
-    currentPlayerArray += "]]";
+    currentPlayerArray += "";
     let otherPlayersArray = [];
     let currentIndexToSend = 1;
     for (const player of G.players) {
@@ -454,19 +452,22 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardInde
         url, 
         {
             method: 'POST',
-            mode: 'no-cors',
+            // mode: 'no-cors',
             // headers: { 'Content-Type': 'application/json' },
-            body: mainArray
+            body: JSON.stringify({
+                players: G.players,
+                currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
+            })
         }
-    )
-        .then(response => {
-            return response.json();
-        })
-        .then((data: any) => {
-            console.log("response data: ", data);
-            return data;
-        })
-        .catch(error => console.error(error));
+    ).then(response => console.log(response))
+        // .then(response => {
+        //     return response.json();
+        // })
+        // .then((data: any) => {
+        //     console.log("response data: ", data);
+        //     return data;
+        // })
+        // .catch(error => console.error(error));
     return { bikeIndex: 0, cardIndex: moves[0], target: "" };
 }
 
