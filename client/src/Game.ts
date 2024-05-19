@@ -383,16 +383,148 @@ function setUp() {
 function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardIndex: number, target: boardKey } {
     // TODO: check with @Maragaux what AI will return
     let moves: number[] = [];
-    const url = `${process.env.REACT_APP_SERVER_URL}/ia/`;
-    axios.post(url, {
-            headers: { 'Content-Type': 'application/json' },
-            body: {
-                players: G.players,
-                currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
+    const url = `http://localhost:8080/ia`;
+    // axios.post(url, {
+    //         headers: { 'Content-Type': 'application/json' },
+    //         mode: 'no-cors',
+    //         body: {
+    //             players: G.players,
+    //             currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
+    //         }
+    //     })
+    const myBody = `
+    {
+        "currentPlayer": {
+            "playerID": 2
+        },
+        "players": [
+            {
+                "playerID": 0,
+                "hand": [
+                    1,
+                    4,
+                    2,
+                    9,
+                    6
+                ],
+                "bikes": [
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    }
+                ]
+            },
+            {
+                "playerID": 1,
+                "hand": [
+                    12,
+                    9,
+                    7,
+                    11,
+                    9
+                ],
+                "bikes": [
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    }
+                ]
+            },
+            {
+                "playerID": 2,
+                "hand": [
+                    5,
+                    10,
+                    6,
+                    11,
+                    3
+                ],
+                "bikes": [
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3_A_left",
+                        "reduce": 0,
+                        "turn": 0
+                    }
+                ]
+            },
+            {
+                "playerID": 3,
+                "hand": [
+                    8,
+                    3,
+                    11,
+                    3,
+                    8
+                ],
+                "bikes": [
+                    {
+                        "position": "3-A-left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3-A-left",
+                        "reduce": 0,
+                        "turn": 0
+                    },
+                    {
+                        "position": "3-A-left",
+                        "reduce": 0,
+                        "turn": 0
+                    }
+                ]
             }
-        })
+        ]
+    }
+    `;
+    console.log(myBody);
+    fetch(
+        url, 
+        {
+            method: 'POST',
+            // mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            // body: JSON.stringify({
+            //     players: G.players,
+            //     currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
+            // })
+            body: myBody,
+        }
+    )
         .then(response => {
-            return response.data.json();
+            return response.json();
         })
         .then((data: any) => {
             console.log("response data: ", data);

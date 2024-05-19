@@ -16,9 +16,9 @@
 
 %différentes root 
 :- http_handler(root(.),http_redirect(moved, location_by_id(home_page)),[]). %redirige vers la page d'accueil
-:- http_handler(root(home), home_page, []). %page d'accueil (uniquement pour tester)
+:- http_handler(root(home), home_page, []). %page d'accueil (documentation de l'API)
 :- http_handler(root(bot/Question), answer(Question),[]). %root pour le bot
-:- http_handler(root(ia), extract_json, [methods([post])]). %root pour l'ia
+:- http_handler(root(ia), extract_json(Method), [method(Method), methods([post, options])]). %root pour l'ia
 
 home_page(_Request) :- %page d'accueil permetaant de voir la documentation de notre API
     reply_html_page(
@@ -48,20 +48,19 @@ openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour le
     close(Stream),
     answer_ia(Dict, 2).
 
-extract_json(Request) :- %predicat pour extraire le json de la requête
-    member(method(post), Request), %on vérifie que la méthode est post (pour éviter les erreurs 405 Method Not Allowed)
+extract_json(options, Request) :- %predicat pour extraire le json de la requête
+    write("Request: "), writeln(Request),
+    option(method(options), Request), !,
+    cors_enable(Request, [ methods([post]) ]),
+    % format('Access-Control-Allow-Origin: *~n'), %on renvoie une réponse vide pour les requêtes options
+    format('Content-type: application/json~n'),
+    format('~n').
+extract_json(post, Request) :- %predicat pour extraire le json de la requête
+    cors_enable,
     http_read_json_dict(Request, Dict),
-    Board = Dict,
-%    answer_ia(Dict, 1). %on appelle le prédicat pour l'ia
-
-%ia
-%answer_ia(Board, _Request) :- %predicat pour l'ia
-    extract_board(Board, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
+    extract_board(Dict, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
     write("BoardData: "), writeln(BoardData),
     get_move_IA(BoardData, Move), %On recupère le move de l'ia
-    cors_enable(Request,
-                [ methods([get,post,delete])
-                ]),
     write("Move: "), writeln(Move),
     format_move(Move, NewMove), %on met les infos du move dans une liste
     move_to_char(NewMove, Response), %on tranforme la liste en string
