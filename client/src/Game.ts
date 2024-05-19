@@ -450,27 +450,23 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardInde
     mainArray += "]";
 
     console.log(mainArray);
-    // fetch(
-    //     url, 
-    //     {
-    //         method: 'POST',
-    //         // mode: 'no-cors',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         // body: JSON.stringify({
-    //         //     players: G.players,
-    //         //     currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
-    //         // })
-    //         body: myBody,
-    //     }
-    // )
-    //     .then(response => {
-    //         return response.json();
-    //     })
-    //     .then((data: any) => {
-    //         console.log("response data: ", data);
-    //         return data;
-    //     })
-    //     .catch(error => console.error(error));
+    fetch(
+        url, 
+        {
+            method: 'POST',
+            mode: 'no-cors',
+            // headers: { 'Content-Type': 'application/json' },
+            body: mainArray
+        }
+    )
+        .then(response => {
+            return response.json();
+        })
+        .then((data: any) => {
+            console.log("response data: ", data);
+            return data;
+        })
+        .catch(error => console.error(error));
     return { bikeIndex: 0, cardIndex: moves[0], target: "" };
 }
 
