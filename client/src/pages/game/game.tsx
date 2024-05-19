@@ -5,9 +5,12 @@ import { Client } from 'boardgame.io/react';
 
 import { TourDeFrance, bot, mockUseCardOnBike, nbPlayers } from '../../Game';
 
+import { players as PlayerRep } from '../../data/player';
+
 import TourDeFranceBoard from '../../components/board/Board';
 import ChatBot from '../../components/bot/bot';
 import DisplayHands from '../../components/hands/hands';
+import { Modal } from '../../components/modal/modal';
 import SideBoard from '../../components/sideBoard/sideBoard';
 import { Winner } from '../../components/winner/winner';
 
@@ -41,6 +44,7 @@ function Page(props: TODO) {
     const currentPlayer = parseInt(props.ctx.currentPlayer) as playerID;
 
     const currentPlayerPlayer = props.G.players[currentPlayer];
+    const [ displayModal, setDisplayModal ] = React.useState(false);
 
     const { currentBikeIndex, currentCardIndex, setBikeIndex, handleChoiceCard, mockUseCard, applyCardOnBike } = useGame({ 
             player: currentPlayerPlayer, 
@@ -69,9 +73,6 @@ function Page(props: TODO) {
                 console.log("cardIndex: ", res.cardIndex);
                 console.log("target: ", res.target);
             }))
-            // setBikeIndex(bikeIndex);
-            // handleChoiceCard(cardIndex);
-            // applyCardOnBike(target);
     }});
 
     let boardProps = {
@@ -104,13 +105,49 @@ function Page(props: TODO) {
         props.events.pass();
     }
 
+    const MultipleChoiceModal = () => {
+        const card = players[currentPlayer].hand[currentCardIndex];
+        const availableMoves = mockUseCard();
+        if (availableMoves.length === 1) {
+            applyCardOnBike(availableMoves[0]);
+            setDisplayModal(false);
+        }
+
+        const handleChoice = (e: any, move: string) => {
+            e.preventDefault();
+            applyCardOnBike(move);
+            setDisplayModal(false);
+        }
+
+        return <>
+            <Modal className="modal">
+                <h2>Carte jouée: {card}</h2>
+                <p>L'équipe {PlayerRep[currentPlayer as playerID].teamName} a joué la carte: {card}</p>
+                <p>Cette carte mene à plusieurs endroit</p>
+                <p>Choisissez la destination</p>
+                <ul>
+                    {availableMoves.map((move, i) => {
+                        return <li
+                            key={i}
+                            onClick={(event) => handleChoice(event, move)}
+                        >
+                            {move}
+                        </li>
+                    })}
+                </ul>
+                <button onClick={() => setDisplayModal(false)}>Close</button>
+            </Modal>
+        </>
+    };
+
     return (
         <div className='board-game'>
             <GameContext.Provider value={{ currentBikeIndex, currentCardIndex, mockUseCard, setBikeIndex, handleChoiceCard, applyCardOnBike }}>
                 <SideBoard {...props} />
                 <TourDeFranceBoard {...boardProps} />
-                <DisplayHands {...props} />
+                <DisplayHands {...props} displayModal={displayModal} setDisplayModal={setDisplayModal} />
                 {props.ctx.gameover && <Winner G={props.G} ctx={props.ctx} />}
+                {displayModal && <MultipleChoiceModal />}
             </GameContext.Provider>
         </div>
     );

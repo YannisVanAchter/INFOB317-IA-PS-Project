@@ -27,7 +27,7 @@ home_page(_Request) :- %page d'accueil permetaant de voir la documentation de no
         p('To use the bot, go to /bot/Question where Question is the question you want to ask the bot.'),
         p('The bot will return the answer to the question throught a JSON file. The answer is in the field "answer".'),
         h2('IA'),
-        p('To use the IA, send a get request to /ia with the JSON data of the game board.')
+        p('To use the IA, send a get request to /ia with the data of the game board.')
     ]).
 %---------------------------------------
 %bot

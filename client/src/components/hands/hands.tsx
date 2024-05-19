@@ -8,31 +8,35 @@ import { useGameContext } from '../../context/gameContext';
 
 import { players as PlayerRep } from '../../data/player';
 
-import { Modal } from '../modal/modal';
-
 import './hands.css';
 
 type TODO = {
     G: DCtx,
     ctx: Ctx,
+    displayModal: boolean,
+    setDisplayModal: (value: boolean) => void
 };
 
 
 function DisplayHands(props: TODO) {
 
-    const { G, ctx } = props;
+    const { G, ctx, setDisplayModal } = props;
     const currentPlayer = parseInt(ctx.currentPlayer);
 
     const players = G.players;
-
-    const [displayModal, setDisplayModal] = useState(false);
     const { currentBikeIndex, currentCardIndex, setBikeIndex, handleChoiceCard, mockUseCard, applyCardOnBike } = useGameContext()
 
-    const handleClickCard = (e: any, playerID: number, cardIndex: number) => {
+    const handleClickCard = (e: any, playerID: number, cardValue: number) => {
         e.preventDefault();
         if (playerID !== currentPlayer) return;
+        const cardIndex = G.players[playerID].hand.findIndex(card => card === cardValue);
         handleChoiceCard(cardIndex);
         setDisplayModal(true);
+
+        const card = document.querySelector(`.player.current cards .card-${cardIndex}`) as HTMLElement;
+        if (card) {
+            card.style.transform = 'scale(1.2)';
+        }
     };
 
     const handleChoiceBike = (e: any) => {
@@ -72,44 +76,8 @@ function DisplayHands(props: TODO) {
         });
     });
 
-    const MultipleChoiceModal = () => {
-        const card = players[currentPlayer].hand[currentCardIndex];
-        const availableMoves = mockUseCard();
-        if (availableMoves.length === 1) {
-            applyCardOnBike(availableMoves[0]);
-            setDisplayModal(false);
-        }
-
-        const handleChoice = (e: any, move: string) => {
-            e.preventDefault();
-            applyCardOnBike(move);
-            setDisplayModal(false);
-        }
-
-        return <>
-            <Modal className="modal">
-                <h2>Carte jouée: {card}</h2>
-                <p>L'équipe {PlayerRep[currentPlayer as playerID].teamName} a joué la carte: {card}</p>
-                <p>Cette carte mene à plusieurs endroit</p>
-                <p>Choisissez la destination</p>
-                <ul>
-                    {availableMoves.map((move, i) => {
-                        return <li
-                            key={i}
-                            onClick={(event) => handleChoice(event, move)}
-                        >
-                            {move}
-                        </li>
-                    })}
-                </ul>
-                <button onClick={() => setDisplayModal(false)}>Close</button>
-            </Modal>
-        </>
-    };
-
     return (
         <>
-            {displayModal && <MultipleChoiceModal />}
             <div className='hands'>
                 {players.map((player, i) => {
                     // if (i.toString() !== currentPlayer) return;
@@ -154,7 +122,7 @@ function DisplayHands(props: TODO) {
                                             id={`id-${player.playerID}-${j}`}
                                             className={`card`}
                                             key={j}
-                                            onClick={(e) => handleClickCard(e, player.playerID, j)}
+                                            onClick={(e) => handleClickCard(e, player.playerID, card)}
                                         >
                                             <CardFront className={`value card-${j}`} number={card as CardValue} />
                                         </li>

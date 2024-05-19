@@ -401,14 +401,6 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
     // TODO: check with @Maragaux what AI will return
     let moves: number[] = [];
     const url = `http://localhost:8080/ia`;
-    // axios.post(url, {
-    //         headers: { 'Content-Type': 'application/json' },
-    //         mode: 'no-cors',
-    //         body: {
-    //             players: G.players,
-    //             currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
-    //         }
-    //     })
 
     let currentPlayer = G.players.find(p => p.playerID === parseInt(ctx.currentPlayer));
     if (currentPlayer === undefined) throw new Error("Some real shit is happening (from bot)");
