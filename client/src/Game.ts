@@ -421,7 +421,7 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
     currentPlayerArray.push(currentPlayerHand);
     let currentPlayerBikePos = []
     for (let i = 0; i < currentPlayer.bikes.length; i++) {
-        currentPlayerBikePos.push(currentPlayer.bikes[i]);
+        currentPlayerBikePos.push(currentPlayer.bikes[i].position);
     }
     currentPlayerArray.push(currentPlayerBikePos);
     // currentPlayerArray += "*";
