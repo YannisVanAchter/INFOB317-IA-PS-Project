@@ -200,7 +200,9 @@ score((_,New_pos,Old_pos),Bikes,Score):-
     length(List_val1,Length1),
     nth0(0,List_position2,Val2),
     split_string(Val2,"-","",List_val2),
-    length(List_val2,Length2),
+    length(List_val2,Lenght2),
+    get_value_bike(New_pos,Value1),
+    get_value_bike(Old_pos,Value2),
     get_group_score(Old_pos,New_pos,Bikes,Score_group),
     compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score).
 
