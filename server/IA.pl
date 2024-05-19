@@ -212,13 +212,9 @@ score((_,New_pos,Old_pos),Bikes,Score):-
     nth0(0,List_position2,Val2),
     split_string(Val2,"-","",List_val2),
     length(List_val2,Lenght2),
-    writeln(1),
     get_value_bike(New_pos,Value1),
-    writeln(2),
     get_value_bike(Old_pos,Value2),
-    writeln(3),
     get_group_score(New_pos,Bikes,Score_group),!,
-    writeln(Score_group),
     compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score).
 
 % get_group_score(New_bike,Bikes_player,Score)/3
@@ -294,17 +290,14 @@ compute_score(_,_,Length1,Length2,_,Score):-
 
 compute_score(_,Value2,_,_,Score_group,Score):-
     Value2=0,
-    writeln(1),
     Score is 100+Score_group,!.
 
 compute_score(Value1,_,Length1,Length2,Score_group,Score):-
     Length2<Length1,
-    writeln(2),
     Score is Value1+30+Score_group,!.
 
 compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score):-
     Length1=Lenght2,
-    writeln(3),
     Score is Value1-Value2+Score_group,!.
 
 % possible_moves(Bikes,Cards,Acc,Moves)/4
