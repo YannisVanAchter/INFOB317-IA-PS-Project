@@ -176,9 +176,7 @@ make_move([Cards,_],(Card,New_pos,_),[New_cards,[New_pos]]):-
 % test if a move is not made on a bike that has finished the game
     % Move : tuple
 valid_pos((_,_,Old_pos)):-
-    split_string(Old_pos,"_","",List_pos),
-    length(List_pos,Lenght),
-    Lenght=3,!.
+    not(end(Old_pos)).
 
 % valid_move(Move,All_bikes)/2
 % test if a move is valid
@@ -197,10 +195,12 @@ valid_move((_,New_pos,_),All_bikes):-
 score((_,New_pos,Old_pos),Bikes,Score):-
     split_string(New_pos,"_","",List_position1),
     split_string(Old_pos,"_","",List_position2),
-    length(List_position1,Length1),
-    length(List_position2,Lenght2),
-    get_value_bike(New_pos,Value1),
-    get_value_bike(Old_pos,Value2),
+    nth0(0,List_position1,Val1),
+    split_string(Val1,"-","",List_val1),
+    length(List_val1,Length1),
+    nth0(0,List_position2,Val2),
+    split_string(Val2,"-","",List_val2),
+    length(List_val2,Length2),
     get_group_score(Old_pos,New_pos,Bikes,Score_group),
     compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score).
 
@@ -236,17 +236,22 @@ get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
     % Bike : string
     % Value : int
 get_value_bike(Bike,Value):-
-    split_string(Bike,"-","",List_bike),
-    length(List_bike,Length),
-    Length=4,
-    nth0(1,List_bike,Value_string),
+    split_string(Bike,"_","",List_bike),
+    nth0(0,List_bike,Val),
+    split_string(Val,"-","",List_val),
+    length(List_val,Length),
+    Length=2,
+    nth0(1,List_val,Value_string),
     number_string(Value,Value_string).
 
 get_value_bike(Bike,Value):-
     split_string(Bike,"_","",List_bike),
-    length(List_bike,Length),
-    Length=3,
-    nth0(0,List_bike,Value_string),
+    nth0(0,List_bike,Val),
+    split_string(Val,"-","",List_val),
+    length(List_val,Length),
+    length(List_val,Length),
+    Length=1,
+    nth0(0,List_val,Value_string),
     number_string(Value,Value_string).
 
 % compute_score(Value1,Value2,Length1,Length2,Score_group,Score)/6
@@ -602,7 +607,7 @@ next('-5_A_left',['-6_A_left']).
 next('-6_A_left',['-7_A_left']).
 next('-7_A_left',['-8_A_left']).
 next('-8_A_left',['-9_A_left']).
-next('-9_A_left',['9_A_left']).
+next('-9_A_left',['-9_A_left']).
 
 % end cases of the board
 end('0_A_left').
