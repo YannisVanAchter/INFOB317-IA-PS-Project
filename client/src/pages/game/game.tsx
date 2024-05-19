@@ -61,13 +61,17 @@ function Page(props: TODO) {
     useEffect(() => {
         if (AIPlayers.includes(currentPlayer.toString())) {
             console.log("AIPlayers.includes(currentPlayer)");
-            const { bikeIndex, cardIndex, target } = bot(props.G, props.ctx, currentPlayer.toString());
-            console.log("bikeIndex: ", bikeIndex);
-            console.log("cardIndex: ", cardIndex);
-            console.log("target: ", target);
-            setBikeIndex(bikeIndex);
-            handleChoiceCard(cardIndex);
-            applyCardOnBike(target);
+            bot(props.G, props.ctx, currentPlayer.toString()).then((res => {
+                setBikeIndex(res.bikeIndex);
+                handleChoiceCard(res.cardIndex);
+                applyCardOnBike(res.target);
+                console.log("bikeIndex: ", res.bikeIndex);
+                console.log("cardIndex: ", res.cardIndex);
+                console.log("target: ", res.target);
+            }))
+            // setBikeIndex(bikeIndex);
+            // handleChoiceCard(cardIndex);
+            // applyCardOnBike(target);
     }});
 
     let boardProps = {

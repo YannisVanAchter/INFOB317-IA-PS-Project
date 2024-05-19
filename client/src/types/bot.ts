@@ -7,4 +7,10 @@ interface Message {
     response?: Message;
 }
 
-export type { Message };
+interface AIMove {
+    card: number;
+    destination: string;
+    origin: string;
+}
+
+export type { Message, AIMove };

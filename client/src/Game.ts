@@ -7,6 +7,7 @@ import { Board } from './data/board';
 import { SprintsData } from './data/sprints';
 
 import { BoardCase, Bike, Player, DCtx, Ctx, Context, playerID } from './types/game';
+import { AIMove } from './types/bot';
 import axios from 'axios';
 
 // Constants
@@ -382,7 +383,21 @@ function setUp() {
     return ctx;
 }
 
-function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardIndex: number, target: boardKey } {
+function getBikeIndexFromPlayerAndPos(player: Player, pos: string): number {
+    for (let i = 0; i < player.bikes.length; i++) {
+        if (player.bikes[i].position === pos) return i;
+    }
+    return -1;
+}
+
+function getCardIndexFromPlayerAndValue(player: Player, value: number): number {
+    for (let i = 0; i < player.hand.length; i++) {
+        if (player.hand[i] === value) return i;
+    }
+    return -1;
+}
+
+function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, cardIndex: number, target: boardKey }> {
     // TODO: check with @Maragaux what AI will return
     let moves: number[] = [];
     const url = `http://localhost:8080/ia`;
@@ -446,24 +461,37 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardInde
     }
 
     console.log(mainArray);
-    fetch(
-        url, 
-        {
-            method: 'POST',
-            // mode: 'no-cors',
-            // headers: { 'Content-Type': 'application/json' },
-            body: mainArray
-        }
-    ).then(response => console.log(response))
-        // .then(response => {
-        //     return response.json();
-        // })
-        // .then((data: any) => {
-        //     console.log("response data: ", data);
-        //     return data;
-        // })
-        // .catch(error => console.error(error));
-    return { bikeIndex: 0, cardIndex: moves[0], target: "" };
+    return new Promise<{ bikeIndex: number, cardIndex: number, target: boardKey }>((resolve, reject) => {
+        fetch(
+            url, 
+            {
+                method: 'POST',
+                // mode: 'no-cors',
+                // headers: { 'Content-Type': 'application/json' },
+                body: mainArray
+            }
+        )
+        .then(response => response.json())
+        .then((data: {response: string}) => {
+                let rawData: string[] = data.response.split(", ");
+                let newData: AIMove = {
+                    origin: rawData[2],
+                    destination: rawData[1],
+                    card: parseInt(rawData[0])
+                };
+                console.log("NEWDATA");
+                console.log(newData);
+                if (currentPlayer == undefined) throw new Error("Some real shit is happening (from bot)");
+                resolve(
+                    {
+                        bikeIndex: getBikeIndexFromPlayerAndPos(currentPlayer, newData.origin),
+                        target: newData.destination,
+                        cardIndex: getCardIndexFromPlayerAndValue(currentPlayer, newData.card)
+                    }
+                );
+            })
+            .catch(error => reject(error));
+    })
 }
 
 const TourDeFrance = {
