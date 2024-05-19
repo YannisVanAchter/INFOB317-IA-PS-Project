@@ -14,6 +14,11 @@ get_move_IA(Infos,Move):-
     get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
     minimax(Bikes1,All_bikes,[New_cards,Bikes1],Depth,Move,_),!.
 
+% check_num_cards_ia(Cards,Number_cards,New_cards)/3
+% checks if the hand of the player has more than one card and if not, decuplates the actual card and creates a new hand
+    % Cards : list
+    % Number_cards : int
+    % New_cards : list
 check_num_cards_ia(Cards1,1,New_cards):-
     nth0(0,Cards1,Value),
     New_cards=[Value,Value],!.
@@ -207,37 +212,40 @@ score((_,New_pos,Old_pos),Bikes,Score):-
     nth0(0,List_position2,Val2),
     split_string(Val2,"-","",List_val2),
     length(List_val2,Lenght2),
+    writeln(1),
     get_value_bike(New_pos,Value1),
+    writeln(2),
     get_value_bike(Old_pos,Value2),
-    get_group_score(Old_pos,New_pos,Bikes,Score_group),
+    writeln(3),
+    get_group_score(New_pos,Bikes,Score_group),!,
+    writeln(Score_group),
     compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score).
 
-% get_group_score(Old_bike,New_bike,Bikes_player,Score)/4
+% get_group_score(New_bike,Bikes_player,Score)/3
 % gets the score depending of the distance between the bikes of the player
-    % Old_bike : string
     % New_bike : string
     % Bikes_player : string
     % Score : int
-get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
-    Old_bike=Bike1,
-    get_value_bike(New_bike,Value1),
-    get_value_bike(Bike2,Value2),
-    get_value_bike(Bike3,Value3),
-    Score is 4+(Value3-Value2-Value1).
+get_group_score(New_bike,[Bike1,Bike2,Bike3],Score):-
+    get_sub_value_group(New_bike,Bike1,Bike2,V1),
+    get_sub_value_group(New_bike,Bike1,Bike3,V2),
+    get_sub_value_group(New_bike,Bike3,Bike2,V3),
+    get_min(V1,V2,Min1),
+    get_min(Min1,V3,Min2),
+    Score is 5+Min2.
 
-get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
-    Old_bike=Bike2,
-    get_value_bike(New_bike,Value1),
-    get_value_bike(Bike1,Value2),
-    get_value_bike(Bike3,Value3),
-    Score is 4+(Value3-Value2-Value1).
-
-get_group_score(Old_bike,New_bike,[Bike1,Bike2,Bike3],Score):-
-    Old_bike=Bike3,
+% get_sub_value_group(New_bike,Bike1,Bike2,Value)/4
+% gets the score of a sub group
+    % New_bike : string
+    % Bike1 : string
+    % Bike2 : string
+    % Value : int
+get_sub_value_group(New_bike,Bike1,Bike2,Value):-
     get_value_bike(New_bike,Value1),
     get_value_bike(Bike2,Value2),
     get_value_bike(Bike1,Value3),
-    Score is 4+(Value3-Value2-Value1).
+    Value is Value2+Value3-Value1.
+    
 
 % get_value_bike(Bike,Value)/2
 % get the value of the position of a bike
@@ -262,6 +270,16 @@ get_value_bike(Bike,Value):-
     nth0(0,List_val,Value_string),
     number_string(Value,Value_string).
 
+% get_min(Value1,Value2,Result)/3
+% gets the minimum between two integers
+    % Value1 : int
+    % Value2 : int
+    % Result : int
+get_min(Val1,Val2,Val1):-
+    Val1=<Val2.
+
+get_min(_,Val2,Val2).
+
 % compute_score(Value1,Value2,Length1,Length2,Score_group,Score)/6
 % compute the score for a leaf of the three
     % Value1 : int
@@ -270,17 +288,24 @@ get_value_bike(Bike,Value):-
     % Lenght2 : int
     % Score_group : int
     % Score : int
-compute_score(_,_,Length1,Lenght2,_,Score):-
-    Score is 0,
-    Length1>Lenght2,!.
+compute_score(_,_,Length1,Length2,_,Score):-
+    Length2>Length1,
+    Score is 0,!.
 
-compute_score(_,Value2,Length1,Lenght2,Score_group,Score):-
-    Length1<Lenght2,
-    Score is Value2+30+Score_group,!.
+compute_score(_,Value2,_,_,Score_group,Score):-
+    Value2=0,
+    writeln(1),
+    Score is 100+Score_group,!.
+
+compute_score(Value1,_,Length1,Length2,Score_group,Score):-
+    Length2<Length1,
+    writeln(2),
+    Score is Value1+30+Score_group,!.
 
 compute_score(Value1,Value2,Length1,Lenght2,Score_group,Score):-
     Length1=Lenght2,
-    Score is Value2-Value1+Score_group,!.
+    writeln(3),
+    Score is Value1-Value2+Score_group,!.
 
 % possible_moves(Bikes,Cards,Acc,Moves)/4
 % gets all the possible moves with the actual hand and position of the bikes
