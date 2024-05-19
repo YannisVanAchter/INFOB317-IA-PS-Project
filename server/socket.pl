@@ -52,16 +52,15 @@ extract_json(Request) :- %predicat pour extraire le json de la requête
 answer_ia(Board, _Request) :- %predicat pour l'ia
     extract_board(Board, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
     write("BoardData: "), writeln(BoardData),
-    get_move_IA(BoardData, Move), %A changer pour le predicat qui renvoie la réponse de l'ia
+    get_move_IA(BoardData, Move), %On recupère le move de l'ia
     cors_enable,
     write("Move: "), writeln(Move),
-    %reply_json(json([response=Move])). %on renvoie la réponse de l'ia
-    format_move(Move, NewMove),
-    move_to_char(NewMove, Response), %on crée le json à partir de la réponse de l'ia
-    write("Response: "), writeln(Response), %pour tester
+    format_move(Move, NewMove), %on met les infos du move dans une liste
+    move_to_char(NewMove, Response), %on tranforme la liste en string
+    write("Response: "), writeln(Response),
     reply_json(json([response=Response])). %on renvoie le json
 
-format_move(Move, NewMove) :- %predicat pour tester
+format_move(Move, NewMove) :- %renvoie un move du style (Number, (String1, String2))
     Move =.. [_|NewMove],
     write("NewMove: "), writeln(NewMove).
 
@@ -78,14 +77,14 @@ get_move_IA2(Board, Move) :- %uniquement pour tester en attendant l'ia, à suppr
     Move = Board.
 
 extract_board(Board, FinalBoard) :- %Board est un dict contenant le contenu du JSON et on veut que BoardData soit une liste de liste contenant uniquement les infos nécéssaires pour l'IA
-    Players = Board.players, %On récupère les infos des joueurs
-    CurrentPlayerID = Board.currentPlayer.playerID, %On récupère l'ID du joueur actuel
-    reorder_players(Players, CurrentPlayerID, ReorderedPlayers), %On réorganise les joueurs pour que le joueur actuel soit le premier
+    Players = Board.players, 
+    CurrentPlayerID = Board.currentPlayer.playerID, 
+    reorder_players(Players, CurrentPlayerID, ReorderedPlayers), %On réorganise les joueurs pour que le joueur actuel soit le premier de la liste
     maplist(extract_player, ReorderedPlayers, NewBoard), %on applique le prédicat extract_player à chaque joueur pour récupérer les infos nécéssaires pour l'IA
-    change_ID(NewBoard, 0, [], BoardData),
-    reverse(BoardData, FinalBoard).
+    change_ID(NewBoard, 0, [], BoardData), %on change les ID des joueurs pour que l'ID du joueur actuel soit 0
+    reverse(BoardData, FinalBoard). 
 
-change_ID([], _, BoardData, BoardData).
+change_ID([], _, BoardData, BoardData). %prédicat pour changer les ID des joueurs
 change_ID([[_, Hand, Position]|OtherPlayer], I, Acc, BoardData) :- 
     NewID = I,
     I1 is I + 1,
@@ -99,12 +98,12 @@ current_player(CurrentPlayerID, Player) :- %prédicat pour vérifier si un joueu
     Player.playerID >= CurrentPlayerID.
 
 extract_player(Player, PlayerData) :- %Player est un dict contenant les infos d'un joueur 
-    PlayerID = Player.playerID, %On récupère l'ID du joueur
-    Hand = Player.hand, %On récupère la main du joueur
-    Bikes = Player.bikes, %On récupère les infos des vélos du joueur
+    PlayerID = Player.playerID, 
+    Hand = Player.hand, 
+    Bikes = Player.bikes, 
     maplist(bike_position, Bikes, BikePositions), %On applique le prédicat bike_position à chaque vélo pour récupérer leur position
-    maplist(string_to_atom, BikePositions, BikePositionsChar), %pour le fichier
-    PlayerData = [PlayerID, Hand, BikePositionsChar]. %On crée une liste contenant l'ID du joueur, sa main et les positions de ses vélos
+    %maplist(string_to_atom, BikePositions, BikePositionsChar), %pour le fichier .json
+    PlayerData = [PlayerID, Hand, BikePositions]. %On crée une liste contenant l'ID du joueur, sa main et les positions de ses vélos
 
     bike_position(Bike, Position) :- %Bike est un dict contenant les infos d'un vélo
-    Position = Bike.position. %On récupère la position du vélo
+    Position = Bike.position. 
