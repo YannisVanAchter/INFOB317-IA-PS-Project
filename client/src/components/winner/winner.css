@@ -1,0 +1,35 @@
+
+.final-winner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.final-winner table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.final-winner table th {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    padding: .1rem;
+}
+
+.final-winner table td {
+    padding: .1rem;
+}
+
+.final-winner table tr:nth-child(even) {
+    background-color: var(--ternary-color);
+    color: var(--secondary-color);
+}
+
+.final-winner table tr:nth-child(odd) {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}

@@ -13,8 +13,10 @@ function TourDeFranceBoard(props: BoardProps) {
             <ReactSVG 
                 src="/map.svg"
                 afterInjection={(svg) => {
+                    console.log('afterInjection', svg);
                     addBikes(svg);
                     addPlayerMoves(svg);
+                    console.log('afterInjection added bike and moves', svg);
                 }}
             />
             </div>
