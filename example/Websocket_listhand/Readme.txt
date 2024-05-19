@@ -1,1 +1,0 @@
-Prend en paramètre une liste d'entier que l'utilisateur donne et renvoie aléatoirement un des entiers de la liste

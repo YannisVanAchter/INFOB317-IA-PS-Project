@@ -21,27 +21,14 @@ The first command installs dependencies (React, TypeScript, and Boardgames.io).
 
 The second command starts the app on [localhost](http://localhost:3000/).
 
-### Bot
+### Bot and AI 
 
-.... TODO ....
+To run the bot and the AI you will need to start a prolog server in [`server`](./server/socket.pl) 
 
-### AI 
+To do it, run the following command in a terminal:
 
-.... TODO ....
-
-## Run App in Production
-
-Ensure [Docker](https://www.docker.com/) is correctly installed on your computer. 
-
-Use the command:
 ```bash
-$ docker-compose up -d
+server $ swipl socket.pl
 ```
 
- ## Exemple websocket
-
-- Open a terminal and navigate to the directory ./example/example_websocket_bot/
-- Run the command =swipl echo-ws-server.pl=
-- Execute =:- start_server=
-- Open your browser and enter http://localhost:3000 in the address bar
-- the /echo route is for WebSocket communication
+A short version on the API documentation is provide on the [home page](http://localhost:8080/home).
