@@ -18,7 +18,7 @@
 :- http_handler(root(.),http_redirect(moved, location_by_id(home_page)),[]). %redirige vers la page d'accueil
 :- http_handler(root(home), home_page, []). %page d'accueil (documentation de l'API)
 :- http_handler(root(bot/Question), answer(Question),[]). %root pour le bot
-:- http_handler(root(ia), extract_json(Method), [method(Method), methods([post, options])]). %root pour l'ia
+:- http_handler(root(ia), answer_ia(Method), [method(Method), methods([post, options])]). %root pour l'ia
 
 home_page(_Request) :- %page d'accueil permetaant de voir la documentation de notre API
     reply_html_page(
@@ -48,18 +48,63 @@ answer(Question, _Request):- %predicat pour le bot
 %     close(Stream).
     %answer_ia(Dict, 2).
 
-extract_json(post, Request) :- %predicat pour extraire le json de la requête
+test_ia(Data, Response) :-
+    spliter(Data, Board),
+    write("Board: "), writeln(Board),
+    get_move_IA(Board, Move), %On recupère le move de l'ia
+    write("Move: "), writeln(Move),
+    format_move(Move, NewMove), %on met les infos du move dans une liste
+    move_to_char(NewMove, Response), %on tranforme la liste en string
+    write("Response: "), writeln(Response),
+    reply_json(json([response=Response])). %on renvoie le json
+
+
+answer_ia(post, Request) :- %predicat pour extraire le json de la requête
     cors_enable,
     % writeln("Blah"),
     http_read_data(Request, Data, []),
+    spliter(Data, Board),
     %extract_board(Data, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
-    % write("Data: "), writeln(Data),
-    % get_move_IA(BoardData, Move), %On recupère le move de l'ia
-    % write("Move: "), writeln(Move),
-    % format_move(Move, NewMove), %on met les infos du move dans une liste
-    % move_to_char(NewMove, Response), %on tranforme la liste en string
-    % write("Response: "), writeln(Response),
-    reply_json(json([response=Data])). %on renvoie le json
+    write("Board: "), writeln(Board),
+    get_move_IA(Board, Move), %On recupère le move de l'ia
+    write("Move: "), writeln(Move),
+    format_move(Move, NewMove), %on met les infos du move dans une liste
+    move_to_char(NewMove, Response), %on tranforme la liste en string
+    write("Response: "), writeln(Response),
+    reply_json(json([response=Response])). %on renvoie le json
+
+%---------------------------------------
+spliter(Text, List) :-
+    split_string(Text, "*", "", PlayerText),
+    maplist(sub_split, PlayerText, List),
+    write("List: "), writeln(List).
+
+sub_split(PlayerText, SubList) :-
+    split_string(PlayerText, ".", "", ParamText),
+    split_again(ParamText, SubList),
+    write("SubList: "), writeln(SubList).
+
+split_again([ID|OtherParam], [IDInt|NewParam]) :-
+    number_string(IDInt, ID),
+    subsub_split(OtherParam, NewParam).
+
+subsub_split([FirstElement|SecondElement], [FirstList|SecondList]) :-
+    split_int(FirstElement, FirstList),
+    split_atom(SecondElement, SecondList),
+    write("FirstList: "), writeln(FirstList),
+    write("SecondList: "), writeln(SecondList).
+
+split_int(Input, Output) :-
+    split_string(Input, ";", "", ElementString),
+    maplist(number_string, Output, ElementString),
+    write("Output: "), writeln(Output).
+
+split_atom([Input], [Output]) :-
+    split_string(Input, ";", "", ElementString),
+    maplist(string_to_atom, ElementString, Output),
+    write("Output: "), writeln(Output).
+
+
 
 %---------------------------------------
 %changer le format des données du JSON pour que l'IA puisse les utiliser (extract_board)

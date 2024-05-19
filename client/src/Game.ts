@@ -151,6 +151,7 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
     for (const player of G.players) {
         for (const bike of player.bikes) {
             if (bike.reduce === 0) {
+                console.log({playerID: player.playerID, bike: bike, seconds: Board[bike.position].position - bike.bonusSeconds + bike.malusSeconds});
                 currentSecondsAllBikes.push({playerID: player.playerID, bike: bike, seconds: Board[bike.position].position - bike.bonusSeconds + bike.malusSeconds});
             }
         }
@@ -182,8 +183,9 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
     const retrunArray = [];
     for (let i = 0; i < playersScore.length; i++) 
         retrunArray.push({playerID: i, score: playersScore[i]});
-    retrunArray.sort((a, b) => a.score - b.score);
+    retrunArray.sort((a, b) => a.score - b.score).reverse();
 
+    console.log(retrunArray);
     return retrunArray;
 }
 
