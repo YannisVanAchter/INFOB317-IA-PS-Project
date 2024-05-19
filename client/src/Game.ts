@@ -413,39 +413,35 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardInde
         // @ts-ignore
         if (i < currentPlayer.bikes.length - 1) currentPlayerArray += ";"
     }
-    currentPlayerArray += "";
+    // currentPlayerArray += "*";
     let otherPlayersArray = [];
     let currentIndexToSend = 1;
     for (const player of G.players) {
         if (player == currentPlayer) continue;
-        let thisPlayerString = "[" + currentIndexToSend.toString() + ",[";
+        let thisPlayerString = currentIndexToSend.toString() + ".";
         for (let i = 0; i < player.hand.length; i++) {
             thisPlayerString += player.hand[i].toString();
 
             if (i < player.hand.length - 1) {
-                thisPlayerString += ",";
+                thisPlayerString += ";";
             }
         }
-        thisPlayerString += "],[";
+        thisPlayerString += ".";
 
         for (let i = 0; i < player.bikes.length; i++) {
-            thisPlayerString += "\"";
             thisPlayerString += player.bikes[i].position;
-            thisPlayerString += "\"";
 
-            if (i < player.bikes.length - 1) thisPlayerString += ",";
+            if (i < player.bikes.length - 1) thisPlayerString += ";";
         }
-        thisPlayerString += "]";
         otherPlayersArray.push(thisPlayerString);
         currentIndexToSend++;
     }
     console.log(otherPlayersArray);
-    let mainArray = "[" + currentPlayerArray + ",";
+    let mainArray = currentPlayerArray + "*";
     for (let i = 0; i < otherPlayersArray.length; i++) {
         mainArray += otherPlayersArray[i];
-        if (i < otherPlayersArray.length - 1) mainArray += ",";
+        if (i < otherPlayersArray.length - 1) mainArray += "*";
     }
-    mainArray += "]";
 
     console.log(mainArray);
     fetch(
@@ -454,10 +450,7 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): { bikeIndex: number, cardInde
             method: 'POST',
             // mode: 'no-cors',
             // headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                players: G.players,
-                currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
-            })
+            body: mainArray
         }
     ).then(response => console.log(response))
         // .then(response => {
