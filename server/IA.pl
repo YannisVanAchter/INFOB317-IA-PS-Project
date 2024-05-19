@@ -13,7 +13,7 @@ get_move_IA(Infos,Move):-
     check_num_cards_ia(Cards1,Depth,New_cards),
     get_all_bikes(Bikes1,Bikes2,Bikes3,Bikes4,All_bikes),
     minimax(Bikes1,All_bikes,[New_cards,Bikes1],Depth,Move,_),
-    test_move(Move),!.
+    test_move(Move).
 
 % test_move(Move)/1
 % checks if the three found a move
@@ -608,6 +608,7 @@ next('78_A_left',['79_A_left']).
 next('79_A_left',['80_A_left']).
 next('80_A_left',['81_A_left']).
 next('81_A_left',['82_A_left']).
+next('82_A_left',['83_A_left']).
 next('83_A_left',['84_A_left','84_A_right']).
 next('84_A_left',['85_A_left']).
 next('85_A_left',['86_A_left']).

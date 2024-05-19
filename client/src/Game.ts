@@ -324,8 +324,14 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
         // Check si il a la possibilité de jouer autre chose qui ne provoque pas de chute
         // Sinon provoqué une chute
     }
+    console.log("--- USE CARD ON BIKE ---")
 
+    console.log("bike position: " + bike.position);
+    console.log("card value: " + card);
+
+    console.log(numberedPosition)
     let possibleTiles = getPossibleTilesFromPosition(numberedPosition);
+    console.log(possibleTiles);
     for (const tile of possibleTiles) {
         if (checkAspiration(tile)) {
             for (let i = 0; i < Board[tile].next.length; i++) {
@@ -384,17 +390,29 @@ function setUp() {
 }
 
 function getBikeIndexFromPlayerAndPos(player: Player, pos: string): number {
+    let toReturn = -1;
     for (let i = 0; i < player.bikes.length; i++) {
-        if (player.bikes[i].position === pos) return i;
+        console.log("FROM GET BIKE INDEX");
+        console.log(player.bikes[i].position);
+        console.log(pos);
+        
+        if (player.bikes[i].position === pos) toReturn = i;
+        console.log(toReturn);
     }
-    return -1;
+    console.log(toReturn);
+    return toReturn;
 }
 
 function getCardIndexFromPlayerAndValue(player: Player, value: number): number {
+    let toReturn = -1;
     for (let i = 0; i < player.hand.length; i++) {
-        if (player.hand[i] === value) return i;
+        if (player.hand[i] === value) toReturn = i;
     }
-    return -1;
+    console.log("GET CARD INDEX");
+    console.log(value);
+    console.log(player.hand);
+    console.log(toReturn);
+    return toReturn;
 }
 
 function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, cardIndex: number, target: boardKey }> {
