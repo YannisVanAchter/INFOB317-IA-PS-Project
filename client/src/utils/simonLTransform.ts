@@ -30,8 +30,6 @@ function fromMapToSVG(key: boardKey, alreadyUsed: boardKey[] = []) {
             svgSide = 3;
             break;
     }
-
-    svgSide += Board[key].nbBikes - 1
     
     svgSide = svgSide as svgSide;
 
