@@ -3,12 +3,9 @@
 :- use_module(library(http/http_json)).
 :- use_module(library(http/json_convert)).
 :- use_module(library(http/json)).
-
 :- use_module(library(http/http_cors)). %module pour éviter l'erreur "Reason: CORS header ‘Access-Control-Allow-Origin’ missing" 
-
 :- use_module(bot_TDF). %module pour le bot
 :- use_module(ia). %module pour l'ia
-
 %-------------------------------------- 
 %set up du serveur
 :- initialization set_setting(http:cors, [*]).
@@ -32,7 +29,6 @@ home_page(_Request) :- %page d'accueil permetaant de voir la documentation de no
         h2('IA'),
         p('To use the IA, send a get request to /ia with the JSON data of the game board.')
     ]).
-
 %---------------------------------------
 %bot
 answer(Question, _Request):- %predicat pour le bot
@@ -41,15 +37,9 @@ answer(Question, _Request):- %predicat pour le bot
     reply_json(json([answer=Resp])). %on renvoie la réponse du bot
 
 %---------------------------------------
-%ia (extraire données)
-% openfile_json(File) :- %predicat pour ouvrir un fichier json (uniquement pour les tests)
-%     open(File, read, Stream),
-%     json_read_dict(Stream, Dict),
-%     close(Stream).
-    %answer_ia(Dict, 2).
-
+%pour tester l'IA directement par prolog
 test_ia(Data, Response) :-
-    spliter(Data, Board),
+    spliter(Data, Board), %on extrait les données du string
     write("Board: "), writeln(Board),
     get_move_IA(Board, Move), %On recupère le move de l'ia
     write("Move: "), writeln(Move),
@@ -57,95 +47,57 @@ test_ia(Data, Response) :-
     move_to_char(NewMove, Response), %on tranforme la liste en string
     write("Response: "), writeln(Response),
     reply_json(json([response=Response])). %on renvoie le json
-
-
+    
+%IA
 answer_ia(post, Request) :- %predicat pour extraire le json de la requête
     cors_enable,
-    % writeln("Blah"),
-    http_read_data(Request, Data, []),
-    spliter(Data, Board),
-    %extract_board(Data, BoardData), %on tranforme le format des données pour que l'ia puisse les utiliser
-    write("Board: "), writeln(Board),
+    http_read_data(Request, Data, []), %on lit les données de la requête
+    spliter(Data, Board), %on extrait les données dans une liste de liste pour que l'ia puisse les utiliser
     get_move_IA(Board, Move), %On recupère le move de l'ia
-    write("Move: "), writeln(Move),
     format_move(Move, NewMove), %on met les infos du move dans une liste
     move_to_char(NewMove, Response), %on tranforme la liste en string
-    write("Response: "), writeln(Response),
     reply_json(json([response=Response])). %on renvoie le json
 
 %---------------------------------------
-spliter(Text, List) :-
-    split_string(Text, "*", "", PlayerText),
-    maplist(sub_split, PlayerText, List),
+%Pour extraire les données qui sont en texte brut (string) et renvoyer en liste de liste pour que l'IA puisse les utiliser
+
+%1. Récupérer les données en string (http_read_data) 
+%2. Split les données à chaque "*" pour avoir les données de chaque joueur
+%3. Split les données de chaque joueur à chaque "." pour avoir les différentes info
+%4. Split les données de chaque info à chaque ";" pour avoir les différentes valeurs
+%5. Transformer les valeurs en int ou atom
+%6. Renvoyer les données en liste de liste
+
+spliter(Text, List) :- %predicat pour transformer les données en liste de liste
+    split_string(Text, "*", "", PlayerText), %on split les données à chaque "*" pour avoir les données de chaque joueur
+    maplist(sub_split, PlayerText, List), %on s'occupe pour chaque joueur de faire des sous-splits
     write("List: "), writeln(List).
 
-sub_split(PlayerText, SubList) :-
-    split_string(PlayerText, ".", "", ParamText),
-    split_again(ParamText, SubList),
+sub_split(PlayerText, SubList) :- %predicat pour faire un sous-split
+    split_string(PlayerText, ".", "", ParamText), %on split les données de chaque joueur à chaque "." pour avoir les différentes info
+    split_again(ParamText, SubList), %on s'occupe pour chaque paramètre de faire un sous-sous-split
     write("SubList: "), writeln(SubList).
 
-split_again([ID|OtherParam], [IDInt|NewParam]) :-
-    number_string(IDInt, ID),
-    subsub_split(OtherParam, NewParam).
+split_again([ID|OtherParam], [IDInt|NewParam]) :- 
+    number_string(IDInt, ID), %on transforme l'ID en int car on a pas besoin de le split encore
+    subsub_split(OtherParam, NewParam), %on s'occupe pour chaque paramètre de faire un sous-sous-split
+    write("NewParam: "), writeln(NewParam).
 
-subsub_split([FirstElement|SecondElement], [FirstList|SecondList]) :-
-    split_int(FirstElement, FirstList),
-    split_atom(SecondElement, SecondList),
+subsub_split([FirstElement|SecondElement], [FirstList|SecondList]) :- %predicat pour faire un sous-sous-split
+    split_int(FirstElement, FirstList), %on split les éléments de la main du joueur à chaque ";" 
+    split_atom(SecondElement, SecondList), %on split les éléments de la position des vélos à chaque ";"
     write("FirstList: "), writeln(FirstList),
     write("SecondList: "), writeln(SecondList).
 
-split_int(Input, Output) :-
+split_int(Input, Output) :- %predicat pour sous-sous-split et transformer les valeurs en int
     split_string(Input, ";", "", ElementString),
     maplist(number_string, Output, ElementString),
     write("Output: "), writeln(Output).
 
-split_atom([Input], [Output]) :-
+split_atom([Input], [Output]) :- %predicat pour sous-sous-split et transformer les valeurs en atom
     split_string(Input, ";", "", ElementString),
     maplist(string_to_atom, ElementString, Output),
     write("Output: "), writeln(Output).
-
-
-
-%---------------------------------------
-%changer le format des données du JSON pour que l'IA puisse les utiliser (extract_board)
-
-%1. extraire les données du JSON (openfile_json ou extract_json)
-%2. réorganiser les joueurs pour que le joueur actuel soit le premier de la liste (reorder_players et current_player)
-%3. extraire les infos nécéssaires du JSON pour l'IA (extract_player et bike_position)
-%4. changer les ID des joueurs pour que l'ID du joueur actuel soit 0 (change_ID)
-
-
-extract_board(Board, FinalBoard) :- %Board est un dict contenant le contenu du JSON et on veut que BoardData soit une liste de liste contenant uniquement les infos nécéssaires pour l'IA
-    Players = Board.players, 
-    CurrentPlayerID = Board.currentPlayer.playerID, 
-    reorder_players(Players, CurrentPlayerID, ReorderedPlayers), %On réorganise les joueurs pour que le joueur actuel soit le premier de la liste
-    maplist(extract_player, ReorderedPlayers, NewBoard), %on applique le prédicat extract_player à chaque joueur pour récupérer les infos nécéssaires pour l'IA
-    change_ID(NewBoard, 0, [], BoardData), %on change les ID des joueurs pour que l'ID du joueur actuel soit 0
-    reverse(BoardData, FinalBoard). 
-
-reorder_players(Players, CurrentPlayerID, ReorderedPlayers) :- %prédicat pour réorganiser les joueurs
-    partition(current_player(CurrentPlayerID), Players, CurrentAndGreater, LessThanCurrent), %On sépare les joueurs avec des ids > ou = à celui du joueur actuel des autres
-    append(CurrentAndGreater, LessThanCurrent, ReorderedPlayers). %On met le joueur actuel en premier dans la liste 
-
-current_player(CurrentPlayerID, Player) :- %prédicat pour vérifier si un joueur a un id supérieur ou égal à celui du joueur actuel
-    Player.playerID >= CurrentPlayerID.
-
-extract_player(Player, PlayerData) :- %Player est un dict contenant les infos d'un joueur 
-    PlayerID = Player.playerID, 
-    Hand = Player.hand, 
-    Bikes = Player.bikes, 
-    maplist(bike_position, Bikes, BikePositions), %On applique le prédicat bike_position à chaque vélo pour récupérer leur position
-    maplist(string_to_atom, BikePositions, BikePositionsChar), %pour le fichier .json
-    PlayerData = [PlayerID, Hand, BikePositionsChar]. %On crée une liste contenant l'ID du joueur, sa main et les positions de ses vélos
-
-    bike_position(Bike, Position) :- %Bike est un dict contenant les infos d'un vélo
-    Position = Bike.position. 
-
-change_ID([], _, BoardData, BoardData). %prédicat pour changer les ID des joueurs
-change_ID([[_, Hand, Position]|OtherPlayer], I, Acc, BoardData) :- 
-    NewID = I,
-    I1 is I + 1,
-    change_ID(OtherPlayer, I1, [[NewID, Hand, Position]|Acc], BoardData).
 
 %---------------------------------------
 %Pour renvoyer le move de l'IA en JSON
@@ -165,4 +117,3 @@ move_to_char(Move, String) :- %predicat pour transformer le move en String
     List = [NumChar, String1, String2],
     atomic_list_concat(List, ', ', String),
     write("String: "), writeln(String).
-
