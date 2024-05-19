@@ -47,7 +47,7 @@ test_ia(Data, Response) :-
     move_to_char(NewMove, Response), %on tranforme la liste en string
     write("Response: "), writeln(Response),
     reply_json(json([response=Response])). %on renvoie le json
-    
+
 %IA
 answer_ia(post, Request) :- %predicat pour extraire le json de la requête
     cors_enable,
@@ -113,7 +113,9 @@ format_move(Move, NewMove) :- %renvoie un move du style (Number, (String1, Strin
 
 move_to_char(Move, String) :- %predicat pour transformer le move en String
     Move = [Number, (String1, String2)],
-    number_chars(Number, NumList), atom_chars(NumChar, NumList),
-    List = [NumChar, String1, String2],
+    (var(Number) -> NumChar = '0' ; number_chars(Number, NumList), atom_chars(NumChar, NumList)),
+    (var(String1) -> NewString1 = '0_B_left' ; NewString1 = String1),
+    (var(String2) -> NewString2 = '0_B_left' ; NewString2 = String2),
+    List = [NumChar, NewString1, NewString2],
     atomic_list_concat(List, ', ', String),
     write("String: "), writeln(String).
