@@ -148,16 +148,16 @@ let Board: dico<BoardCase>={
     // réunion des 2
     '95_A_left':{position: 95, luck: [], nbBikesMax: 3, nbBikes:0, next: ['0_A_left']},
     //zone buffer
-    '0_A_left':{position: 96, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-1_A_left']},
-    '-1_A_left':{position: 97, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-2_A_left']},
-    '-2_A_left':{position: 98, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-3_A_left']},
-    '-3_A_left':{position: 99, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-4_A_left']},
-    '-4_A_left':{position: 100, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-5_A_left']},
-    '-5_A_left':{position: 101, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-6_A_left']},
-    '-6_A_left':{position: 102, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-7_A_left']},
-    '-7_A_left':{position: 103, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-8_A_left']},
-    '-8_A_left':{position: 104, luck: [], nbBikesMax: 3, nbBikes:0, next: ['-9_A_left']},
-    '-9_A_left':{position: 105, luck: [], nbBikesMax: 3, nbBikes:0, next: []}
+    '0_A_left':{position: 96, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-1_A_left']},
+    '-1_A_left':{position: 97, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-2_A_left']},
+    '-2_A_left':{position: 98, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-3_A_left']},
+    '-3_A_left':{position: 99, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-4_A_left']},
+    '-4_A_left':{position: 100, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-5_A_left']},
+    '-5_A_left':{position: 101, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-6_A_left']},
+    '-6_A_left':{position: 102, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-7_A_left']},
+    '-7_A_left':{position: 103, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-8_A_left']},
+    '-8_A_left':{position: 104, luck: [], nbBikesMax: 10, nbBikes:0, next: ['-9_A_left']},
+    '-9_A_left':{position: 105, luck: [], nbBikesMax: 10, nbBikes:0, next: []}
 }
 
 export {Board};
