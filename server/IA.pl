@@ -6,6 +6,7 @@
     % Move : tuple
 get_move_IA(Infos,Move):-
     get_infos_player(Infos,0,[Cards1,Bikes1]),
+    writeln(Cards1),
     get_infos_player(Infos,1,[_,Bikes2]),
     get_infos_player(Infos,2,[_,Bikes3]),
     get_infos_player(Infos,3,[_,Bikes4]),
@@ -30,6 +31,7 @@ check_num_cards_ia(Cards1,1,New_cards):-
     nth0(0,Cards1,Value),
     New_cards=[Value,Value],!.
 
+check_num_cards_ia(Cards1,_,Cards1).
 
 % get_infos_player(State,Num_player,Infos)/3
 % there is not base case since every player should be present one time only, and each shoul be present
