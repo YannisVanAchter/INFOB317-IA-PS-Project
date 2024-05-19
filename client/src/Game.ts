@@ -409,52 +409,59 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
     //             currentPlayer: { playerID: parseInt(ctx.currentPlayer) },
     //         }
     //     })
+
     let currentPlayer = G.players.find(p => p.playerID === parseInt(ctx.currentPlayer));
     if (currentPlayer === undefined) throw new Error("Some real shit is happening (from bot)");
     
-    let currentPlayerArray = "0.";
+    let currentPlayerArray: any[] = [0];
+    let currentPlayerHand = []
     for (let i = 0; i < currentPlayer.hand.length; i++) {
-        currentPlayerArray += currentPlayer.hand[i].toString();
-        if (i < currentPlayer.hand.length - 1) {
-            currentPlayerArray += ";";
-        }
+        currentPlayerHand.push(currentPlayer.hand[i]);
     }
-    currentPlayerArray += ".";
+    currentPlayerArray.push(currentPlayerHand);
+    let currentPlayerBikePos = []
     for (let i = 0; i < currentPlayer.bikes.length; i++) {
-        currentPlayerArray += currentPlayer.bikes[i].position
-        if (i < currentPlayer.bikes.length - 1) currentPlayerArray += ";"
+        currentPlayerBikePos.push(currentPlayer.bikes[i]);
     }
+    currentPlayerArray.push(currentPlayerBikePos);
     // currentPlayerArray += "*";
     let otherPlayersArray = [];
+    otherPlayersArray.push(currentPlayerArray);
     let currentIndexToSend = 1;
     for (const player of G.players) {
         if (player == currentPlayer) continue;
-        let thisPlayerString = currentIndexToSend.toString() + ".";
+        let thisPlayer: any[] = [];
+        thisPlayer.push(currentIndexToSend);
+        let thisPlayerHand = []
         for (let i = 0; i < player.hand.length; i++) {
-            thisPlayerString += player.hand[i].toString();
+            thisPlayerHand.push(player.hand[i]);
 
-            if (i < player.hand.length - 1) {
-                thisPlayerString += ";";
-            }
         }
-        thisPlayerString += ".";
-
+        thisPlayer.push(thisPlayerHand);
+        let thisPlayerBikePos = []
         for (let i = 0; i < player.bikes.length; i++) {
-            thisPlayerString += player.bikes[i].position;
-
-            if (i < player.bikes.length - 1) thisPlayerString += ";";
+            thisPlayerBikePos.push(player.bikes[i].position)
         }
-        otherPlayersArray.push(thisPlayerString);
+        thisPlayer.push(thisPlayerBikePos);
+        otherPlayersArray.push(thisPlayer);
         currentIndexToSend++;
     }
+    console.log("FORMATED ARRAY DATA");
     console.log(otherPlayersArray);
-    let mainArray = currentPlayerArray + "*";
+    console.log("---------------------")
+    let otherPlayersArrayModified = deepCopy(otherPlayersArray);
+    let mainArray: any[] = [];
+
     for (let i = 0; i < otherPlayersArray.length; i++) {
-        mainArray += otherPlayersArray[i];
-        if (i < otherPlayersArray.length - 1) mainArray += "*";
+        otherPlayersArrayModified[i][1] = otherPlayersArrayModified[i][1].join(';')
+        otherPlayersArrayModified[i][2] = otherPlayersArrayModified[i][2].join(';');
+        otherPlayersArrayModified[i][0] = otherPlayersArrayModified[i][0].toString();
+        mainArray.push(otherPlayersArrayModified[i].join('.'))
     }
 
-    console.log(mainArray);
+    let arrayToReturn = mainArray.join('*');
+
+    console.log(arrayToReturn);
     return new Promise<{ bikeIndex: number, cardIndex: number, target: boardKey }>((resolve, reject) => {
         fetch(
             url, 
@@ -462,12 +469,13 @@ function bot(G: DCtx, ctx: Ctx, playerID: string): Promise<{ bikeIndex: number, 
                 method: 'POST',
                 // mode: 'no-cors',
                 // headers: { 'Content-Type': 'application/json' },
-                body: mainArray
+                body: arrayToReturn
             }
         )
         .then(response => response.json())
         .then((data: {response: string}) => {
                 let rawData: string[] = data.response.split(", ");
+                console.log(rawData);
                 let newData: AIMove = {
                     origin: rawData[2],
                     destination: rawData[1],
