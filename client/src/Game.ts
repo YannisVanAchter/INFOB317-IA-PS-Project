@@ -1,14 +1,12 @@
-import { FnContext } from 'boardgame.io';
 import { shuffle } from './utils/shuffle';
 import { deepCopy } from './utils/deep_copy';
-import { boardKey } from './utils/simonLTransform';
 
 import { Board } from './data/board';
 import { SprintsData } from './data/sprints';
 
-import { BoardCase, dico, Bike, Player, DCtx, Ctx, Context, playerID } from './types/game';
-import { AIMove } from './types/bot';
-import axios from 'axios';
+import type { BoardCase, Bike, Player, DCtx, Ctx, Context } from './types/game';
+import type { AIMove } from './types/bot';
+import type { boardKey } from './types/board';
 
 // Constants
 const nbCases = 95;
@@ -38,8 +36,8 @@ const CardsDeck = [...Array(nbCards / CardsSeconds.length)].flatMap(() => CardsS
 
 // Functions
 /**
- * @param {string} position Position of the bike in the board
- * @return {object} Return the board case object
+ * @param {string} position Position of the bike in the Board
+ * @return {object} Return the Board case object
  */
 function getBoardCase(position: string): BoardCase {
     return Board[position];
@@ -142,18 +140,18 @@ function isGameOver({ G, ctx }: Context) {
     return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases)) || ctx.turn > 300;
 }
 
-function fixBoard(board: dico<BoardCase>, players: Player[]) {
+function fixBoard(players: Player[]) {
     let allPositionsUsed = []
     for (const player of players) {
         for (const bike of player.bikes) {
             allPositionsUsed.push(bike.position);
         }
     }
-    for (const key of Object.keys(board)) {
-        board[key].nbBikes = 0;
+    for (const key of Object.keys(Board)) {
+        Board[key].nbBikes = 0;
     }
     for (const position of allPositionsUsed) {
-        board[position].nbBikes++;
+        Board[position].nbBikes++;
     }
 }
 
@@ -337,7 +335,7 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     const bike = player.bikes[bikeIndex];
     let oldPosition = bike.position;
     let numberedPosition = Board[bike.position].position + card;
-    fixBoard(Board, myG.players);
+    fixBoard(myG.players);
     if (numberedPosition > nbCases) {
         bike.reduce = numberedPosition + card - nbCases;
         if (bike.reduce > nbReduceMax) {
@@ -388,7 +386,7 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
     player.hand.splice(cardIndex, 1);
     myG.discard.push(card);
 
-    // Update board
+    // Update Board
     Board[oldPosition].nbBikes--;
     Board[bike.position].nbBikes++;
 
@@ -403,7 +401,6 @@ function useCardOnBike(context: Context, bikeIndex: number, cardIndex: number, t
 
 function setUp() {
     let ctx = {
-        board: Board,
         deck: shuffle(CardsDeck),
         discard: [],
         players: [...Array(nbPlayers)].map((_, playerID) => ({ // generate each player
