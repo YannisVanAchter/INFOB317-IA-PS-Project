@@ -137,7 +137,7 @@ function checkAspiration(newPosition: string): boolean {
  * The game is over if all the bikes of all the players are at the finish line
  */
 function isGameOver({ G, ctx }: Context) {
-    return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases)) || ctx.turn > 300;
+    return G.players.every((player: Player) => player.bikes.every((bike: Bike) => Board[bike.position].position >= nbCases)) || ctx.turn > 210;
 }
 
 function fixBoard(players: Player[]) {
@@ -167,6 +167,7 @@ function fixBoard(players: Player[]) {
 function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[] {
     let playersScore = [0, 0, 0, 0];
     let currentSecondsAllBikes = [];
+    console.info("==== WINNER RANKING in ====");
     for (const player of G.players) {
         for (const bike of player.bikes) {
             if (bike.reduce === 0) {
@@ -211,6 +212,7 @@ function winnerRanking({ G, ctx }: Context): {playerID: number, score: number}[]
     retrunArray.sort((a, b) => a.score - b.score).reverse();
 
     console.log(retrunArray);
+    console.info("==== WINNER RANKING out ====");
     return retrunArray;
 }
 

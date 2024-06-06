@@ -1,3 +1,6 @@
+:root {
+    --table-width: 100%;
+}
 
 .final-winner {
     display: flex;
@@ -9,19 +12,51 @@
     color: var(--secondary-color);
 }
 
-.final-winner table {
+.final-winner .list-player {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1rem;
     width: 100%;
+    margin: 1rem;
+}
+
+.final-winner .list-player .player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: .3rem;
+    border-radius: .5rem;
+
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.final-winner table {
+    width: var(--table-width);
     border-collapse: collapse;
+    border-radius: .5rem;
 }
 
 .final-winner table th {
     background-color: var(--secondary-color);
     color: var(--primary-color);
     padding: .1rem;
+
+    width: var(--table-width);
 }
 
-.final-winner table td {
-    padding: .1rem;
+.final-winner table td, .final-winner table th {
+    padding: .3rem; 
+}
+
+.final-winner table th td {
+    padding-left: 1rem;
+}
+
+.final-winner table th td + td {
+    padding-left: .5rem;
 }
 
 .final-winner table tr:nth-child(even) {
@@ -34,6 +69,14 @@
     color: var(--secondary-color);
 }
 
+.final-winner table tr.first {
+    border-radius: .5rem .5rem 0 0;
+}
+
+.final-winner table tr.last {
+    border-radius: 0 0 .5rem .5rem;
+}
+
 .final-winner button {
     margin: 1rem;
     padding: .5rem 1rem;
@@ -43,9 +86,12 @@
     color: var(--primary-color);
     font-size: 1rem;
     cursor: pointer;
+
+    transition: all .3s;
 }
 
 .final-winner button:hover {
-    background-color: var(--ternary-color);
+    background-color: var(--primary-color);
     color: var(--secondary-color);
+    border: .1rem solid var(--secondary-color);
 }

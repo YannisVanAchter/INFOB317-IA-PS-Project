@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Modal } from '../modal/modal';
 import { winnerRanking } from '../../Game';
+import { Board } from '../../data/board';
 import { players } from '../../data/player';
 import { DCtx, Ctx } from '../../types/game';
 
@@ -28,24 +29,25 @@ export function Winner(props: TODO) {
         <Modal className="final-winner">
             <h2>Fin de la partie</h2>
             <h3>Classement final</h3>
-            <ol>
+            <ol className='list-player'>
                 {winners.map((player, index) => (
                     <li key={index} className='player'>
                         <table>
                             <th>
-                                <td>{players[player.playerID].teamName}</td>
-                                <td>{player.score} points</td>
+                                <td>{index+1}. {players[player.playerID].teamName}</td>
+                                <td>- {player.score} points</td>
                             </th>
                             {props.G.players[player.playerID].bikes.map((bike, index) => {
-                                    const score = bike.position;
+                                    const score = Board[bike.position].position - bike.bonusSeconds + bike.malusSeconds;
+                                    const isFirst = index === 0;
                                     return (
-                                    <tr key={index}>
+                                    <tr key={index} className={`${isFirst ? "first" : ""}`}>
                                         <td>Vélo {index}</td>
                                         <td>{score}</td>
                                     </tr>)
                             })}
                             {
-                                <tr>
+                                <tr className='last'>
                                     <td>Points bonus</td>
                                     <td>{props.G.players[player.playerID].bonusPoints}</td>
                                 </tr>
